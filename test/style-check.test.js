@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { checkText } from '../scripts/style-check.mjs';
+
+const HERE = fileURLToPath(new URL('.', import.meta.url));
 
 const cats = (flags) => flags.map((f) => f.category);
 
@@ -29,6 +34,52 @@ describe('checkText', () => {
 			'Despite the fact that readability is, as often described by professional writers, very important for both enjoyment, understanding, and accessibility, it has been overlooked by many novices.'
 		);
 		expect(cats(flags)).toContain('very-hard-sentence');
+	});
+
+	describe('sentence difficulty, led by grade', () => {
+		const DENSE = 'For each group, it shows the first and latest occurrence, helping you ' +
+			'distinguish a one-off incident from an active regression.'; // 20 words, grade 14
+		const LONG_PLAIN = 'The team moved the old jobs to the new queue last week, and the workers ' +
+			'now pick them up in order and write each result to the same table.'; // 29 words, grade 11
+		const MID = 'The platform team rewrote the deployment scripts so each service now ships ' +
+			'through one pipeline.'; // 15 words, grade 12
+		const SHORT_DENSE = 'Operators review the rollout dashboard before promoting canary deployments.';
+		const sentenceFlags = (text, opts) => checkText(text, opts).flags
+			.filter((f) => f.category.endsWith('hard-sentence'));
+
+		it('flags a dense sentence four grades above the target, with a word-choice hint', () => {
+			expect(sentenceFlags(DENSE)).toEqual([expect.objectContaining({
+				category: 'hard-sentence', match: '20 words, grade 14',
+				hint: expect.stringMatching(/^use shorter, plainer words/) })]);
+		});
+
+		it('leaves a long sentence of plain words alone', () => {
+			expect(sentenceFlags(LONG_PLAIN)).toEqual([]);
+		});
+
+		it('never flags a sentence under fourteen words', () => {
+			expect(sentenceFlags(SHORT_DENSE)).toEqual([]);
+		});
+
+		it('moves both thresholds with the target grade', () => {
+			expect(sentenceFlags(MID)).toEqual([]);
+			expect(sentenceFlags(MID, { maxGrade: 8 }).map((f) => f.category))
+				.toEqual(['hard-sentence']);
+			expect(sentenceFlags(DENSE, { maxGrade: 6 }).map((f) => f.category))
+				.toEqual(['very-hard-sentence']);
+		});
+
+		it('flags unedited model prose more often than edited human prose', () => {
+			const rate = (dir) => {
+				const docs = readdirSync(dir).filter((x) => x.endsWith('.md'))
+					.map((x) => checkText(readFileSync(join(dir, x), 'utf8')).stats);
+				const sum = (key) => docs.reduce((n, s) => n + s[key], 0);
+				return sum('hardSentences') / sum('sentences');
+			};
+			const model = rate(join(HERE, 'fixtures', 'model-prose'));
+			const human = rate(join(HERE, '..', 'samples', 'hemingway'));
+			expect(model).toBeGreaterThan(human);
+		});
 	});
 
 	it('flags em dashes with line numbers', () => {

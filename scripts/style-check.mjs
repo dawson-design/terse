@@ -10,17 +10,19 @@ import { dirname, resolve, join } from 'node:path';
 import { createGrammarPool } from './grammar-check.mjs';
 import { GRAMMAR_PATTERNS } from './grammar-patterns.mjs';
 
-const HARD_GRADE = 10; // document grade target; also the hard-sentence floor
-// Sentence flags are length-led, calibrated against 514 sentences of
-// Hemingway's journalism: the old grade-only rule flagged 26.8% of his
-// sentences, because ARI's character counting punishes long vocabulary in
-// otherwise plain sentences. This rule flags 13.2% of the corpus: the
-// genuinely long tail plus the impenetrably dense.
-const HARD_WORDS = 25;        // hard: 25+ words at or above the target grade
-const VHARD_WORDS = 30;       // very hard: 30+ words at grade 14+ ...
-const VHARD_GRADE = 14;
-const DENSE_WORDS = 14;       // ... or any 14+ word sentence at grade 18+
-const DENSE_GRADE = 18;
+const HARD_GRADE = 10; // document grade target; sentence thresholds sit above it
+// Sentence flags are led by grade. They were calibrated on CEFR-SP (Arase et
+// al., EMNLP 2022): 7,453 Wikipedia sentences that English teachers rated for
+// difficulty. On its held-out sentences rated C1 or harder, these thresholds
+// score F0.5 43.2 against 32.2 for the length-led rule they replaced, which
+// missed every dense sentence under 25 words. They flag 15% of unedited model
+// prose and 10% of Hemingway's journalism. Model drafts run dense rather than
+// long, so most flags land on 14- to 24-word sentences whose long words carry
+// the difficulty. scripts/accuracy-benchmark.mjs reproduces the measurement.
+const SENTENCE_FLOOR = 14;  // shorter sentences are never flagged
+const HARD_ABOVE = 4;       // hard: at least four grades above the target
+const VERY_HARD_ABOVE = 8;  // very hard: at least eight grades above it
+const LONG_SENTENCE = 25;   // from here the fix is a split; below, plainer words
 const MIN_WORDS_FOR_GRADE = 14; // documents shorter than this skip the gate
 const ASIDE_WORDS = 6; // parenthetical asides at or above this length are flagged
 // The Kansas City Star style sheet, which Hemingway called the best rules he
@@ -645,18 +647,23 @@ function wordsOf(sentence) {
 		.filter((w) => /[\p{L}\p{N}]/u.test(w));
 }
 
-function checkSentence(sentence, maxGrade, flags, file, line) {
-	const words = wordsOf(sentence);
+// The difficulty flag for a sentence, or null. The hint names the likely
+// cause: a long sentence wants a split, a dense one wants plainer words.
+function difficultyFlag(words, maxGrade) {
 	const grade = ariGrade(words);
-	const veryHard = (words.length >= VHARD_WORDS && grade >= VHARD_GRADE) ||
-		(words.length >= DENSE_WORDS && grade >= DENSE_GRADE);
-	const hard = words.length >= HARD_WORDS && grade >= maxGrade;
-	if (veryHard || hard) {
-		flags.push({ file, line,
-			category: veryHard ? 'very-hard-sentence' : 'hard-sentence',
-			match: `${words.length} words, grade ${grade}`,
-			hint: 'split the sentence or convert an in-sentence list to bullets' });
-	}
+	if (words.length < SENTENCE_FLOOR || grade < maxGrade + HARD_ABOVE) return null;
+	return {
+		category: grade >= maxGrade + VERY_HARD_ABOVE ? 'very-hard-sentence' : 'hard-sentence',
+		match: `${words.length} words, grade ${grade}`,
+		hint: words.length >= LONG_SENTENCE
+			? 'split the sentence or convert an in-sentence list to bullets'
+			: 'use shorter, plainer words, or split the sentence',
+	};
+}
+
+function checkSentence(sentence, maxGrade, flags, file, line) {
+	const difficulty = difficultyFlag(wordsOf(sentence), maxGrade);
+	if (difficulty) flags.push({ file, line, ...difficulty });
 	const passiveRe = /\b(am|is|are|was|were|be|been|being|get|gets|got)(?:n['’]t)?\s+(?:\w+ly\s+)*(?:being\s+)?(?:\w+ly\s+)*(\w+)\b/gi;
 	for (const m of sentence.matchAll(passiveRe)) {
 		const p = m[2].toLowerCase();
