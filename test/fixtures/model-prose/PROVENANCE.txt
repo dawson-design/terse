@@ -1,0 +1,13 @@
+Model-written prose: the precision gate for LLM-assisted writing.
+
+Terse checks prose that a model drafted and a person or agent edited. Model
+drafts are grammatical, so any grammar finding here is a false alarm unless a
+test labels it as a real error. Each file is unedited model output.
+
+- haiku-*.md, sonnet-*.md, opus-*.md: written 2026-09-26 by fresh Claude Haiku,
+  Sonnet, and Opus sessions with no Terse context, asked for common software
+  documents (README, postmortem, design doc, PR description, migration guide,
+  runbook, blog post, ADR, API guide, onboarding doc, launch post, security
+  review) in their default style.
+- gpt-*.md: the plugin-off arm of the 2026-08-26 Codex eval runs
+  (gpt-5.6-sol, codex-cli 0.149.0) for the explainer, launch, and README cases.

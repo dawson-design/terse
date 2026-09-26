@@ -10,6 +10,9 @@ import { checkText, createDocumentChecker } from '../scripts/style-check.mjs';
 const HERE = fileURLToPath(new URL('.', import.meta.url));
 const styleScript = join(HERE, '..', 'scripts', 'style-check.mjs');
 const proseDir = join(HERE, 'fixtures', 'human-prose');
+const modelDir = join(HERE, 'fixtures', 'model-prose');
+// Real errors in the unedited model output, each confirmed by reading it.
+const MODEL_PROSE_ERRORS = [];
 let grammar;
 let documents;
 
@@ -121,6 +124,16 @@ describe('Harper admission gate', () => {
 		expect(findings).toEqual([]);
 	});
 
+	it('finds only the labeled real errors in unedited model prose', async () => {
+		const findings = [];
+		for (const name of readdirSync(modelDir).filter((x) => x.endsWith('.md'))) {
+			const { flags } = await documents.checkDocument(
+				readFileSync(join(modelDir, name), 'utf8'), { file: name });
+			findings.push(...flags.filter((f) => f.category === 'grammar')
+				.map((f) => `${f.file}: ${f.match}`));
+		}
+		expect(findings).toEqual(MODEL_PROSE_ERRORS);
+	});
 });
 
 describe('combined document checker', () => {
