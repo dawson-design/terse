@@ -112,6 +112,7 @@ describe('Harper admission gate', () => {
 		['Pick some one of these options.'],
 		['Both A- and U23 games were held.'],
 		['Writes started failing around 3 a.m.'],
+		['The token is stored in an HttpOnly cookie.'],
 		['We engineers need more context before we commit.'],
 	])('leaves the correct sentence %s alone', async (text) => {
 		expect(await grammar.check(text)).toEqual([]);

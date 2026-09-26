@@ -84,8 +84,9 @@ const ADMITTED_IN_CONTEXT = {
 	RepeatedWords: ({ match }) =>
 		!VALID_REPEATED_WORDS.has(match.toLowerCase().replace(/\s+/g, ' ')),
 	// A letter grade or an abbreviation is not an article ("A- and U23
-	// games", "3 a.m.").
-	AnA: ({ after }) => !/^[-.]/.test(after),
+	// games", "3 a.m."), and a CamelCase name hides how it is spoken
+	// ("an HttpOnly cookie").
+	AnA: ({ after }) => !/^[-.]/.test(after) && !/^\s+[A-Z][a-z]+[A-Z]/.test(after),
 	// "It's been" is always "it has been": no noun follows a possessive as "been".
 	ItsPossessive: ({ after }) => !/^\s+been\b/i.test(after),
 	// Only the noun slot ("the affects of", "no affect on", "side affects").
