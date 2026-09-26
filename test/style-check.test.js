@@ -103,6 +103,13 @@ describe('checkText', () => {
 		expect(checkText(doc).flags).toEqual([]);
 	});
 
+	it.each([
+		['- Press the ` key.\n- We utilize `npm test` here.\n'],
+		['1. Press the ` key.\n2. We utilize `npm test` here.\n'],
+	])('ends inline code at a new list item: %j', (doc) => {
+		expect(checkText(doc).flags.map((f) => f.match)).toEqual(['utilize']);
+	});
+
 	it('keeps a paragraph break between unmatched backticks as prose', () => {
 		const doc = 'A stray ` mark.\n\nWe utilize the helper. Another ` mark.\n';
 		expect(checkText(doc).flags.map((f) => f.match)).toEqual(['utilize']);

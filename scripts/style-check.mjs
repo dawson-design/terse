@@ -507,13 +507,18 @@ const NOT_PARTICIPLES = new Set([
 	'convoluted', 'nuanced',
 ]);
 
+// A line break inline code may continue across: not a blank line, a list
+// item, a quote, or a heading, since CommonMark spans end with their block.
+const CODE_LINE_BREAK = /\n(?![ \t]*(?:\n|[-*+][ \t]|\d{1,9}[.)][ \t]|>|#))/.source;
+const INLINE_CODE = new RegExp(`\`(?:[^\`\\n]|${CODE_LINE_BREAK})+\``, 'g');
+
 // Exported for the conservation property tests. Inline code may wrap onto
-// the next line, as CommonMark allows, but never across a blank line.
+// the next line of its paragraph, as CommonMark allows.
 export function stripMarkdown(text) {
 	return text
 		.replace(/^---\n[\s\S]*?\n---(?=\n|$)/, (m) => m.replace(/[^\n]/g, ' '))
 		.replace(/```[\s\S]*?```/g, (m) => m.replace(/[^\n]/g, ' '))
-		.replace(/`(?:[^`\n]|\n(?![ \t]*\n))+`/g, (m) => m.replace(/[^\n]/g, ' '))
+		.replace(INLINE_CODE, (m) => m.replace(/[^\n]/g, ' '))
 		.replace(/<!--[\s\S]*?-->/g, (m) => m.replace(/[^\n]/g, ' '))
 		.replace(/\[([^\]]*)\]\((?:[^()\n]|\([^()\n]*\))*\)/g, (m, label) =>
 			label.padEnd(m.length, ' '))
