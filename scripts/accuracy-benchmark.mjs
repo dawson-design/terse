@@ -13,10 +13,15 @@ import { checkText, createDocumentChecker } from './style-check.mjs';
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const fixture = (...parts) => join(ROOT, 'test', 'fixtures', ...parts);
 const CONLL = 'conll14st-test-data/noalt/official-2014.combined.m2';
-const CEFR_TEST = 'CEFR-SP_Wikiauto_test.txt';
+// The sentence rule's thresholds were chosen on the train and dev splits;
+// the test split is held out. All three feed the grammar false-alarm pass.
+const CEFR_SPLITS = ['train', 'dev', 'test'].map((split) => `CEFR-SP_Wikiauto_${split}.txt`);
+const CEFR_TEST = CEFR_SPLITS[2];
+const CEFR_COMMIT = '2ba4a5005fbff68ab0f863891cf977c50fdcda29';
 const FETCH_HELP = [
 	'curl -L https://www.comp.nus.edu.sg/~nlp/conll14st/conll14st-test-data.tar.gz | tar xz',
-	`curl -LO https://raw.githubusercontent.com/yukiar/CEFR-SP/main/CEFR-SP/Wiki-Auto/${CEFR_TEST}`,
+	...CEFR_SPLITS.map((file) => 'curl -LO https://raw.githubusercontent.com/yukiar/CEFR-SP/' +
+		`${CEFR_COMMIT}/CEFR-SP/Wiki-Auto/${file}`),
 ];
 
 const pct = (a, b) => (b ? Math.round((1000 * a) / b) / 10 : 0);
@@ -132,12 +137,26 @@ function precisionRecall(predicted, gold) {
 		recall: pct(R, 1), f1: pct(f(1), 1), f05: pct(f(0.5), 1) };
 }
 
-/** Terse and Hemingway against CEFR-SP's held-out difficulty labels. */
-function scoreCefr(path) {
-	const rows = readFileSync(path, 'utf8').trim().split('\n').map((line) => {
+function cefrRows(path) {
+	return readFileSync(path, 'utf8').trim().split('\n').map((line) => {
 		const [tokens, a, b] = line.split('\t');
 		return { text: detokenize(tokens.split(' ')).text, level: (Number(a) + Number(b)) / 2 };
 	});
+}
+
+/** Grammar findings on CEFR-SP's edited Wikipedia sentences, for review. */
+async function cefrGrammarFindings(checker, paths) {
+	const findings = [];
+	for (const { text } of paths.flatMap(cefrRows)) {
+		findings.push(...grammarOf((await checker.checkDocument(text)).flags)
+			.map((f) => `${f.match} -> ${f.hint} | ${text}`));
+	}
+	return findings;
+}
+
+/** Terse and Hemingway against CEFR-SP's held-out difficulty labels. */
+function scoreCefr(path) {
+	const rows = cefrRows(path);
 	const terse = rows.map((r) => checkText(r.text).stats.hardSentences > 0);
 	const hemingway = rows.map((r) => hemingwayHard(r.text));
 	const result = { sentences: rows.length };
@@ -173,8 +192,12 @@ async function main() {
 				hemingway: hardSentenceRate(join(ROOT, 'samples', 'hemingway')) } };
 		if (existsSync(join(data, CONLL))) report.conll2014 = await scoreConll(checker, join(data, CONLL));
 		if (existsSync(join(data, CEFR_TEST))) report.cefrSp = scoreCefr(join(data, CEFR_TEST));
+		const splits = CEFR_SPLITS.map((file) => join(data, file));
+		if (splits.every(existsSync)) {
+			report.cefrSpGrammarFindings = await cefrGrammarFindings(checker, splits);
+		}
 		console.log(json ? JSON.stringify(report, null, 2) : summarize(report));
-		if (!report.conll2014 || !report.cefrSp) {
+		if (!report.conll2014 || !report.cefrSpGrammarFindings) {
 			console.error(`\nExternal datasets not found in ${data}. From that directory run:\n  ` +
 				FETCH_HELP.join('\n  '));
 		}
@@ -190,7 +213,8 @@ function summarize(report) {
 		`held-out suite: ${suite(g.heldoutSuite)}`,
 		`dev suite: ${suite(g.devSuite)}`,
 		`grammar-repair fixture findings: ${g.grammarRepairFindings}`,
-		`clean prose findings: model ${g.modelProseFindings.length}, human ${g.humanProseFindings.length}`,
+		`grammar findings on clean prose, each a false alarm or a real error to review: ` +
+			`model ${g.modelProseFindings.length}, human ${g.humanProseFindings.length}`,
 		`hard sentences: model prose ${report.hardSentenceRate.modelProse}%, ` +
 			`Hemingway ${report.hardSentenceRate.hemingway}%`,
 	];
@@ -198,6 +222,10 @@ function summarize(report) {
 		const c = report.conll2014;
 		lines.push(`CoNLL-2014 detection: recall ${c.recallAnnotator0}% / ${c.recallAnnotator1}% ` +
 			`(annotator 0 / 1), precision ${c.precision}% of ${c.findings} findings`);
+	}
+	if (report.cefrSpGrammarFindings) {
+		lines.push(`CEFR-SP Wikipedia grammar findings to review: ` +
+			`${report.cefrSpGrammarFindings.length} (--json lists them)`);
 	}
 	if (report.cefrSp) {
 		for (const cut of ['c1OrHarder', 'b2c1OrHarder']) {

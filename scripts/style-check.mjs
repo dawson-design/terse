@@ -13,7 +13,8 @@ import { GRAMMAR_PATTERNS } from './grammar-patterns.mjs';
 const HARD_GRADE = 10; // document grade target; sentence thresholds sit above it
 // Sentence flags are led by grade. They were calibrated on CEFR-SP (Arase et
 // al., EMNLP 2022): 7,453 Wikipedia sentences that English teachers rated for
-// difficulty. On its held-out sentences rated C1 or harder, these thresholds
+// difficulty. The thresholds were chosen on its train and dev splits. On the
+// held-out test split's sentences rated C1 or harder, these thresholds
 // score F0.5 43.2 against 32.2 for the length-led rule they replaced, which
 // missed every dense sentence under 25 words. They flag 15% of unedited model
 // prose and 10% of Hemingway's journalism. Model drafts run dense rather than

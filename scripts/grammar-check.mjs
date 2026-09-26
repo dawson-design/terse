@@ -14,9 +14,10 @@ if (!globalThis.crypto) {
 }
 
 // Each rule earned admission on the same evidence: at least one real catch
-// in the error suites or CoNLL-2014, and no finding on clean human prose,
-// unedited model prose, the corrected suite sentences, or the CEFR-SP
-// Wikipedia sentences once the context rules below apply.
+// in the error suites or CoNLL-2014, and no false alarm on clean human
+// prose, unedited model prose, or the corrected suite sentences once the
+// context rules below apply. On the 7,453 CEFR-SP Wikipedia sentences, the
+// only false alarms left are two on the band name "An Cafe".
 // scripts/accuracy-benchmark.mjs reproduces the measurement.
 const ADMITTED_RULES = [
 	'AdjectiveDoubleDegree',
