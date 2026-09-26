@@ -231,6 +231,7 @@ describe('forms that break after a verb, modal, or quantity', () => {
 		['YAML tags such as !!null and !!int are supported.'],
 		["Haven't you seen the logs?"],
 		['We need to wing it.'],
+		['With a bigger buffer, less spills to disk. Less stays in memory now.'],
 	])('leaves the correct sentence %s alone', (text) => {
 		expect(grammar(text)).toEqual([]);
 	});

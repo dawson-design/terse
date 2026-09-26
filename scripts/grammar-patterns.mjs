@@ -467,9 +467,15 @@ const FORMS = [
 			pluralVerb(m[0])}"` },
 	// "Less happens at startup" is a pronoun before its verb, "field-less" a
 	// suffix, and a plural before another noun is a modifier ("less sales
-	// tax"), so the plural must end its phrase.
-	{ re: new RegExp(`(?<![\\w-]|\\bor\\s+)([Ll]ess)(?=\\s+(?!(?:${alt(SINGULAR_VERBS)})\\b)` +
-		`${PLURAL_NOUN}${PHRASE_END})`, 'g'),
+	// tax"), so the plural must end its phrase. Where "less" opens a clause,
+	// the word after it may be its verb ("less spills to disk"), so a verb
+	// must follow that word to prove it a noun.
+	{ re: new RegExp(`(?<![\\w-]|\\bor\\s+|${SUBJECT_START})([Ll]ess)(?=\\s+` +
+		`(?!(?:${alt(SINGULAR_VERBS)})\\b)${PLURAL_NOUN}${PHRASE_END})`, 'g'),
+		hint: (m) => `use "${keepCase(m[1], 'fewer')}"` },
+	{ re: new RegExp(`(?<=${SUBJECT_START})([Ll]ess)(?=\\s+(?!(?:${alt(SINGULAR_VERBS)})\\b)` +
+		`${PLURAL_NOUN}\\s+(?:are|were|have|had|will|would|can|could|should|may|might|did|` +
+		'(?![a-z]*eed\\b)[a-z]{3,}ed)\\b)', 'g'),
 		hint: (m) => `use "${keepCase(m[1], 'fewer')}"` },
 	{ re: /\b[A-Z]{2,}['’]s(?=\s+(?:are|were|have|do|don['’]t)\b)/g,
 		hint: (m) => `use "${m[0].slice(0, -2)}s"` },
