@@ -364,6 +364,16 @@ describe('checkText', () => {
 		expect(tells.map((f) => text.slice(...f.span))).toEqual(['this approach', 'that tension']);
 	});
 
+	// Placing each finding by rescanning its sentence took about 12 seconds
+	// here; one scan per pattern takes a fraction of one.
+	it('places many findings in one long sentence in linear time', () => {
+		const text = `Our ${'the the '.repeat(12_500)}end.`;
+		const started = performance.now();
+		const flags = checkText(text).flags.filter((f) => f.category === 'grammar');
+		expect(flags).toHaveLength(12_500);
+		expect(performance.now() - started).toBeLessThan(2000);
+	});
+
 	it('suppresses the next line under a terse-ignore comment', () => {
 		const doc = '<!-- terse-ignore -->\nWe utilize robust things.\n\nWe utilize more.\n';
 		const { flags } = checkText(doc);

@@ -732,8 +732,11 @@ function pushMatchesWithLine(text, re, lineAt, flags, flag) {
 // sentence-level categories keep the whole sentence.
 const SENTENCE_LEVEL = new Set(['hard-sentence', 'very-hard-sentence']);
 
+// Each pattern runs once per sentence and its hits are grouped by text, so
+// many findings from one pattern cost one scan.
 function assignSpans(text, flags, from, span) {
 	const seen = new Map(); // repeated matches refine to their own occurrence
+	const hits = new Map();
 	for (let i = from; i < flags.length; i++) {
 		if (flags[i].span) continue;
 		if (SENTENCE_LEVEL.has(flags[i].category)) {
@@ -752,8 +755,12 @@ function assignSpans(text, flags, from, span) {
 		// A grammar finding that cannot be placed exactly is dropped: its
 		// hint replaces the matched text, and a sentence-wide span would
 		// replace the whole sentence.
-		flags[i].span = refineSpan(text, span, re, flags[i].match, n) ??
-			(flags[i].category === 'grammar' ? null : span);
+		const grammar = flags[i].category === 'grammar';
+		const hitKey = `${re.source}:${re.flags}`;
+		if (!hits.has(hitKey)) hits.set(hitKey, hitsByText(text.slice(span[0], span[1]), re));
+		const m = hits.get(hitKey).get(normalized(flags[i].match))?.[n];
+		flags[i].span = m ? [span[0] + m.index, span[0] + m.index + m[0].length]
+			: (grammar ? null : span);
 	}
 }
 
@@ -764,18 +771,17 @@ function literalRegex(match) {
 
 const normalized = (s) => s.replace(/\s+/g, ' ').replace(/’/g, "'").toLowerCase();
 
-// The nth hit of re whose text is the flag's match. One pattern can match
-// different text in one sentence ("this approach", "that tension"), so the
-// count skips hits that belong to another flag.
-function refineSpan(text, span, re, match, occurrence = 0) {
-	const slice = text.slice(span[0], span[1]);
-	const target = normalized(match);
-	let seen = 0;
+// Every hit of re in a sentence, grouped by its normalized text. One
+// pattern can match different text in one sentence ("this approach", "that
+// tension"), so a flag counts only the hits that share its text.
+function hitsByText(slice, re) {
+	const groups = new Map();
 	for (const m of slice.matchAll(re)) {
-		if (normalized(m[0]) !== target) continue;
-		if (seen++ === occurrence) return [span[0] + m.index, span[0] + m.index + m[0].length];
+		const key = normalized(m[0]);
+		if (!groups.has(key)) groups.set(key, []);
+		groups.get(key).push(m);
 	}
-	return null;
+	return groups;
 }
 
 function isLiteralSimplerUse(sentence, phrase, match) {
