@@ -81,6 +81,8 @@ describe('agreement at an edit seam', () => {
 		['Each time take a backup first.'],
 		['The emoji are rendered as images. The emoji take up two columns.'],
 		['The graffiti were removed.'],
+		['This will help ensure the tests pass. This can help prevent memory leaks.'],
+		['This can cause compile issues.'],
 	])('leaves the correct sentence %s alone', (text) => {
 		expect(grammar(text)).toEqual([]);
 	});

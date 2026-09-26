@@ -71,10 +71,12 @@ const SUBJECT_START = clauseStart(CLAUSE_OPENERS);
 // "unless", or "whether" ("if the primary were to fail"), and before "to".
 const WERE_SUBJECT_START = clauseStart(CLAUSE_OPENERS.filter((w) =>
 	!/^\[..\](?:f|hough|lthough|nless|hether)$/.test(w)));
-// A modifier is not a function word or a superlative: "the most useful are"
-// uses an adjective as the noun, and a preposition means a phrase.
+// A modifier is not a function word, a superlative, or an auxiliary: "the
+// most useful are" uses an adjective as the noun, a preposition means a
+// phrase, and "this will help ensure" holds a verb phrase.
 const NOT_MODIFIER = '(?!(?:most|least|best|worst|only|of|in|on|at|for|with|from|to|by|as|' +
-	'about|after|before|into|than|and|or|but|that|which|who|whose)\\s)';
+	'about|after|before|into|than|and|or|but|that|which|who|whose|can|could|will|would|' +
+	'shall|should|may|might|must|do|does|did)\\s)';
 const MODIFIER = `(?:${NOT_MODIFIER}[a-z][a-z-]*\\s+)?`;
 // A plural modifier would make the next word the noun: "the users now have".
 const SINGULAR_MODIFIER = `(?:${NOT_MODIFIER}(?![a-z-]*s\\s)[a-z][a-z-]*\\s+)?`;
