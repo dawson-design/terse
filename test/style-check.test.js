@@ -333,6 +333,12 @@ describe('checkText', () => {
 		expect(spans[0]).not.toEqual(spans[1]);
 	});
 
+	it('places a sentence-opening tell inside a list item', () => {
+		const text = '- Note that the flag is optional.\n';
+		const tell = checkText(text).flags.find((f) => f.category === 'ai-tell');
+		expect(text.slice(...tell.span)).toBe('Note that');
+	});
+
 	it('places a sentence-opening tell on its own line in wrapped text', () => {
 		const text = 'The cache is warm.\nNote that the flag is optional.\n';
 		const tell = checkText(text).flags.find((f) => f.category === 'ai-tell');
