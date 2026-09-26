@@ -14,7 +14,7 @@ const MISSPELLINGS = {
 	acheive: 'achieve', acheived: 'achieved', begining: 'beginning',
 	beleive: 'believe', comittee: 'committee', existance: 'existence',
 	goverment: 'government', independant: 'independent',
-	neccessary: 'necessary', necessary: 'necessary', occassion: 'occasion',
+	neccessary: 'necessary', occassion: 'occasion',
 	publically: 'publicly', recomend: 'recommend', recomended: 'recommended',
 	refered: 'referred', succesful: 'successful', sucessful: 'successful',
 	sucess: 'success', tommorow: 'tomorrow', truely: 'truly', wierd: 'weird',
@@ -37,7 +37,6 @@ const MISSPELLINGS = {
 	seige: 'siege', tendancy: 'tendency', useable: 'usable',
 	quater: 'quarter',
 };
-delete MISSPELLINGS.necessary;
 
 const alt = (words) => words.join('|');
 const eitherCase = (word) => `[${word[0].toUpperCase()}${word[0]}]${word.slice(1)}`;
