@@ -135,6 +135,18 @@ describe('Harper admission gate', () => {
 		}
 		expect(findings).toEqual(MODEL_PROSE_ERRORS);
 	});
+
+	it.each(['dev-suite.json', 'heldout-suite.json'])(
+		'finds no error in any corrected sentence of %s', async (name) => {
+			const suite = JSON.parse(readFileSync(join(HERE, 'fixtures', 'grammar', name), 'utf8'));
+			const findings = [];
+			for (const [, corrected] of Object.values(suite).flat()) {
+				const { flags } = await documents.checkDocument(corrected);
+				findings.push(...flags.filter((f) => f.category === 'grammar')
+					.map((f) => `${corrected} -> ${f.match}`));
+			}
+			expect(findings).toEqual([]);
+		});
 });
 
 describe('combined document checker', () => {

@@ -5,3 +5,4 @@ evals/results/
 examples/
 .terse/
 drafts/
+.bench-data/

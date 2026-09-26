@@ -1,0 +1,16 @@
+Grammar error suites for scripts/accuracy-benchmark.mjs.
+
+Each suite maps an error category to [error, corrected] sentence pairs. Each
+error sentence holds one planted error, and its corrected twin differs only
+where the fix requires. A finding on the error sentence that the twin lacks
+counts as a catch; any grammar finding on the twin counts as a false alarm.
+The sentences read like software documentation a person wrote with an AI
+assistant and then edited by hand.
+
+- dev-suite.json: 172 pairs in 33 categories, written 2026-09-26 while the
+  native patterns were designed. The patterns were tuned against it, so its
+  score overstates recall.
+- heldout-suite.json: 180 pairs in 30 categories, written 2026-09-26 by a
+  fresh Claude Sonnet session with no access to Terse's code or patterns.
+  Its score is the recall estimate. One false alarm on a corrected twin led
+  to a precision fix after the recall figure was recorded.

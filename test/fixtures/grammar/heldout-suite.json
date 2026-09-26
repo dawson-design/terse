@@ -1,0 +1,242 @@
+{
+	"sva-noun": [
+		["The deployment script run every night at midnight.", "The deployment script runs every night at midnight."],
+		["Our API endpoints supports both JSON and XML responses.", "Our API endpoints support both JSON and XML responses."],
+		["The database migration take about ten minutes to complete.", "The database migration takes about ten minutes to complete."],
+		["These configuration files determines how the service starts up.", "These configuration files determine how the service starts up."],
+		["The error message appear whenever the token has expired.", "The error message appears whenever the token has expired."],
+		["The test suites covers most of the edge cases we found.", "The test suites cover most of the edge cases we found."]
+	],
+	"sva-distant": [
+		["The list of pending jobs are long this morning.", "The list of pending jobs is long this morning."],
+		["The set of permissions granted to admins are documented in the wiki.", "The set of permissions granted to admins is documented in the wiki."],
+		["A batch of failed requests were retried automatically overnight.", "A batch of failed requests was retried automatically overnight."],
+		["The number of open tickets have grown since the outage.", "The number of open tickets has grown since the outage."],
+		["The collection of scripts used for deployment need a cleanup pass.", "The collection of scripts used for deployment needs a cleanup pass."],
+		["The team of engineers reviewing the incident are still gathering logs.", "The team of engineers reviewing the incident is still gathering logs."]
+	],
+	"sva-pronoun": [
+		["She work on the billing service full time now.", "She works on the billing service full time now."],
+		["They was supposed to review the pull request yesterday.", "They were supposed to review the pull request yesterday."],
+		["He don't have access to the production cluster yet.", "He doesn't have access to the production cluster yet."],
+		["It don't matter which region you deploy to first.", "It doesn't matter which region you deploy to first."],
+		["We was expecting the release to ship on Friday.", "We were expecting the release to ship on Friday."],
+		["I doesn't think the cache invalidation logic is correct.", "I don't think the cache invalidation logic is correct."]
+	],
+	"its-its": [
+		["The pipeline finally finished it's nightly run without errors.", "The pipeline finally finished its nightly run without errors."],
+		["Its been three days since the last successful deploy.", "It's been three days since the last successful deploy."],
+		["The library exposes a clean API, but it's internals are a mess.", "The library exposes a clean API, but its internals are a mess."],
+		["Its worth noting that the rollback script is untested.", "It's worth noting that the rollback script is untested."],
+		["The service restarts automatically when it's memory usage spikes.", "The service restarts automatically when its memory usage spikes."],
+		["Its clear from the logs that the retry loop is broken.", "It's clear from the logs that the retry loop is broken."]
+	],
+	"their-there": [
+		["The reviewers left they're comments on the pull request this afternoon.", "The reviewers left their comments on the pull request this afternoon."],
+		["There going to migrate the legacy database next quarter.", "They're going to migrate the legacy database next quarter."],
+		["The on-call engineers grabbed there laptops and joined the incident call.", "The on-call engineers grabbed their laptops and joined the incident call."],
+		["Their are three open issues blocking the release.", "There are three open issues blocking the release."],
+		["The customers reported that they're accounts were locked after the update.", "The customers reported that their accounts were locked after the update."],
+		["We put the new servers over their, next to the old rack.", "We put the new servers over there, next to the old rack."]
+	],
+	"your-youre": [
+		["Your going to need admin rights to run this migration.", "You're going to need admin rights to run this migration."],
+		["Please update you're SSH key before the deploy window opens.", "Please update your SSH key before the deploy window opens."],
+		["If your not sure which branch to use, ask in the channel.", "If you're not sure which branch to use, ask in the channel."],
+		["Make sure your logged into the VPN before accessing the admin panel.", "Make sure you're logged into the VPN before accessing the admin panel."],
+		["Your welcome to open a PR once the design doc is approved.", "You're welcome to open a PR once the design doc is approved."],
+		["Check that you're credentials haven't expired before running the script.", "Check that your credentials haven't expired before running the script."]
+	],
+	"to-too": [
+		["The onboarding docs are to outdated to be useful.", "The onboarding docs are too outdated to be useful."],
+		["The staging environment is broken to, so we can't reproduce the bug there.", "The staging environment is broken too, so we can't reproduce the bug there."],
+		["We tried too deploy the hotfix before the code freeze started.", "We tried to deploy the hotfix before the code freeze started."],
+		["It's to early to tell whether the patch fixed the memory leak.", "It's too early to tell whether the patch fixed the memory leak."],
+		["The new intern wants too join the on-call rotation next sprint.", "The new intern wants to join the on-call rotation next sprint."],
+		["The retry limit was set to aggressively and started throttling valid requests.", "The retry limit was set too aggressively and started throttling valid requests."]
+	],
+	"then-than": [
+		["The new indexing approach is faster then the old one.", "The new indexing approach is faster than the old one."],
+		["First run the migration script, than restart the service.", "First run the migration script, then restart the service."],
+		["The API handles more traffic then it did before the rewrite.", "The API handles more traffic than it did before the rewrite."],
+		["Deploying on Friday is riskier then waiting until Monday.", "Deploying on Friday is riskier than waiting until Monday."],
+		["If the health check fails, than the load balancer removes the node.", "If the health check fails, then the load balancer removes the node."],
+		["The refactored module is easier to test then the legacy one was.", "The refactored module is easier to test than the legacy one was."]
+	],
+	"affect-effect": [
+		["The outage didn't effect our payment processing systems.", "The outage didn't affect our payment processing systems."],
+		["The patch had no noticeable affect on latency.", "The patch had no noticeable effect on latency."],
+		["We need to measure how the change will effect throughput.", "We need to measure how the change will affect throughput."],
+		["The new caching layer had a positive affect on response times.", "The new caching layer had a positive effect on response times."],
+		["Latency spikes can adversely effect the checkout flow.", "Latency spikes can adversely affect the checkout flow."],
+		["We're not sure what affect the new indexing strategy will have on query speed.", "We're not sure what effect the new indexing strategy will have on query speed."]
+	],
+	"confused-words": [
+		["Make sure the retry policy doesn't loose any messages during a restart.", "Make sure the retry policy doesn't lose any messages during a restart."],
+		["The core principal behind the design is to keep state out of the client.", "The core principle behind the design is to keep state out of the client."],
+		["Whose responsible for rotating the API keys this quarter?", "Who's responsible for rotating the API keys this quarter?"],
+		["The deployment was delayed because of unrelated whether issues at the data center.", "The deployment was delayed because of unrelated weather issues at the data center."],
+		["I advice waiting until the next release before upgrading the client library.", "I advise waiting until the next release before upgrading the client library."],
+		["The new dashboard was lead by the platform team.", "The new dashboard was led by the platform team."]
+	],
+	"a-an": [
+		["We need a extra hour to finish the migration safely.", "We need an extra hour to finish the migration safely."],
+		["This is an unique identifier assigned to every incoming request.", "This is a unique identifier assigned to every incoming request."],
+		["The team added a index to speed up the slow query.", "The team added an index to speed up the slow query."],
+		["That's a honest mistake, and we've already shipped a fix.", "That's an honest mistake, and we've already shipped a fix."],
+		["The outage was caused by an single misconfigured firewall rule.", "The outage was caused by a single misconfigured firewall rule."],
+		["We rolled back after an user reported missing order data.", "We rolled back after a user reported missing order data."]
+	],
+	"modal-of": [
+		["We should of caught this bug during code review.", "We should have caught this bug during code review."],
+		["They could of avoided the outage with better monitoring.", "They could have avoided the outage with better monitoring."],
+		["I would of merged the PR sooner if the tests had passed.", "I would have merged the PR sooner if the tests had passed."],
+		["The team must of missed the alert during the weekend.", "The team must have missed the alert during the weekend."],
+		["We should of written a migration guide before deprecating the endpoint.", "We should have written a migration guide before deprecating the endpoint."],
+		["He could of documented the workaround in the runbook.", "He could have documented the workaround in the runbook."]
+	],
+	"repeated-word": [
+		["Please make make sure the backup completes before you start the migration.", "Please make sure the backup completes before you start the migration."],
+		["The the service restarts automatically after a crash.", "The service restarts automatically after a crash."],
+		["We need to to update the dependency before the next release.", "We need to update the dependency before the next release."],
+		["The config file has has a typo in the port number.", "The config file has a typo in the port number."],
+		["Once the tests pass, deploy deploy the change to staging first.", "Once the tests pass, deploy the change to staging first."],
+		["The incident report was was reviewed by the whole team on Monday.", "The incident report was reviewed by the whole team on Monday."]
+	],
+	"comma-splice": [
+		["The deploy finished early, the team moved on to the next task.", "The deploy finished early; the team moved on to the next task."],
+		["The cache was stale, users saw outdated prices for almost an hour.", "The cache was stale; users saw outdated prices for almost an hour."],
+		["We reverted the change, the errors stopped almost immediately.", "We reverted the change; the errors stopped almost immediately."],
+		["The API key expired, requests started failing across every region.", "The API key expired; requests started failing across every region."],
+		["The runbook was outdated, the on-call engineer had to improvise.", "The runbook was outdated; the on-call engineer had to improvise."],
+		["The migration ran overnight, nobody checked the logs until morning.", "The migration ran overnight; nobody checked the logs until morning."]
+	],
+	"run-on": [
+		["The server crashed we didn't get an alert until an hour later.", "The server crashed; we didn't get an alert until an hour later."],
+		["The build failed nobody noticed until the morning standup.", "The build failed; nobody noticed until the morning standup."],
+		["The feature flag was left on it caused a spike in error rates.", "The feature flag was left on; it caused a spike in error rates."],
+		["The database ran out of disk space writes started failing silently.", "The database ran out of disk space; writes started failing silently."],
+		["The on-call engineer restarted the pod the errors disappeared instantly.", "The on-call engineer restarted the pod; the errors disappeared instantly."],
+		["The release notes were incomplete customers kept filing support tickets.", "The release notes were incomplete; customers kept filing support tickets."]
+	],
+	"adjective-for-adverb": [
+		["The service degraded quick after the new deployment went out.", "The service degraded quickly after the new deployment went out."],
+		["Please review the migration script careful before merging it.", "Please review the migration script carefully before merging it."],
+		["The rollout went pretty smooth once the config was corrected.", "The rollout went pretty smoothly once the config was corrected."],
+		["The team responded immediate once the alert fired.", "The team responded immediately once the alert fired."],
+		["The new queue processes messages more efficient than the old one.", "The new queue processes messages more efficiently than the old one."],
+		["The support team handled the escalation surprising well given the circumstances.", "The support team handled the escalation surprisingly well given the circumstances."]
+	],
+	"verb-form": [
+		["The script has went into an infinite loop twice this week.", "The script has gone into an infinite loop twice this week."],
+		["I should have wrote a test for that edge case.", "I should have written a test for that edge case."],
+		["The new intern can runs the deployment pipeline without help now.", "The new intern can run the deployment pipeline without help now."],
+		["We will fixed the flaky test before the next release.", "We will fix the flaky test before the next release."],
+		["I seen the same error in last week's logs.", "I saw the same error in last week's logs."],
+		["The build has broke twice since we upgraded the compiler.", "The build has broken twice since we upgraded the compiler."]
+	],
+	"pronoun-case": [
+		["Him and the on-call engineer patched the vulnerability together last night.", "He and the on-call engineer patched the vulnerability together last night."],
+		["The lead assigned the migration task to Sarah and I.", "The lead assigned the migration task to Sarah and me."],
+		["Between you and I, the estimate looks way too optimistic.", "Between you and me, the estimate looks way too optimistic."],
+		["Us engineers need more context before committing to that deadline.", "We engineers need more context before committing to that deadline."],
+		["The manager gave John and I the same feedback in the retro.", "The manager gave John and me the same feedback in the retro."],
+		["Whom do you think broke the build this time?", "Who do you think broke the build this time?"]
+	],
+	"less-fewer": [
+		["We have less open incidents this month than last month.", "We have fewer open incidents this month than last month."],
+		["There are less servers in the new cluster than we expected.", "There are fewer servers in the new cluster than we expected."],
+		["The new release introduced less bugs than the previous one.", "The new release introduced fewer bugs than the previous one."],
+		["Less customers complained about latency after the fix shipped.", "Fewer customers complained about latency after the fix shipped."],
+		["We need less false positives from the alerting system.", "We need fewer false positives from the alerting system."],
+		["The refactor left us with less lines of duplicated code.", "The refactor left us with fewer lines of duplicated code."]
+	],
+	"countable-noun": [
+		["We received a lot of good feedbacks on the new dashboard.", "We received a lot of good feedback on the new dashboard."],
+		["The support team is drowning in informations about the outage.", "The support team is drowning in information about the outage."],
+		["We need to update the softwares running on these servers before Friday.", "We need to update the software running on these servers before Friday."],
+		["We need more evidences before we can close the ticket.", "We need more evidence before we can close the ticket."],
+		["The new hire has a lot of knowledges about distributed systems.", "The new hire has a lot of knowledge about distributed systems."],
+		["The postmortem gathered a lot of advices from the incident review.", "The postmortem gathered a lot of advice from the incident review."]
+	],
+	"comparative": [
+		["This approach is more faster than the one we tried before.", "This approach is faster than the one we tried before."],
+		["That was the most easiest migration we've ever run.", "That was the easiest migration we've ever run."],
+		["The new server is more cheaper to run than the old one.", "The new server is cheaper to run than the old one."],
+		["This bug is the most worst one we've seen all quarter.", "This bug is the worst one we've seen all quarter."],
+		["The refactored code is more simpler to maintain than before.", "The refactored code is simpler to maintain than before."],
+		["Our latest release is the most fastest version we've shipped.", "Our latest release is the fastest version we've shipped."]
+	],
+	"double-negative": [
+		["We don't have no spare capacity left in the cluster.", "We don't have any spare capacity left in the cluster."],
+		["The service doesn't log nothing when the request times out.", "The service doesn't log anything when the request times out."],
+		["I haven't found no workaround for this bug yet.", "I haven't found any workaround for this bug yet."],
+		["There isn't no reason to delay the release any further.", "There isn't any reason to delay the release any further."],
+		["We can't hardly reproduce the crash in staging.", "We can hardly reproduce the crash in staging."],
+		["The on-call engineer didn't do nothing wrong during the incident.", "The on-call engineer didn't do anything wrong during the incident."]
+	],
+	"possessive-apostrophe": [
+		["Update the users password before you close the ticket.", "Update the user's password before you close the ticket."],
+		["The APIs response time improved after the caching layer was added.", "The API's response time improved after the caching layer was added."],
+		["We revoked all of the teams access to the production database.", "We revoked all of the team's access to the production database."],
+		["The clients feedback shaped the next round of feature work.", "The client's feedback shaped the next round of feature work."],
+		["Both PR's were merged before the freeze started.", "Both PRs were merged before the freeze started."],
+		["The servers configuration was reset after the failed upgrade.", "The server's configuration was reset after the failed upgrade."]
+	],
+	"capitalization": [
+		["we shipped the hotfix right before the weekend started.", "We shipped the hotfix right before the weekend started."],
+		["i reviewed the pull request twice before approving it.", "I reviewed the pull request twice before approving it."],
+		["The release is scheduled for monday morning, pending final QA.", "The release is scheduled for Monday morning, pending final QA."],
+		["We're planning the migration for early january next year.", "We're planning the migration for early January next year."],
+		["the incident started around 2 a.m. and lasted four hours.", "The incident started around 2 a.m. and lasted four hours."],
+		["Our next sync is scheduled for tuesday afternoon.", "Our next sync is scheduled for Tuesday afternoon."]
+	],
+	"missing-word": [
+		["We need update the schema before the migration runs.", "We need to update the schema before the migration runs."],
+		["The team decided go ahead with the rollback.", "The team decided to go ahead with the rollback."],
+		["Please make sure the config file backed up before editing it.", "Please make sure the config file is backed up before editing it."],
+		["The API returns error when the payload is malformed.", "The API returns an error when the payload is malformed."],
+		["We plan add retries to the notification service next sprint.", "We plan to add retries to the notification service next sprint."],
+		["The dashboard shows number of failed jobs over the last hour.", "The dashboard shows the number of failed jobs over the last hour."]
+	],
+	"fragment": [
+		["Because the cache invalidation logic was broken for weeks.", "The cache invalidation logic was broken for weeks."],
+		["Which is why the rollout was paused until further notice.", "This is why the rollout was paused until further notice."],
+		["Even though the fix passed every test in staging.", "The fix passed every test in staging."],
+		["Although the team already rolled back the deployment twice.", "The team already rolled back the deployment twice."],
+		["While the on-call engineer restarted the service several times overnight.", "The on-call engineer restarted the service several times overnight."],
+		["Since the incident response plan hadn't been updated in over a year.", "The incident response plan hadn't been updated in over a year."]
+	],
+	"punctuation": [
+		["We shipped the fix , then verified it in staging.", "We shipped the fix, then verified it in staging."],
+		["However we should still monitor error rates closely after the patch.", "However, we should still monitor error rates closely after the patch."],
+		["The rollout went well,but a few nodes lagged behind the rest.", "The rollout went well, but a few nodes lagged behind the rest."],
+		["The deployment finished successfully, but the health check failed twice!!", "The deployment finished successfully, but the health check failed twice!"],
+		["The team, decided to postpone the release until further review.", "The team decided to postpone the release until further review."],
+		["The incident affected three services,billing, search, and notifications.", "The incident affected three services, billing, search, and notifications."]
+	],
+	"misspelling": [
+		["We need to seperate the staging and production configs.", "We need to separate the staging and production configs."],
+		["The team recieved the alert five minutes after the outage began.", "The team received the alert five minutes after the outage began."],
+		["The outage occured because of a misconfigured load balancer.", "The outage occurred because of a misconfigured load balancer."],
+		["We should definately add a health check for this service.", "We should definitely add a health check for this service."],
+		["The new enviroment variable wasn't picked up until the restart.", "The new environment variable wasn't picked up until the restart."],
+		["We scheduled the maintainance window for Saturday night.", "We scheduled the maintenance window for Saturday night."]
+	],
+	"phrasal-verb": [
+		["Please setup the server before the demo tomorrow.", "Please set up the server before the demo tomorrow."],
+		["You'll need to login to the console to check the logs.", "You'll need to log in to the console to check the logs."],
+		["Remember to backup the database before running the migration.", "Remember to back up the database before running the migration."],
+		["We should signup for the new monitoring service this week.", "We should sign up for the new monitoring service this week."],
+		["The team needs to checkout the latest branch before testing.", "The team needs to check out the latest branch before testing."],
+		["Click the log in button at the top of the page.", "Click the login button at the top of the page."]
+	],
+	"edit-seam": [
+		["We renamed the endpoint to routes, but the old endpoint are still active for now.", "We renamed the endpoint to routes, but the old endpoints are still active for now."],
+		["The retry limit changed from one attempt to five attempts, so the job now retry automatically.", "The retry limit changed from one attempt to five attempts, so the job now retries automatically."],
+		["We split the monolith into a services, each owned by a different team.", "We split the monolith into services, each owned by a different team."],
+		["We upgraded the database from a single instance to an cluster of replicas for redundancy.", "We upgraded the database from a single instance to a cluster of replicas for redundancy."],
+		["The queue used to process one message at a time; now it process a whole batch at once.", "The queue used to process one message at a time; now it processes a whole batch at once."],
+		["We switched from sending a confirmation email to sending a confirmation text email after signup.", "We switched from sending a confirmation email to sending a confirmation text after signup."]
+	]
+}

@@ -16,6 +16,7 @@
     "node": ">=18"
   },
   "scripts": {
+    "benchmark:accuracy": "node scripts/accuracy-benchmark.mjs",
     "benchmark:grammar": "node scripts/grammar-benchmark.mjs",
     "check": "node scripts/style-check.mjs",
     "check:quotes": "node scripts/quote-check.mjs",

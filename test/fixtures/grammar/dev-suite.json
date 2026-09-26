@@ -1,0 +1,240 @@
+{
+	"sva-noun": [
+		["The deploy pipeline have three stages.", "The deploy pipeline has three stages."],
+		["Each request take about 40 ms.", "Each request takes about 40 ms."],
+		["The results shows a clear regression.", "The results show a clear regression."],
+		["The config file contain the database URL.", "The config file contains the database URL."],
+		["Our users expects the export to finish in seconds.", "Our users expect the export to finish in seconds."],
+		["The index speed up every query.", "The index speeds up every query."]
+	],
+	"sva-distant": [
+		["The list of open issues are longer than last week.", "The list of open issues is longer than last week."],
+		["One of the servers were down overnight.", "One of the servers was down overnight."],
+		["The quality of the test fixtures have improved.", "The quality of the test fixtures has improved."],
+		["Neither of the fixes work on Windows.", "Neither of the fixes works on Windows."],
+		["Every one of these endpoints return JSON.", "Every one of these endpoints returns JSON."]
+	],
+	"sva-pronoun": [
+		["She review every pull request before lunch.", "She reviews every pull request before lunch."],
+		["He don't have access to production.", "He doesn't have access to production."],
+		["They was on call last weekend.", "They were on call last weekend."],
+		["It run every night at midnight.", "It runs every night at midnight."],
+		["We was surprised by the latency numbers.", "We were surprised by the latency numbers."]
+	],
+	"its-its": [
+		["The service restarts when it's config changes.", "The service restarts when its config changes."],
+		["Its a known issue in the current release.", "It's a known issue in the current release."],
+		["Each worker writes to it's own log file.", "Each worker writes to its own log file."],
+		["Its been broken since Tuesday.", "It's been broken since Tuesday."],
+		["The cache is fast, but its not durable.", "The cache is fast, but it's not durable."]
+	],
+	"their-there": [
+		["Their are three open incidents.", "There are three open incidents."],
+		["The engineers pushed there changes late.", "The engineers pushed their changes late."],
+		["Their going to cut the release tomorrow.", "They're going to cut the release tomorrow."],
+		["Put the fixtures over their, next to the tests.", "Put the fixtures over there, next to the tests."],
+		["Customers lost there saved settings after the update.", "Customers lost their saved settings after the update."]
+	],
+	"your-youre": [
+		["You're on-call engineer gets paged first.", "Your on-call engineer gets paged first."],
+		["Your going to need admin rights.", "You're going to need admin rights."],
+		["Check that you're token has not expired.", "Check that your token has not expired."],
+		["If your seeing this error, restart the agent.", "If you're seeing this error, restart the agent."],
+		["Save you're changes before you switch branches.", "Save your changes before you switch branches."]
+	],
+	"to-too": [
+		["The migration was to complex to finish in one sprint.", "The migration was too complex to finish in one sprint."],
+		["The payload is to large for the queue.", "The payload is too large for the queue."],
+		["We need to update the docs to.", "We need to update the docs too."],
+		["That timeout is way to short.", "That timeout is way too short."],
+		["There are to many retries in the client.", "There are too many retries in the client."]
+	],
+	"then-than": [
+		["The new index is faster then the old one.", "The new index is faster than the old one."],
+		["It uses less memory then Redis.", "It uses less memory than Redis."],
+		["We shipped more features this quarter then last.", "We shipped more features this quarter than last."],
+		["Rather then retry, the client fails fast.", "Rather than retry, the client fails fast."],
+		["The build takes longer then it should.", "The build takes longer than it should."]
+	],
+	"affect-effect": [
+		["The affects of the change will be monitored.", "The effects of the change will be monitored."],
+		["The outage did not effect paying customers.", "The outage did not affect paying customers."],
+		["This flag has no affect on the output.", "This flag has no effect on the output."],
+		["Caching will effect how stale the data can be.", "Caching will affect how stale the data can be."],
+		["The side affects are documented below.", "The side effects are documented below."]
+	],
+	"confused-words": [
+		["Make sure you don't loose the backup key.", "Make sure you don't lose the backup key."],
+		["All tests pass accept the flaky one.", "All tests pass except the flaky one."],
+		["The principle engineer approved the design.", "The principal engineer approved the design."],
+		["Whose going to own the migration?", "Who's going to own the migration?"],
+		["The spike lead to a second outage.", "The spike led to a second outage."],
+		["We need to decide weather to roll back.", "We need to decide whether to roll back."],
+		["Please advice the customer to upgrade.", "Please advise the customer to upgrade."],
+		["The new theme compliments the old logo.", "The new theme complements the old logo."]
+	],
+	"a-an": [
+		["This is a error in the parser.", "This is an error in the parser."],
+		["Open a issue with the stack trace.", "Open an issue with the stack trace."],
+		["It returns an list of users.", "It returns a list of users."],
+		["We need a hour to restore the backup.", "We need an hour to restore the backup."],
+		["Add a index on the email column.", "Add an index on the email column."]
+	],
+	"modal-of": [
+		["We could of shipped on Friday.", "We could have shipped on Friday."],
+		["You should of checked the logs first.", "You should have checked the logs first."],
+		["That would of broken the build.", "That would have broken the build."],
+		["They must of missed the alert.", "They must have missed the alert."]
+	],
+	"repeated-word": [
+		["Run the the migration before you deploy.", "Run the migration before you deploy."],
+		["The cache is is warm after startup.", "The cache is warm after startup."],
+		["We need to to update the schema.", "We need to update the schema."],
+		["Restart the worker and and check the queue.", "Restart the worker and check the queue."],
+		["The test failed on on the second run.", "The test failed on the second run."]
+	],
+	"comma-splice": [
+		["The canary failed, the system reverted to the previous release.", "The canary failed, so the system reverted to the previous release."],
+		["The build is green, we can merge now.", "The build is green, so we can merge now."],
+		["I checked the logs, nothing looked wrong.", "I checked the logs. Nothing looked wrong."],
+		["We tried a larger heap, it did not help.", "We tried a larger heap, but it did not help."],
+		["The team decided to separate the config from the code, however the migration was too complex.", "The team decided to separate the config from the code; however, the migration was too complex."]
+	],
+	"run-on": [
+		["The server crashed we lost an hour of data.", "The server crashed. We lost an hour of data."],
+		["Click Save the dialog closes.", "Click Save. The dialog closes."],
+		["The job timed out nobody noticed until Monday.", "The job timed out, and nobody noticed until Monday."],
+		["Tests pass locally they fail in CI.", "Tests pass locally, but they fail in CI."]
+	],
+	"adjective-for-adverb": [
+		["The rollback happens automatic.", "The rollback happens automatically."],
+		["The dashboard loads real slow on mobile.", "The dashboard loads really slowly on mobile."],
+		["The new parser handles edge cases good.", "The new parser handles edge cases well."],
+		["The service responded quick to the spike.", "The service responded quickly to the spike."],
+		["The script ran perfect on the first try.", "The script ran perfectly on the first try."]
+	],
+	"verb-form": [
+		["The job has went through three retries.", "The job has gone through three retries."],
+		["We should have wrote a test for that.", "We should have written a test for that."],
+		["The cron had ran before the fix landed.", "The cron had run before the fix landed."],
+		["I seen this error before.", "I have seen this error before."],
+		["The deploy was broke for an hour.", "The deploy was broken for an hour."],
+		["The client can retries three times.", "The client can retry three times."],
+		["We will fixed it in the next release.", "We will fix it in the next release."]
+	],
+	"pronoun-case": [
+		["Send the report to Sam and I.", "Send the report to Sam and me."],
+		["Me and Priya wrote the migration.", "Priya and I wrote the migration."],
+		["Between you and I, the estimate is low.", "Between you and me, the estimate is low."],
+		["Him and the lead reviewed the change.", "He and the lead reviewed the change."]
+	],
+	"less-fewer": [
+		["We saw less errors after the patch.", "We saw fewer errors after the patch."],
+		["There are less users on weekends.", "There are fewer users on weekends."],
+		["The new plan has less steps.", "The new plan has fewer steps."]
+	],
+	"countable-noun": [
+		["The logs contain useful informations.", "The logs contain useful information."],
+		["We got many feedbacks from beta users.", "We got a lot of feedback from beta users."],
+		["How much errors did the job log?", "How many errors did the job log?"]
+	],
+	"comparative": [
+		["The new build is more faster.", "The new build is faster."],
+		["This is the most easiest fix.", "This is the easiest fix."],
+		["The second query is more cheaper to run.", "The second query is cheaper to run."]
+	],
+	"double-negative": [
+		["We don't have no rollback plan.", "We don't have a rollback plan."],
+		["The script doesn't return nothing.", "The script doesn't return anything."],
+		["I can't hardly read the logs.", "I can hardly read the logs."]
+	],
+	"possessive-apostrophe": [
+		["The users password is hashed.", "The user's password is hashed."],
+		["The API's are versioned by date.", "The APIs are versioned by date."],
+		["We added test's for the parser.", "We added tests for the parser."],
+		["The teams' lead signed off.", "The team's lead signed off."]
+	],
+	"capitalization": [
+		["the build failed at noon.", "The build failed at noon."],
+		["After the patch i reran the suite.", "After the patch I reran the suite."],
+		["We deploy on monday.", "We deploy on Monday."]
+	],
+	"missing-word": [
+		["The service going to restart at noon.", "The service is going to restart at noon."],
+		["We need update the schema first.", "We need to update the schema first."],
+		["She asked me review the change.", "She asked me to review the change."],
+		["The file was moved the archive folder.", "The file was moved to the archive folder."]
+	],
+	"fragment": [
+		["Because the build failed.", "The deploy stopped because the build failed."],
+		["Which means the cache is stale.", "This means the cache is stale."],
+		["For example, the export job.", "For example, the export job timed out."]
+	],
+	"punctuation": [
+		["The build failed , and we rolled back.", "The build failed, and we rolled back."],
+		["Did the job finish.", "Did the job finish?"],
+		["The tests passed,the build did not.", "The tests passed; the build did not."],
+		["We shipped it!!", "We shipped it!"],
+		["However the migration is still running.", "However, the migration is still running."]
+	],
+	"phrasal-verb": [
+		["Setup the server before you run the tests.", "Set up the server before you run the tests."],
+		["You need to login to the console first.", "You need to log in to the console first."],
+		["Backup the database before the migration.", "Back up the database before the migration."],
+		["Checkout the release branch and rebuild.", "Check out the release branch and rebuild."],
+		["We shutdown the old cluster on Friday.", "We shut down the old cluster on Friday."],
+		["Please cleanup the temp files after the run.", "Please clean up the temp files after the run."],
+		["The log in page times out after a minute.", "The login page times out after a minute."],
+		["We rollout the change to ten percent of users.", "We roll out the change to ten percent of users."]
+	],
+	"edit-seam": [
+		["Each checks runs in its own container.", "Each check runs in its own container."],
+		["The workers polls the queue every second.", "The workers poll the queue every second."],
+		["Open an pull request against main.", "Open a pull request against main."],
+		["The new endpoints returns paginated results.", "The new endpoints return paginated results."],
+		["The script now now exits early on failure.", "The script now exits early on failure."],
+		["These setting is ignored in production.", "This setting is ignored in production."],
+		["The two services shares one database.", "The two services share one database."],
+		["There is three open incidents this week.", "There are three open incidents this week."]
+	],
+	"to-verb-form": [
+		["Remember to runs the linter before you push.", "Remember to run the linter before you push."],
+		["The goal is to reduced latency.", "The goal is to reduce latency."],
+		["We plan to migrating next week.", "We plan to migrate next week."]
+	],
+	"everyday": [
+		["We deploy everyday at noon.", "We deploy every day at noon."],
+		["The job runs everytime a commit lands.", "The job runs every time a commit lands."],
+		["I check the dashboard everyday.", "I check the dashboard every day."]
+	],
+	"more-confused": [
+		["Who's config is this?", "Whose config is this?"],
+		["Whose been assigned the ticket?", "Who's been assigned the ticket?"],
+		["We might loose data if the disk fills.", "We might lose data if the disk fills."],
+		["The weather or not question is still open.", "The whether-or-not question is still open."],
+		["We are suppose to ship on Friday.", "We are supposed to ship on Friday."],
+		["It could of been worse.", "It could have been worse."]
+	],
+	"misspelling": [
+		["The config is seperate from the code.", "The config is separate from the code."],
+		["We will definately ship on Friday.", "We will definitely ship on Friday."],
+		["Did you recieve the alert?", "Did you receive the alert?"],
+		["The error occured twice.", "The error occurred twice."],
+		["It is now planned for next quater.", "It is now planned for next quarter."],
+		["The enviroment variable is missing.", "The environment variable is missing."],
+		["Add it to the team calender.", "Add it to the team calendar."],
+		["The change is backwards compatable.", "The change is backwards compatible."],
+		["We need a reciept for the purchase.", "We need a receipt for the purchase."],
+		["The results were inconsistant.", "The results were inconsistent."],
+		["That was a concious tradeoff.", "That was a conscious tradeoff."],
+		["Check the paramters before you call it.", "Check the parameters before you call it."],
+		["The functon returns early.", "The function returns early."],
+		["Performence dropped after the upgrade.", "Performance dropped after the upgrade."],
+		["The documentaion is out of date.", "The documentation is out of date."],
+		["The request was succesful.", "The request was successful."],
+		["This is the begining of the log.", "This is the beginning of the log."],
+		["Make the header visable.", "Make the header visible."],
+		["The cache is usefull for reads.", "The cache is useful for reads."],
+		["Wait untill the job finishes.", "Wait until the job finishes."]
+	]
+}
