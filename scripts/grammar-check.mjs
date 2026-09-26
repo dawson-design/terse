@@ -83,8 +83,9 @@ const COMMA_MARKERS = /^(?:however|moreover|furthermore|nevertheless|nonetheless
 const ADMITTED_IN_CONTEXT = {
 	RepeatedWords: ({ match }) =>
 		!VALID_REPEATED_WORDS.has(match.toLowerCase().replace(/\s+/g, ' ')),
-	// A letter grade or team is not an article ("A- and U23 games").
-	AnA: ({ after }) => !after.startsWith('-'),
+	// A letter grade or an abbreviation is not an article ("A- and U23
+	// games", "3 a.m.").
+	AnA: ({ after }) => !/^[-.]/.test(after),
 	// "It's been" is always "it has been": no noun follows a possessive as "been".
 	ItsPossessive: ({ after }) => !/^\s+been\b/i.test(after),
 	// Only the noun slot ("the affects of", "no affect on", "side affects").
