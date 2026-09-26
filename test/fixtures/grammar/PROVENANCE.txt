@@ -14,3 +14,9 @@ assistant and then edited by hand.
   fresh Claude Sonnet session with no access to Terse's code or patterns.
   Its score is the recall estimate. One false alarm on a corrected twin led
   to a precision fix after the recall figure was recorded.
+- clause-suite.json: agreement across a phrase, comma splices, and run-ons,
+  each with 25 [error, corrected] pairs and 25 correct lookalikes built to
+  trip a naive checker. Written 2026-09-26 by a fresh Claude Sonnet session
+  with no access to Terse, and scored once before any tuning: 4, 9, and 0
+  of 25 caught, no lookalike flagged. The one false alarm on a corrected
+  sentence led to a precision fix in the AnA rule afterwards.

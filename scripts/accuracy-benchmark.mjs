@@ -28,8 +28,7 @@ const pct = (a, b) => (b ? Math.round((1000 * a) / b) / 10 : 0);
 const grammarOf = (flags) => flags.filter((f) => f.category === 'grammar');
 
 /** Catches and false alarms on a suite of [error, corrected] pairs. */
-async function scoreSuite(checker, path) {
-	const suite = JSON.parse(readFileSync(path, 'utf8'));
+async function scoreSuite(checker, path, suite = JSON.parse(readFileSync(path, 'utf8'))) {
 	let pairs = 0, caught = 0, falseAlarms = 0;
 	const byCategory = {};
 	for (const [category, items] of Object.entries(suite)) {
@@ -45,6 +44,26 @@ async function scoreSuite(checker, path) {
 		byCategory[category] = `${hits}/${items.length}`;
 	}
 	return { pairs, caught, recall: pct(caught, pairs), falseAlarms, byCategory };
+}
+
+/**
+ * Catches on a suite whose categories each hold `errors` ([error, corrected]
+ * pairs) and `lookalikes` (correct sentences a naive checker might flag).
+ */
+async function scoreClauseSuite(checker, path) {
+	const suite = JSON.parse(readFileSync(path, 'utf8'));
+	const byCategory = {};
+	for (const [category, { errors, lookalikes }] of Object.entries(suite)) {
+		const pairs = Object.fromEntries(errors.map((pair, i) => [i, pair]));
+		const scored = await scoreSuite(checker, null, { [category]: Object.values(pairs) });
+		let flagged = 0;
+		for (const text of lookalikes) {
+			if (grammarOf((await checker.checkDocument(text)).flags).length) flagged++;
+		}
+		byCategory[category] = { caught: `${scored.caught}/${scored.pairs}`,
+			correctedFlagged: scored.falseAlarms, lookalikesFlagged: `${flagged}/${lookalikes.length}` };
+	}
+	return byCategory;
 }
 
 /** Grammar findings on every Markdown file in a directory. */
@@ -174,6 +193,7 @@ async function grammarReport(checker) {
 	return {
 		devSuite: await scoreSuite(checker, fixture('grammar', 'dev-suite.json')),
 		heldoutSuite: await scoreSuite(checker, fixture('grammar', 'heldout-suite.json')),
+		clauseSuite: await scoreClauseSuite(checker, fixture('grammar', 'clause-suite.json')),
 		grammarRepairFindings: grammarOf((await checker.checkDocument(repair)).flags).length,
 		modelProseFindings: await cleanFindings(checker, fixture('model-prose')),
 		humanProseFindings: await cleanFindings(checker, fixture('human-prose')),
@@ -212,6 +232,9 @@ function summarize(report) {
 	const lines = [
 		`held-out suite: ${suite(g.heldoutSuite)}`,
 		`dev suite: ${suite(g.devSuite)}`,
+		...Object.entries(g.clauseSuite).map(([category, s]) => `clause suite ${category}: ` +
+			`${s.caught} caught, ${s.correctedFlagged} corrected flagged, ` +
+			`${s.lookalikesFlagged} lookalikes flagged`),
 		`grammar-repair fixture findings: ${g.grammarRepairFindings}`,
 		`grammar findings on clean prose, each a false alarm or a real error to review: ` +
 			`model ${g.modelProseFindings.length}, human ${g.humanProseFindings.length}`,
