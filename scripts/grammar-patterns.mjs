@@ -557,19 +557,25 @@ const CLAUSE_TAKING_VERB = alt(['found', 'thought', 'knew', 'said', 'realized', 
 	'wrote', 'stated', 'saw', 'wanted', 'needed', 'liked', 'preferred', 'hated']);
 const CLAUSE_END_ADVERB = '(?:early|late|again|today|yesterday|overnight|twice|down|up|out|' +
 	'off|back|[a-z]+ly)';
+// The opening clause, word by word, up to the join. A subordinator or a
+// conjunction inside it means the comma may close a subordinate clause
+// ("we know that although the cache helps, it ...") or an introductory
+// phrase of a second clause ("risky but with a flag, it ...").
+const OPENING_CLAUSE = '(?:(?!\\b(?:although|though|if|when|whenever|because|since|unless|' +
+	'while|whereas|as|after|before|until|once|whether|where|but|and|or|yet|so)\\b)[^,;:.?!])*?';
 
 const CLAUSE_JOINS = [
 	// "The deploy finished early, the team moved on." A comma alone cannot
 	// join two sentences; a later ", and" makes it a series ("the build
 	// passed, the tests passed, and we shipped").
-	{ re: new RegExp(`(?<=${CLAUSE_OPENING}[^,;:.?!]*?\\b${FINITE}\\b[^,;:.?!]*?` +
+	{ re: new RegExp(`(?<=${CLAUSE_OPENING}${OPENING_CLAUSE}\\b${FINITE}\\b${OPENING_CLAUSE}` +
 		`(?<!\\b(?:${REPORTING_VERB})))` + `,(?=\\s+${SECOND_CLAUSE}` +
 		'(?![^.?!]*,\\s+(?:and|or|but|so|yet)\\b))', 'g'), prose: true,
 		hint: () => 'two sentences joined by a comma: use a period, a semicolon, or ' +
 			'"and", "but", or "so"' },
 	// "The server crashed we lost an hour of data." Two clauses with nothing
 	// between them; the second opens on a subject-only pronoun.
-	{ re: new RegExp(`(?<=${CLAUSE_OPENING}[^,;:.?!]*?\\b(?!(?:${CLAUSE_TAKING_VERB})\\b)` +
+	{ re: new RegExp(`(?<=${CLAUSE_OPENING}${OPENING_CLAUSE}\\b(?!(?:${CLAUSE_TAKING_VERB})\\b)` +
 		`(?:[a-z]+ed|${alt(IRREGULAR_PAST)})(?:\\s+${CLAUSE_END_ADVERB})?\\s+)` +
 		`(?:we|they|he|she|I)(?=\\s+(?:not\\s+)?${FINITE}\\b)`, 'g'), prose: true,
 		hint: (m) => `two sentences run together: end the first before "${m[0]}"` },

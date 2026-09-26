@@ -318,6 +318,10 @@ describe('grammar across a phrase or a clause boundary', () => {
 		['The tool we built last year still runs.'],
 		['We found we needed more memory.'],
 		['The last time it failed we paged the whole team.'],
+		['We know that although the cache helps, it can still serve stale data.'],
+		['And if the job is not running, you will not get alerts.'],
+		['It worries us since if the queue keeps growing, it will stall the workers.'],
+		['The fix is risky but with a feature flag, it will be safe to ship.'],
 	])('leaves the correct sentence %s alone', (text) => {
 		expect(grammar(text)).toEqual([]);
 	});
