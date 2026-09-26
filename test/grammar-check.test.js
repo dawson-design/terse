@@ -52,6 +52,15 @@ describe('Harper admission gate', () => {
 		expect(await grammar.check(text)).toEqual([]);
 	});
 
+	it.each([
+		["It's been broken since Tuesday."],
+		["It's been deployed to staging."],
+		['The outage did not affect paying customers.'],
+		['The flag does not affect running jobs.'],
+	])('leaves the verb in %s alone', async (text) => {
+		expect(await grammar.check(text)).toEqual([]);
+	});
+
 	it('has zero unlabeled findings on the manually reviewed human-prose corpus', async () => {
 		const findings = [];
 		for (const name of readdirSync(proseDir).filter((x) => x.endsWith('.md'))) {

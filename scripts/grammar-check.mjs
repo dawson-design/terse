@@ -38,6 +38,22 @@ const VALID_REPEATED_WORDS = new Set([
 	'a a', 'had had', 'in in', 'is is', 'on on', 'that that', 'this this',
 ]);
 
+// Harper 2.7.0 misreads two verb contexts. "It's been" is always "it has
+// been", since no noun follows a possessive as "been". A bare "affect" after
+// an auxiliary, "not", or "to" is always the verb, even when an -ing word
+// follows ("does not affect running jobs"). The swaps it proposes there
+// would break correct text.
+const AUXILIARY_BEFORE =
+	/(?:\b(?:not|do|does|did|will|would|can|could|may|might|must|should|shall|to)|n['’]t)\s+$/i;
+
+function misreadsVerb(ruleId, before, match, after) {
+	if (ruleId === 'ItsPossessive') return /^\s+been\b/i.test(after);
+	if (ruleId === 'NounVerbConfusion') {
+		return /^affect$/i.test(match) && AUXILIARY_BEFORE.test(before);
+	}
+	return false;
+}
+
 export function normalizeGrammarConfig(grammar) {
 	if (grammar === undefined) return { spelling: false, dialect: 'american', words: [] };
 	if (!grammar || typeof grammar !== 'object' || Array.isArray(grammar)) {
@@ -108,6 +124,8 @@ function findingOf(rawText, file, ruleId, lint, spelling) {
 	const match = rawText.slice(start, end);
 	if (ruleId === 'RepeatedWords' &&
 		VALID_REPEATED_WORDS.has(match.toLowerCase().replace(/\s+/g, ' '))) return null;
+	if (misreadsVerb(ruleId, rawText.slice(Math.max(0, start - 24), start), match,
+		rawText.slice(end, end + 24))) return null;
 	const suggestions = uniqueSuggestions(lint)
 		.filter((suggestion) => suggestion !== match);
 	if (spelling) {
