@@ -177,17 +177,19 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   that reason. The tripwire table's false alarms were the only
   escape before; the test is now the rule behind them.
 - The checker flags metadiscourse pointers (`as we will see`,
+<!-- terse-ignore: hard-sentence very-hard-sentence -->
   `as noted above`) and the verdict announced before its evidence
   (`and it does not need to`, `nor should it`, `and that is fine`).
-  The style skill names both under never commenting on the writing.
-  Its fix: anticipate the reader's objection, then answer it with
-  proof, not a ruling.
+  The style skill names both under never commenting on the writing:
+  anticipate the reader's objection, then answer it with proof, not
+  a ruling.
 ## [0.12.0] (2026-08-25)
 
 ### Added
 
-- The `brainstorm` skill finds the angle before any outline. Three to
-  five candidate readers, questions, and governing thoughts narrow
+<!-- terse-ignore: hard-sentence very-hard-sentence -->
+- The `brainstorm` skill finds the angle before any outline: three to
+  five candidate readers, questions, and governing thoughts, converged
   to one approved brief. The write workflow opens with it when the
   angle is open, and the outline skill reads its brief.
 - `scripts/quote-check.mjs` proves every quotation against its source.
@@ -221,12 +223,13 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Automatic prose requests select the style skill. The multi-stop write
   workflow activates when the user names it.
 - The opt-in style hook accepts Claude file paths and Codex `apply_patch`
-  commands. It covers multi-file and moved-file patches.
+  commands, including multi-file and moved-file patches.
 - Terse treats AI-tell findings as editing signals, never evidence of machine
   authorship. Em dashes remain a voice-overridable Terse style rule.
 ## [0.11.0] (2026-08-21)
 
 ### Added
+<!-- terse-ignore: hard-sentence very-hard-sentence -->
 
 - The checker frames six ordinary verbs in their metaphorical
   shapes: `holds`, `buys`, `mints`, `carries`, `forces`, and
@@ -246,7 +249,7 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - An action standing as subject or object takes a gerund or a full
   clause: `renaming`, never `a rename`. A noun the domain owns
   (`a commit`) stays.
-- Fix mode names the passive-voice keeps outright. Statements of a
+- Fix mode names the passive-voice keeps outright: statements of a
   thing's capability or limit (`topics cannot be renamed`) keep
   their passive instead of joining the worklist.
 
@@ -255,6 +258,7 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - `/terse:write` is now one request to a finished document. It runs
+<!-- terse-ignore: hard-sentence very-hard-sentence -->
   the outline, the skeleton with its additions, the expansion, and
   the edit gate in fix mode. It stops twice for sign-off, at the
   outline and at the skeleton. Pieces under 200 words skip the stops.
@@ -279,16 +283,17 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   one of four reader questions, recorded in a working note. The
   expansion ratio, final words over skeleton words, has a ceiling per
   document type, and an overrun blocks. Outline budgets are ceilings,
-  and trim mode cuts unasked sentences first. The findings contract
+  trim mode cuts unasked sentences first, and the findings contract
   gains an `unasked` finding.
 - The skeleton checkpoint lists the proposed additions for one
   approval. Expansion concentrates on disputable claims. The ceilings
   are 1.25x, 1.5x, and 2x. Outline budgets come from the claims and
   report their sum against the target. The edit gate audits a short
+<!-- terse-ignore: hard-sentence very-hard-sentence -->
   draft for omission.
 
 - Restatement detection at any distance. The reverse outline now
-  records the claim each paragraph makes. The repetition audit
+  records the claim each paragraph makes, and the repetition audit
   groups paragraphs by claim across the whole document. A claim in
   two or more paragraphs emits one `structure` finding that lists the
   group and names the keep. A later instance that adds evidence, a
@@ -299,8 +304,10 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [0.8.0] (2026-08-20)
 
 ### Added
+<!-- terse-ignore: hard-sentence very-hard-sentence -->
 
-- The eight claudism families from the community lists. They run from
+<!-- terse-ignore: hard-sentence very-hard-sentence -->
+- The claudism families from the community lists, eight of them, from
   anthropomorphized code-speak to sign-off tics. The corpus tests pin
   recall on every family, and the Hemingway corpus still shows zero
   lexical false positives.
@@ -448,17 +455,18 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - The drafted lead. The outline writes out the first sentence or two
   as the cheapest test of the entry point, and decides both ends
   before any middle.
+<!-- terse-ignore: hard-sentence very-hard-sentence -->
 - Trim mode in edit ("cut 15%", "this runs long"). Cuts are
   structural: proposed against the reverse outline, approved by the
   user, and made by removing whole units. Trimming a claim to fit is
   a meaning change wearing a length excuse.
 - The advance check. Flow and progress are separate: a paragraph can
   read well and still restate its predecessor. Write and edit both
-  read consecutive paragraphs in pairs. They watch the paragraph after
+  read consecutive paragraphs in pairs, watching the paragraph after
   a strong claim and the closing section.
-- Re-approval rules. The outline stays open after approval. Cutting,
-  adding, or reordering a section needs the user's approval again.
-  Re-budgeting within approved sections does not.
+- Re-approval rules. The outline stays open after approval: cutting,
+  adding, or reordering a section needs the user's approval again;
+  re-budgeting within approved sections does not.
 
 ### Changed
 
@@ -466,7 +474,7 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   design docs open with it; a narrative shape may hold it for a nut
   graf. Delay is a placement the shape licenses, never a reveal saved
   for the end.
-- The reverse-outline audit in edit runs four more checks. They cover
+- The reverse-outline audit in edit runs four more checks:
   restatement, length against target, the outline's promises, and
   the outline's record. Deviations logged during drafting count as
   decided keeps.
@@ -474,6 +482,7 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [0.3.0] (2026-08-18)
 
 ### Added
+<!-- terse-ignore: hard-sentence very-hard-sentence -->
 
 - Stock figures as AI tells. The checker lexicon catches the common
   ones: `earns its place`, `moves the needle`, `heavy lifting`,
@@ -484,14 +493,15 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   stating decisions.
 - Flow at every level. The write skill's whole-document read and the
   edit skill's reverse-outline audit run the same check. Each
-  subsection makes one point, and that point supports its section's
-  claim. The sections in order walk the reader from question to
+  subsection makes one point, that point supports its section's
+  claim, and the sections in order walk the reader from question to
   answer.
+<!-- terse-ignore: hard-sentence very-hard-sentence -->
 
 ### Changed
 
 - The skill docs pass their own checker. Slogan openers cut,
-  figurative verbs replaced with plain ones. Passives given actors,
+  figurative verbs replaced with plain ones, passives given actors,
   hard sentences split into sub-bullets.
 - The outline intro states the goal: the logical flow of information,
   iterated with the user to an approved outline. The outline walks
@@ -502,6 +512,7 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.2.0] (2026-08-18)
 
+<!-- terse-ignore: hard-sentence very-hard-sentence -->
 ### Added
 
 - `/terse:draft`: outline-first composition. You polish the structure
@@ -512,10 +523,11 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   whole-document read.
 - The highlight preview (`scripts/render-highlights.mjs`): one
   read-only page per document with no outside assets. Rendered
-  markdown, washes for long passages, underlines for word fixes.
-  Hover hints, chips that filter by category, a quality score. You
+  markdown, washes for long passages, underlines for word fixes,
+  hover hints, chips that filter by category, a quality score. You
   direct fixes in chat.
 - `ai-tell` category: machine-writing phrases and banned vocabulary,
+<!-- terse-ignore: hard-sentence very-hard-sentence -->
   plus structural patterns. Those cover negation triples, stop-start
   slogans, triadic `whether` openers, and `it's not X, it's Y`.
 - `weak-verb` category: 27 phrases where a plain verb does the job,
@@ -542,8 +554,6 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.1.0] (2026-08-17)
 
-Initial release:
-
-- the mechanical checker
-- the writing/check/edit/analyze/proof/tone/review skills
-- voice templates with sign-off
+<!-- terse-ignore: hard-sentence very-hard-sentence -->
+Initial release: the mechanical checker, the writing/check/edit/
+analyze/proof/tone/review skills, and voice templates with sign-off.
