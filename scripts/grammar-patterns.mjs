@@ -572,8 +572,17 @@ const COMPARATIVE = alt(['more', 'less', 'fewer', 'better', 'worse', 'bigger', '
 const DEFINITE_SUBJECT = `(?:The|This|These|Those|Our|Their|Its|My|Your)\\s+(?!(?:${COMPARATIVE})\\b)` +
 	`(?:(?!(?:${NOT_IN_FIRST_CLAUSE})\\b)[a-z][a-z-]*\\s+){0,3}?`;
 const PRONOUN_SUBJECT = '(?:I|We|They|He|She|It)\\s+';
-const REPORTING_VERB = alt(['said', 'says', 'noted', 'added', 'explained', 'replied', 'wrote',
-	'asked', 'answered', 'argued', 'claimed', 'warned', 'announced', 'thought', 'think']);
+const REPORTING_VERBS = ['said', 'says', 'noted', 'added', 'explained', 'replied', 'wrote',
+	'asked', 'answered', 'argued', 'claimed', 'warned', 'announced', 'thought', 'think'];
+const REPORTING_VERB = alt(REPORTING_VERBS);
+// A comment clause closes or interrupts a sentence rather than starting one:
+// "the cache is warm, it seems", "it failed, we assumed, because ...".
+const COMMENT_CLAUSE = `(?:we|they|he|she|I|it)\\s+(?:${alt([...REPORTING_VERBS, 'seems',
+	'seemed', 'appears', 'appeared', 'turned', 'assumed', 'guess', 'guessed', 'suppose',
+	'supposed', 'believe', 'believed', 'figured', 'reckon', 'recalled', 'admitted', 'found',
+	'knew', 'know', 'hope', 'hoped', 'suspect', 'suspected', 'gather', 'understand',
+	'learned', 'noticed', 'realized', 'heard', 'agreed', 'insisted', 'confirmed',
+	'promised'])})(?:\\s+out)?\\s*(?:[,.;:!?]|$)`;
 const FIRST_CLAUSE_TAIL = `(?:(?!\\b(?:${NOT_IN_FIRST_CLAUSE})\\b)[^,;:.?!]){0,160}?`;
 // Verbs that are finite in any position: auxiliaries, their negations,
 // third-person forms, and past tenses no participle shares.
@@ -585,7 +594,8 @@ const PAST_ONLY = alt(['went', 'came', 'saw', 'took', 'gave', 'ran', 'began', 'f
 // word, preposition, or article.
 const NOT_SUBJECT_WORD = `(?!(?:${CLAUSE_WORD}|by|of|in|on|at|for|with|from|to|as|a|an|the)\\b)`;
 const FINITE_ANYWHERE = `(?:${AUXILIARY}|${NEGATED_AUX}|${PAST_ONLY}|${alt(SINGULAR_VERBS)})`;
-const SECOND_CLAUSE = '(?:(?:we|they|he|she|I|it|nobody|nothing|everyone|everything)\\s+' +
+const SECOND_CLAUSE = `(?:(?!${COMMENT_CLAUSE})(?:we|they|he|she|I|it|nobody|nothing|everyone|` +
+	'everything)\\s+' +
 	`(?:not\\s+)?(?:${FINITE_ANYWHERE}|[a-z]+ed)|(?:the|this|these|those|our|their|its|my|` +
 	`your)\\s+(?:${NOT_SUBJECT_WORD}[a-z][a-z-]*\\s+){0,2}?${NOT_SUBJECT_WORD}[a-z][a-z-]*\\s+` +
 	`(?:not\\s+)?${FINITE_ANYWHERE})\\b`;

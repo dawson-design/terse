@@ -375,6 +375,9 @@ describe('grammar across a phrase or a clause boundary', () => {
 		['The hook that runs before commits are pushed catches secrets.'],
 		['The bigger the file gets, the longer parsing takes.'],
 		['The more plugins are installed, the longer startup takes.'],
+		['The cache is warm, it seems. The bug was in the parser, it turned out.'],
+		['The service was down, he explained.'],
+		['It failed, we assumed, because the cache was cold.'],
 	])('leaves the correct sentence %s alone', (text) => {
 		expect(grammar(text)).toEqual([]);
 	});
