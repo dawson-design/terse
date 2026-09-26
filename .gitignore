@@ -6,3 +6,4 @@ examples/
 .terse/*
 !.terse/config.json
 drafts/
+.bench-data/

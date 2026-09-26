@@ -13,14 +13,14 @@ prose.
 ## Runtime coverage
 
 The Codex port keeps the Claude package and command surface. It adds the Codex
-manifest, `$terse:*` syntax, shared hook payload handling, and an authenticated
-Codex ablation runner.
+manifest and the `$terse:*` syntax. It also shares hook payload handling and
+adds a Codex ablation runner that signs in.
 
 - [x] Package the same six skills for Codex and Claude at version 0.12.0.
 - [x] Parse Claude `file_path` and Codex `apply_patch` events in the always-on
       style hook.
 - [x] Add manifest, hook-process, GPT-signal, and human-corpus contract tests.
-- [x] Complete the eight authenticated Codex runs and record every result,
+- [x] Complete the eight authenticated Codex runs. Record every result,
       including invalid ablations and failed graders.
 - [x] Rerun the corrected A/B harness and meet every acceptance condition.
 - [x] Verify direct and automatic activation with Codex CLI.
@@ -117,8 +117,8 @@ recall. Edited human prose set the false-positive bar and the targets.
 - [x] Keep every property test green: conservation, metamorphic
       relations, and the CLI contract. 77 tests pass.
 - [x] 2026-08-19: the lexicon grew the claudism families from the
-      community lists, in every inflection, and `very` joined the
-      qualifiers. Sixty more corpus entries pin recall. The Hemingway
+      community lists, in every inflection. The qualifiers gained
+      `very`. Sixty more corpus entries pin recall. The Hemingway
       corpus still shows zero lexical false positives.
 - [x] 2026-08-20: caution on single words. A bare word is a tell only
       with no everyday literal sense. Words with one need their tell
@@ -254,11 +254,11 @@ a worklist, not an edit plan. Structure problems want structure tools.
 
 - [x] Outline-first composition, shipped first as one draft command and
       now split into `/terse:outline` and `/terse:write`. The user
-      polishes the structure as bullets, one claim per section, checked
-      for knowledge order and one-theme discipline. They sign off
-      before any prose exists. Expansion then writes each section
-      knowing its place in the whole, in the approved voice. A
-      whole-document read ends the pass.
+      polishes the structure as bullets, one claim per section. The
+      outline skill checks each for knowledge order and one theme. The
+      user signs off before any prose exists. Expansion then writes
+      each section knowing its place in the whole, in the approved
+      voice. A whole-document read ends the pass.
 - [x] `/terse:edit` gained the same ending. Re-read every touched
       section whole, and check the cadence spread against the voice
       range. Local fixes can no longer flatten the rhythm unnoticed.
@@ -311,14 +311,90 @@ Proof so far: the skill file passes the checker and ships in the same
 cross-runtime package. The ablation runner's activation pattern names
 it. A live convergence run stays open.
 
+## Milestone 11: Checks built for LLM-assisted writing
+
+A model's draft is grammatical and dense. Its grammar faults come from
+the edits that follow. A subject changes and its verb stays behind, a
+noun swaps under its old article, or a compound noun lands in a verb
+slot. An agent then acts on every finding, so a false alarm damages
+correct text. The checker targets those faults and puts precision
+first. The model's own pass owns the rest.
+
+- [x] 2026-09-26: measure the checker against the incumbents. It found
+      6 of the 16 fixture errors. It found 37 of 180 errors in a suite
+      written without access to the checker. Its sentence rule flagged
+      only sentences of 25 or more words, so it missed every dense one.
+- [x] Gate every grammar rule on unedited model prose from Claude and
+      GPT. The gate also covers edited human prose, the corrected
+      suite sentences, and 7,453 CEFR-SP Wikipedia sentences.
+- [x] Fix false positives in four admitted Harper rules. Report each
+      Harper insertion as a full replacement.
+- [x] Admit 23 more Harper rules, each kept to the context that proves
+      its fix.
+- [x] Add native patterns for agreement at an edit seam, homophones in
+      their one correct frame, and compound nouns in a verb slot. They
+      also catch comma splices before "however" and clauses with no
+      main clause.
+- [x] Lead sentence difficulty with grade, calibrated on CEFR-SP
+      ratings. Rewrite the repo's own dense sentences to match.
+- [x] `npm run benchmark:accuracy` reproduces the After column below.
+      Copied with its fixtures onto 664fb58, it gives Before; onto
+      0a7bdca, it gives the first blind score.
+- [x] Narrow frames for agreement across a phrase and comma splices
+      with no linking word. On a suite written blind, they first caught
+      5 of 60. The checker flagged 3 of its 210 correct sentences, 2
+      through these frames.
+- [ ] Catch more of those two, and run-ons. The frames skip every
+      reading they cannot prove, and the run-on frame tried caught none
+      of 30. A parser would catch more; the model's pass owns the rest.
+- [ ] Run Terse head to head against Grammarly. No public API has
+      returned single errors since its Text Editor SDK closed on
+      2024-01-10.
+
+Proof, recorded 2026-09-26 with `npm run benchmark:accuracy`:
+
+| Measure | Before | After |
+|---|---|---|
+| Held-out suite errors caught | 37/180 (20.6%) | 91/180 (50.6%) |
+| Held-out corrected sentences flagged | 2 | 0 |
+| Grammar-repair fixture errors caught | 6/16 | 12/16, plus the comma splice |
+| False alarms on unedited model prose | 1 | 0, and one real error caught |
+| CoNLL-2014 errors found (annotator 0) | 0.6% at 46% precision | 1.4% at 71% precision |
+| CEFR-SP F0.5, mean rating C1 or harder | 32.2 | 43.2 |
+| CEFR-SP F0.5, mean rating 4.5 or harder | 34.5 | 52.3 |
+| Blind clause suite errors caught | 0/90 | 4/90, 5/90 when first scored |
+| Blind clause suite correct sentences flagged | 1/210 | 0/210, 3/210 when first scored |
+
+A separate session wrote the held-out suite blind. But its three clause
+categories shaped the clause frames, so its score there runs high. The
+blind clause suite gives the honest recall. A fresh session wrote it
+with no access to Terse and no example sentences, and commit 0a7bdca
+scored it first. Fixes for its three false alarms came after, so its
+0/210 is no longer a blind figure.
+
+A third-party corpus checks precision on prose no one wrote for Terse.
+It holds 2.2 million words in 2,760 README, doc, and changelog files
+from the cargo registry and global npm packages. A local script
+measured it; the benchmark does not. The milestone adds 114 findings to
+the ones before it. All 15 comma splices among them are real. Of the
+other 99, all but a few informal usages (`real quick`, `there's many`)
+are clear errors. The corpus turned up the false alarms these fixes
+remove, so it shows what remains, not an unseen rate.
+
+Hemingway App's default rule scores 28.2 and 49.1 on the same CEFR-SP
+sentences. Grammarly's research model corrects 40.1% of CoNLL-2014
+errors at 77.5% precision (Omelianchuk et al., 2020). On learner
+English the checker alone is no match for a grammar assistant. Its
+target is the narrower set of faults an edit leaves in a model's draft.
+
 ## Parity scorecard
 
 | Capability | Readability editors | Grammar assistants | Terse today |
 |---|---|---|---|
-| Readability grading | yes | partial | yes |
+| Readability grading | yes | partial | yes, ahead of Hemingway on CEFR-SP (M11) |
 | Passive, adverbs, wordiness | yes | yes | yes |
 | AI-tell detection | no | tagging only | yes, with removal |
-| Grammar repair | paid tier | yes | yes, parity eval (M1) |
+| Grammar repair | paid tier | yes | model: parity eval (M1); checker: about half (M11) |
 | Tone presets | paid tier | yes | yes, eval pending (M6) |
 | Voice capture with sign-off | no | partial | yes |
 | Colored highlight view | yes | yes | yes (M3) |

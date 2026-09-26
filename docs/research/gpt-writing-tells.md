@@ -37,7 +37,7 @@ conditions:
 The four live genres are a README, an explainer, a launch post, and
 an edit with planted tells. Each runs once with `terse@terse` enabled and once
 with it disabled. Both arms use the active default model in a fresh temporary
-workspace with project rules disabled. The comparison records the date, model,
+workspace with project rules disabled. The comparison logs the date, model,
 CLI version, checker metrics, fixed graders, and skill activation.
 
 The false-alarm bar is stricter than the source evidence. Increased use in
@@ -72,8 +72,8 @@ human-corpus test coverage. Their labels remain editing signals.
 
 ## Deterministic evidence
 
-`test/corpus.test.js` covers every admitted GPT-linked rule. It tests
-positive and inflected forms, literal senses, quoted examples, and the entire
+`test/corpus.test.js` covers every admitted GPT-linked rule. It tests positive
+and inflected forms, literal senses, and quoted examples. It also tests the entire
 committed human-prose corpus. `npm test` and the repository self-check are the
 acceptance commands.
 
@@ -82,7 +82,7 @@ acceptance commands.
 The signed-in run tested two CLI builds. Codex CLI 0.139.0 loaded the
 direct `$terse:edit` skill, but the active `gpt-5.6-sol` endpoint rejected that
 client as too old before generation. The Desktop-bundled Codex CLI
-0.149.0-alpha.4.1 completed the live calls on 2026-08-22 and 2026-08-23 UTC.
+0.149.0-alpha.4.1 finished the live calls on 2026-08-22 and 2026-08-23 UTC.
 Direct invocation edited its fixture, and a prose request that did not name
 Terse activated an installed Terse skill.
 
@@ -106,7 +106,7 @@ four defects and fixed them:
 
 - The runner closes Codex stdin.
 - Inline regex flags accept `(?is)`.
-- Each arm uses an isolated Codex home because CLI 0.149.0-alpha.4.1 ignored
+- Each arm uses an isolated Codex home since CLI 0.149.0-alpha.4.1 ignored
   the per-command plugin override.
 - The multi-stop write workflow triggers when the user names it.
 

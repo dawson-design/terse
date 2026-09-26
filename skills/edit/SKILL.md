@@ -70,9 +70,10 @@ every mode.
    `../style/references/model-defaults.md`;
    together they govern every rewrite.
    The defaults reference also lists trained habits the checker cannot
-   catch. Hunt them in the collection read that follows: synonym
-   cycling, compulsive triplets, participial tails, closing summaries,
-   and a sources list at the end. The list is a `structure` finding.
+   catch. Hunt them in the collection read that follows. Four are
+   synonym cycling, compulsive triplets, participial tails, and closing
+   summaries. The fifth is a sources list at the end. The list is a
+   `structure` finding.
    The fix moves each link onto the claim it supports and removes
    the list. Hunt metaphorical verbs in the same read. The checker
    frames the common ones. The style skill's translation test owns
@@ -102,9 +103,9 @@ every mode.
    free-form read.
 4. Audit the reverse outline before any fix. Read the list for jumps,
    misordering, and paragraphs making two points. Check the flow at
-   every level. Each subsection makes one point, that point supports
-   its section's claim, and the sections in order walk the reader from
-   question to answer. Four more checks run against the list:
+   every level. Each subsection makes one point, and that point
+   supports its section's claim. The sections in order walk the reader
+   from question to answer. Four more checks run against the list:
    - restatement: a claim group holding two or more paragraphs is a
      restatement, not emphasis, wherever the paragraphs sit. Each
      group emits one `structure` finding. It lists every paragraph in
@@ -115,7 +116,7 @@ every mode.
      consequence is an advance and emits no finding. Only a paragraph
      that brings nothing new joins the group. Two places need a closer
      look. The paragraph after a strong claim often reasserts the
-     claim instead of supporting it, and the closing section drifts
+     claim instead of supporting it. The closing section drifts
      toward summary
    - length and the outline's arithmetic: run
      `node "<terse-root>/scripts/outline-check.mjs" <file>`
@@ -165,8 +166,8 @@ every mode.
    discards the sentence's collected grammar findings; re-proof the new
    wording.
    - **structural** first:
-     - hard sentence: split it, or turn an in-sentence list into
-       bullets
+     - hard sentence: split a long one, or turn its list into
+       bullets; give a dense one shorter, plainer words
      - long opening: cut it back to the fact the reader came for
      - aside: cut it, or promote it to its own sentence
    - **wording** second:
@@ -204,7 +205,7 @@ every mode.
    skips with the reason.
    `structure` findings go to the report, not the loop.
 7. Preserve the author's voice: every edit stays inside the flagged
-   sentence, and the author's order and content survive untouched.
+   sentence. The author's order and content survive untouched.
    Meaning must survive every edit; when a fix would change what the
    sentence claims, skip it and say so.
    Cuts the user approved are the one exception, and they remove whole
@@ -218,7 +219,7 @@ every mode.
    not an edit plan: fifteen correct local fixes can leave a paragraph
    reading as chopped fragments. Four audits happen in this read:
    - cadence against the voice template's measured spread (`--json`
-     gives `stats.sentenceLengths`); a collapsed spread means the
+     gives `stats.sentenceLengths`). A collapsed spread means the
      splits flattened the rhythm
    - the first and last sentence of each paragraph, read in sequence,
      must chain
@@ -226,11 +227,11 @@ every mode.
      the reader's thread
    - where a cut or a merge landed, the paragraphs on either side must
      still meet.
-   Restore flow with the author's own devices: connective openers,
-   asymmetric splits, a short verdict against a long analysis.
+   Restore flow with the author's own devices. They are connective
+   openers, asymmetric splits, a short verdict against a long analysis.
    Never restore it by undoing the fixes.
-10. Report: findings fixed per category, findings kept with reasons,
-    and the before/after stats line including length against target.
+10. Report: findings fixed per category and findings kept with reasons.
+    Add the before/after stats line including length against target.
     Include the cadence spread before and after.
 
 ## Verification
@@ -241,21 +242,21 @@ every mode.
       fixes each category.
 - [ ] The reverse outline ran before the sentence loop; in fix mode,
       `structure` findings got the user's direction first.
-- [ ] The reverse outline records each paragraph's claim, and the
+- [ ] The reverse outline records each paragraph's claim. The
       restatement check grouped those claims across the whole
       document, not only across adjacent lines.
 - [ ] Every repeated-claim finding lists the full group, names one
       keep, and went to the report for the user's direction.
 - [ ] A later instance that advanced its claim raised no finding.
 - [ ] The audit covered restatement, length against target and
-      budget, and omission on a short draft, skeleton compression
-      included.
+      budget, and omission on a short draft. The omission check
+      covered skeleton compression.
 - [ ] The warrant audit ran: every sentence still ties to its
       section's claim on the page.
 - [ ] When an outline file exists, the audit covered its recorded
       claims and promises.
 - [ ] The flow check covered every level: subsection points support
-      their sections, and the sections walk the reader from question
+      their sections. The sections walk the reader from question
       to answer.
 - [ ] The checker ran before and after; every remaining flag is a
       documented keep, not a leftover; iteration stopped at the stop

@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { checkText } from '../scripts/style-check.mjs';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { checkText, stripMarkdown } from '../scripts/style-check.mjs';
+
+const HERE = fileURLToPath(new URL('.', import.meta.url));
 
 const cats = (flags) => flags.map((f) => f.category);
 
@@ -7,6 +12,11 @@ describe('checkText', () => {
 	it('passes clean prose with no flags', () => {
 		const { flags } = checkText('The scheduler deletes stale entries every night.');
 		expect(flags).toEqual([]);
+	});
+
+	it('checks a sentence whose participle names an Object.prototype key', () => {
+		expect(() => checkText('The dependency is constructor-injected.')).not.toThrow();
+		expect(() => checkText('The flag is toString-based.')).not.toThrow();
 	});
 
 	it('flags passive voice, adverbs, and qualifiers', () => {
@@ -31,6 +41,52 @@ describe('checkText', () => {
 		expect(cats(flags)).toContain('very-hard-sentence');
 	});
 
+	describe('sentence difficulty, led by grade', () => {
+		const DENSE = 'For each group, it shows the first and latest occurrence, helping you ' +
+			'distinguish a one-off incident from an active regression.'; // 20 words, grade 14
+		const LONG_PLAIN = 'The team moved the old jobs to the new queue last week, and the workers ' +
+			'now pick them up in order and write each result to the same table.'; // 29 words, grade 11
+		const MID = 'The platform team rewrote the deployment scripts so each service now ships ' +
+			'through one pipeline.'; // 15 words, grade 12
+		const SHORT_DENSE = 'Operators review the rollout dashboard before promoting canary deployments.';
+		const sentenceFlags = (text, opts) => checkText(text, opts).flags
+			.filter((f) => f.category.endsWith('hard-sentence'));
+
+		it('flags a dense sentence four grades above the target, with a word-choice hint', () => {
+			expect(sentenceFlags(DENSE)).toEqual([expect.objectContaining({
+				category: 'hard-sentence', match: '20 words, grade 14',
+				hint: expect.stringMatching(/^use shorter, plainer words/) })]);
+		});
+
+		it('leaves a long sentence of plain words alone', () => {
+			expect(sentenceFlags(LONG_PLAIN)).toEqual([]);
+		});
+
+		it('never flags a sentence under fourteen words', () => {
+			expect(sentenceFlags(SHORT_DENSE)).toEqual([]);
+		});
+
+		it('moves both thresholds with the target grade', () => {
+			expect(sentenceFlags(MID)).toEqual([]);
+			expect(sentenceFlags(MID, { maxGrade: 8 }).map((f) => f.category))
+				.toEqual(['hard-sentence']);
+			expect(sentenceFlags(DENSE, { maxGrade: 6 }).map((f) => f.category))
+				.toEqual(['very-hard-sentence']);
+		});
+
+		it('flags unedited model prose more often than edited human prose', () => {
+			const rate = (dir) => {
+				const docs = readdirSync(dir).filter((x) => x.endsWith('.md'))
+					.map((x) => checkText(readFileSync(join(dir, x), 'utf8')).stats);
+				const sum = (key) => docs.reduce((n, s) => n + s[key], 0);
+				return sum('hardSentences') / sum('sentences');
+			};
+			const model = rate(join(HERE, 'fixtures', 'model-prose'));
+			const human = rate(join(HERE, '..', 'samples', 'hemingway'));
+			expect(model).toBeGreaterThan(human);
+		});
+	});
+
 	it('flags em dashes with line numbers', () => {
 		const { flags } = checkText('First line.\n\nStale entries — every night.');
 		const dash = flags.find((f) => f.category === 'em-dash');
@@ -45,6 +101,23 @@ describe('checkText', () => {
 	it('ignores code blocks, inline code, and headings', () => {
 		const { flags } = checkText('# Utilize This Heading Style\n\nUse `utilize_helper()` here.\n\n```\nwe utilize things very significantly\n```\n');
 		expect(flags).toEqual([]);
+	});
+
+	it('ignores inline code that wraps onto the next line', () => {
+		const doc = 'Examples such as `we utilize\nthe helper` and `utilize` stay code.\n';
+		expect(checkText(doc).flags).toEqual([]);
+	});
+
+	it.each([
+		['- Press the ` key.\n- We utilize `npm test` here.\n'],
+		['1. Press the ` key.\n2. We utilize `npm test` here.\n'],
+	])('ends inline code at a new list item: %j', (doc) => {
+		expect(checkText(doc).flags.map((f) => f.match)).toEqual(['utilize']);
+	});
+
+	it('keeps a paragraph break between unmatched backticks as prose', () => {
+		const doc = 'A stray ` mark.\n\nWe utilize the helper. Another ` mark.\n';
+		expect(checkText(doc).flags.map((f) => f.match)).toEqual(['utilize']);
 	});
 
 	it('flags long parenthetical asides but not short ones', () => {
@@ -263,6 +336,49 @@ describe('checkText', () => {
 		const spans = flags.filter((f) => f.category === 'qualifier').map((f) => f.span);
 		expect(spans).toHaveLength(2);
 		expect(spans[0]).not.toEqual(spans[1]);
+	});
+
+	it('places a sentence-opening tell inside a list item', () => {
+		const text = '- Note that the flag is optional.\n';
+		const tell = checkText(text).flags.find((f) => f.category === 'ai-tell');
+		expect(text.slice(...tell.span)).toBe('Note that');
+	});
+
+	it('places a sentence-opening tell on its own line in wrapped text', () => {
+		const text = 'The cache is warm.\nNote that the flag is optional.\n';
+		const tell = checkText(text).flags.find((f) => f.category === 'ai-tell');
+		expect(tell.line).toBe(2);
+		expect(text.slice(...tell.span)).toBe('Note that');
+	});
+
+	it('places the same match from two patterns in one sentence', () => {
+		const text = 'The config file contain the keys; it contain the secrets.';
+		const flags = checkText(text).flags.filter((f) => f.category === 'grammar');
+		expect(flags.map((f) => f.span[0])).toEqual([16, 37]);
+		expect(flags.map((f) => text.slice(...f.span))).toEqual(['contain', 'contain']);
+	});
+
+	it('gives each different match of one pattern its own span', () => {
+		const text = 'We weighed this approach against that tension.';
+		const tells = checkText(text).flags.filter((f) => f.category === 'ai-tell');
+		expect(tells.map((f) => text.slice(...f.span))).toEqual(['this approach', 'that tension']);
+	});
+
+	// Placing each finding by rescanning its sentence took about 12 seconds
+	// here; one scan per pattern takes a fraction of one. The bound catches
+	// that rescan coming back, not every kind of slowdown.
+	it('strips a run of unclosed link brackets without rescanning it', () => {
+		const started = performance.now();
+		expect(stripMarkdown('['.repeat(100_000))).toHaveLength(100_000);
+		expect(performance.now() - started).toBeLessThan(1000);
+	});
+
+	it('places 12,500 findings in one sentence without a rescan per finding', () => {
+		const text = `Our ${'the the '.repeat(12_500)}end.`;
+		const started = performance.now();
+		const flags = checkText(text).flags.filter((f) => f.category === 'grammar');
+		expect(flags).toHaveLength(12_500);
+		expect(performance.now() - started).toBeLessThan(2000);
 	});
 
 	it('suppresses the next line under a terse-ignore comment', () => {

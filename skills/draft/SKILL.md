@@ -49,16 +49,16 @@ a bare one means naming a missing fact, which you can check.
 3. Set the constraints before drafting. These are the numbers the
    checker measures, so writing to them costs nothing and clearing
    them afterwards costs a rewrite:
-   - document grade below 10; keep sentences under 25 words, or below
-     grade 10 when they run longer
+   - document grade below 10; keep any sentence of 14 or more words
+     below grade 14, with short words or a split
    - the first paragraph under 90 words, opening on the fact the
      reader came for
    - adverbs about 1 per 134 words, passive about 1 per 123,
      qualifiers about 1 per 400
    - an approved voice template's measured ranges bound all of these
    - issues, specs, and acceptance criteria stay impersonal: state the
-     requirement rather than the wish for it, and run the checker with
-     `--impersonal`
+     requirement rather than the wish for it. Run the checker on them
+     with `--impersonal`
    - the expansion ceiling for the document type, from the table in
      step 5. The outline's budgets are ceilings too: a section may
      come in under its number, never over
@@ -168,11 +168,11 @@ a bare one means naming a missing fact, which you can check.
      range. A short draft sits at the low end of the range. Leave it
      there; longer sentences are not the fix
    - connective flow: each section's opening should catch the previous
-     section's throw; each paragraph's first sentence should need the
+     section's throw. Each paragraph's first sentence should need the
      one before it. Restore a broken link by reordering, never by
      adding a connective sentence; that is where padding returns
-   - advance: write one line per paragraph stating the claim it makes,
-     and hold each paragraph against every earlier claim, not only its
+   - advance: write one line per paragraph stating the claim it makes.
+     Hold each paragraph against every earlier claim, not only its
      predecessor. A paragraph that repeats a claim from three sections
      back merges or goes, the same as one that repeats the paragraph
      before it. A match is only a repeat when the later paragraph
@@ -212,7 +212,7 @@ a bare one means naming a missing fact, which you can check.
 - [ ] Every sentence beyond the skeleton answers one of the five
       allowed questions, and the working note records which.
 - [ ] No sentence kept its skeleton compression: abstract orderings
-      carry a concrete anchor, and no claim leans on reasoning the
+      carry a concrete anchor. No claim leans on reasoning the
       draft cut.
 - [ ] The expansion ratio is under the ceiling for the document type,
       or the report says what was cut to get there.
@@ -228,9 +228,9 @@ a bare one means naming a missing fact, which you can check.
       went back to the outline instead of into padding.
 - [ ] The outline file records every deviation from the approved
       outline, none silent.
-- [ ] The whole-document read happened: cadence against the voice
-      range, transitions in order, paragraph advance, outline claims
-      intact.
+- [ ] The whole-document read happened. It covered cadence against
+      the voice range, transitions in order, and paragraph advance.
+      Outline claims stayed intact.
 - [ ] No connective sentence went in to restore flow.
 - [ ] Every subsection makes one point, and that point supports its
       section's claim and the document's flow.

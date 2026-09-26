@@ -10,18 +10,23 @@ import { homedir } from 'node:os';
 import { pathToFileURL } from 'node:url';
 import { dirname, resolve, join } from 'node:path';
 import { createGrammarPool } from './grammar-check.mjs';
+import { GRAMMAR_PATTERNS } from './grammar-patterns.mjs';
 
-export const HARD_GRADE = 10; // document grade target; also the hard-sentence floor
-// Sentence flags are length-led, calibrated against 514 sentences of
-// Hemingway's journalism: the old grade-only rule flagged 26.8% of his
-// sentences, because ARI's character counting punishes long vocabulary in
-// otherwise plain sentences. This rule flags 13.2% of the corpus: the
-// genuinely long tail plus the impenetrably dense.
-const HARD_WORDS = 25;        // hard: 25+ words at or above the target grade
-const VHARD_WORDS = 30;       // very hard: 30+ words at grade 14+ ...
-const VHARD_GRADE = 14;
-const DENSE_WORDS = 14;       // ... or any 14+ word sentence at grade 18+
-const DENSE_GRADE = 18;
+export const HARD_GRADE = 10; // document grade target; sentence thresholds sit above it
+// Sentence flags are led by grade. They were calibrated on CEFR-SP (Arase et
+// al., EMNLP 2022): 7,453 Wikipedia sentences that English teachers rated for
+// difficulty. The thresholds were chosen on its train and dev splits in a
+// one-off sweep of word floors and grade offsets. On the held-out test
+// split's sentences rated C1 or harder, which the benchmark scores, they
+// score F0.5 43.2 against 32.2 for the length-led rule they replaced, which
+// missed every dense sentence under 25 words. They flag 15% of unedited model
+// prose and 10% of Hemingway's journalism. Model drafts run dense rather than
+// long, so most flags land on 14- to 24-word sentences whose long words carry
+// the difficulty. scripts/accuracy-benchmark.mjs reproduces the measurement.
+const SENTENCE_FLOOR = 14;  // shorter sentences are never flagged
+const HARD_ABOVE = 4;       // hard: at least four grades above the target
+const VERY_HARD_ABOVE = 8;  // very hard: at least eight grades above it
+const LONG_SENTENCE = 25;   // from here the fix is a split; below, plainer words
 const MIN_WORDS_FOR_GRADE = 14; // documents shorter than this skip the gate
 const ASIDE_WORDS = 6; // parenthetical asides at or above this length are flagged
 // The Kansas City Star style sheet, which Hemingway called the best rules he
@@ -248,10 +253,12 @@ const AI_TELL_NOUNS = ['synergy', 'footgun', 'linchpin', 'workhorse',
 // Tells whose surface varies: a pattern per family, matched per sentence.
 const AI_TELL_REGEXES = [
 	// "Note that" opening a sentence is a signpost; "a note that said" is a
-	// note. The lexicon runs per sentence, so ^ is the sentence start.
-	{ re: /^note\s+that\b/gi },
+	// note. The lexicon runs per sentence, so ^ is the sentence start; the
+	// span is refined on the raw sentence, which may open with a line break
+	// or a list marker.
+	{ re: /(?<=^(?:\s|[-*+>]\s|\d{1,2}[.)]\s)*)note\s+that\b/gi },
 	// the hedge opens a sentence; "a note that said goodbye" is a note
-	{ re: /^that\s+said\b/gi },
+	{ re: /(?<=^(?:\s|[-*+>]\s|\d{1,2}[.)]\s)*)that\s+said\b/gi },
 	{ re: /\bin\s+this\s+(?:document|article|post|guide|section|chapter|tutorial),?\s+(?:we|i|you)\b/gi },
 	{ re: /\bthis\s+(?:section|chapter|document|guide|article)\s+(?:describes|covers|explains|discusses|outlines|presents|introduces)\b/gi },
 	{ re: /\bthe\s+following\s+sections?\s+(?:cover|describe|explain|discuss|outline|present)s?\b/gi },
@@ -462,59 +469,6 @@ const WEAK_VERB_REGEXES = [
 	{ re: new RegExp(`\\b${LIGHT('provide|provides|provided|providing')}\\s+the\\s+(?:capability|ability)\\s+to\\b`, 'gi'), verb: 'can' },
 ];
 
-// Mechanics a pattern can prove: doubled function words, "could of",
-// "its" before a word only "it's" precedes, "their" before a be-verb, and a
-// short list of misspellings with one correct form. Everything else in the
-// grammar scope stays with the model.
-const MISSPELLINGS = {
-	seperate: 'separate', seperately: 'separately', seperated: 'separated',
-	recieve: 'receive', recieved: 'received', recieving: 'receiving',
-	occured: 'occurred', occuring: 'occurring', occurence: 'occurrence',
-	occurences: 'occurrences', definately: 'definitely', alot: 'a lot',
-	untill: 'until', wich: 'which', accomodate: 'accommodate',
-	acheive: 'achieve', acheived: 'achieved', begining: 'beginning',
-	beleive: 'believe', comittee: 'committee', existance: 'existence',
-	goverment: 'government', independant: 'independent',
-	neccessary: 'necessary', necessary: 'necessary', occassion: 'occasion',
-	publically: 'publicly', recomend: 'recommend', recomended: 'recommended',
-	refered: 'referred', succesful: 'successful', sucessful: 'successful',
-	sucess: 'success', tommorow: 'tomorrow', truely: 'truly', wierd: 'weird',
-	enviroment: 'environment', arguement: 'argument', liason: 'liaison',
-	mispell: 'misspell', noticable: 'noticeable', perseverence: 'perseverance',
-	priviledge: 'privilege', similiar: 'similar', thier: 'their',
-	dependancy: 'dependency', dependancies: 'dependencies',
-	liscence: 'license', maintainance: 'maintenance', prefered: 'preferred',
-	transfered: 'transferred', writting: 'writing', comming: 'coming',
-	buisness: 'business', becuase: 'because', teh: 'the', greatful: 'grateful',
-	harrass: 'harass', lenght: 'length', embarass: 'embarrass',
-	occassionally: 'occasionally', paralell: 'parallel', paralel: 'parallel',
-	recieves: 'receives', retreive: 'retrieve', retreived: 'retrieved',
-	suprise: 'surprise', suprised: 'surprised', threshhold: 'threshold',
-	adress: 'address', calander: 'calendar', concensus: 'consensus',
-	consistant: 'consistent', persistant: 'persistent', existant: 'existent',
-	guage: 'gauge', heirarchy: 'hierarchy', immediatly: 'immediately',
-	lisence: 'license', millenium: 'millennium', miniscule: 'minuscule',
-	pronounciation: 'pronunciation', reccomend: 'recommend',
-	seige: 'siege', tendancy: 'tendency', useable: 'usable',
-	quater: 'quarter',
-};
-delete MISSPELLINGS.necessary;
-
-const GRAMMAR_PATTERNS = [
-	// Function words English never doubles. Particles and determiners stay
-	// out: "log in in a tab", "turns on on boot", "what it is is", "this
-	// this week", "press a a second time" are all grammatical.
-	{ re: /\b(the|an|of|and|for|with|was|are|or|as|if|be)\s+\1\b/gi,
-		hint: (m) => `use "${m[1].toLowerCase()}"` },
-	{ re: /\b(could|should|would|must|might|may)\s+of\b(?!\s+course\b)/gi,
-		hint: (m) => `use "${m[1].toLowerCase()} have"` },
-	{ re: /\bits(?=\s+(?:a|an|the|not|now|also|been|being|already|still|just|going|because|too)\b)/gi,
-		hint: () => 'use "it\'s"' },
-	{ re: /\btheir(?=\s+(?:is|are|was|were)\b)/gi, hint: () => 'use "there"' },
-	{ re: new RegExp(`\\b(${Object.keys(MISSPELLINGS).join('|')})\\b`, 'gi'),
-		hint: (m) => `use "${MISSPELLINGS[m[1].toLowerCase()]}"` },
-];
-
 const IRREGULAR_PARTICIPLES = new Set([
 	'begun', 'beaten', 'bitten', 'bought', 'brought', 'broken', 'built',
 	'caught', 'chosen', 'dealt', 'done', 'drawn', 'driven', 'eaten', 'fed',
@@ -540,7 +494,7 @@ const STATE_IDIOMS = {
 };
 
 function isStateIdiom(aux, participle, rest) {
-	if (!(participle in STATE_IDIOMS)) return false;
+	if (!Object.hasOwn(STATE_IDIOMS, participle)) return false;
 	const follow = STATE_IDIOMS[participle];
 	if (follow === null) return /^g(?:et|ets|ot)$/i.test(aux); // get/got started
 	return follow.test(rest.trimStart());
@@ -558,15 +512,27 @@ const NOT_PARTICIPLES = new Set([
 	'convoluted', 'nuanced',
 ]);
 
-// Exported for the conservation property tests.
-export function stripMarkdown(text) {
+// A line break inline code may continue across: not a blank line, a list
+// item, a quote, or a heading, since CommonMark spans end with their block.
+const CODE_LINE_BREAK = /\n(?![ \t]*(?:\n|[-*+][ \t]|\d{1,9}[.)][ \t]|>|#))/.source;
+const INLINE_CODE = new RegExp(`\`(?:[^\`\\n]|${CODE_LINE_BREAK})+\``, 'g');
+
+// Exported for the conservation property tests. Inline code may wrap onto
+// the next line of its paragraph, as CommonMark allows.
+// `codeMark` fills inline code: the default blank for prose checks, or a
+// capital letter for grammar, so the words on either side of a code span
+// never read as neighbors ("the optional `getOptions` are").
+export function stripMarkdown(text, codeMark = ' ') {
 	return text
 		.replace(/^---\n[\s\S]*?\n---(?=\n|$)/, (m) => m.replace(/[^\n]/g, ' '))
 		.replace(/```[\s\S]*?```/g, (m) => m.replace(/[^\n]/g, ' '))
-		.replace(/`[^`\n]+`/g, (m) => ' '.repeat(m.length))
+		.replace(INLINE_CODE, (m) => m.replace(/[^\n]/g, codeMark))
 		.replace(/<!--[\s\S]*?-->/g, (m) => m.replace(/[^\n]/g, ' '))
-		.replace(/\[([^\]]*)\]\((?:[^()\n]|\([^()\n]*\))*\)/g, (m, label) =>
-			label.padEnd(m.length, ' '))
+		// A link keeps its label at the label's own offsets. An image's "!"
+		// blanks with the brackets, since "!" before a space ends a sentence.
+		// The label holds no "[", so a run of unclosed brackets scans once.
+		.replace(/!?\[([^\][]*)\]\((?:[^()\n]|\([^()\n]*\))*\)/g, (m, label) =>
+			`${' '.repeat(m.indexOf('[') + 1)}${label}`.padEnd(m.length, ' '))
 		.replace(/^[ \t]*[|].*$/gm, (m) => ' '.repeat(m.length))
 		.replace(/^ {0,3}#{1,6}\s.*$/gm, (m) => ' '.repeat(m.length));
 }
@@ -699,18 +665,23 @@ function wordsOf(sentence) {
 		.filter((w) => /[\p{L}\p{N}]/u.test(w));
 }
 
-function checkSentence(sentence, maxGrade, flags, file, line) {
-	const words = wordsOf(sentence);
+// The difficulty flag for a sentence, or null. The hint names the likely
+// cause: a long sentence wants a split, a dense one wants plainer words.
+function difficultyFlag(words, maxGrade) {
 	const grade = ariGrade(words);
-	const veryHard = (words.length >= VHARD_WORDS && grade >= VHARD_GRADE) ||
-		(words.length >= DENSE_WORDS && grade >= DENSE_GRADE);
-	const hard = words.length >= HARD_WORDS && grade >= maxGrade;
-	if (veryHard || hard) {
-		flags.push({ file, line,
-			category: veryHard ? 'very-hard-sentence' : 'hard-sentence',
-			match: `${words.length} words, grade ${grade}`,
-			hint: 'split the sentence or convert an in-sentence list to bullets' });
-	}
+	if (words.length < SENTENCE_FLOOR || grade < maxGrade + HARD_ABOVE) return null;
+	return {
+		category: grade >= maxGrade + VERY_HARD_ABOVE ? 'very-hard-sentence' : 'hard-sentence',
+		match: `${words.length} words, grade ${grade}`,
+		hint: words.length >= LONG_SENTENCE
+			? 'split the sentence or convert an in-sentence list to bullets'
+			: 'use shorter, plainer words, or split the sentence',
+	};
+}
+
+function checkSentence(sentence, maxGrade, flags, file, line) {
+	const difficulty = difficultyFlag(wordsOf(sentence), maxGrade);
+	if (difficulty) flags.push({ file, line, ...difficulty });
 	const passiveRe = /\b(am|is|are|was|were|be|been|being|get|gets|got)(?:n['’]t)?\s+(?:\w+ly\s+)*(?:being\s+)?(?:\w+ly\s+)*(\w+)\b/gi;
 	for (const m of sentence.matchAll(passiveRe)) {
 		const p = m[2].toLowerCase();
@@ -769,23 +740,52 @@ function pushMatchesWithLine(text, re, lineAt, flags, flag) {
 // sentence-level categories keep the whole sentence.
 const SENTENCE_LEVEL = new Set(['hard-sentence', 'very-hard-sentence']);
 
-function assignSpans(text, flags, from, span) {
+// Grammar findings refine against `grammarText`, which masks inline code the
+// way checkGrammar saw it. Each pattern runs once per sentence and its hits
+// are grouped by text, so many findings from one pattern cost one scan.
+function assignSpans({ rawText, text, grammarText }, flags, from, span) {
 	const seen = new Map(); // repeated matches refine to their own occurrence
+	const hits = new Map();
 	for (let i = from; i < flags.length; i++) {
 		if (flags[i].span) continue;
 		if (SENTENCE_LEVEL.has(flags[i].category)) {
 			flags[i].span = span;
 			continue;
 		}
-		const key = `${flags[i].category}:${flags[i].match}`;
+		// Two patterns can report the same text in one sentence, so each
+		// pattern counts its own occurrences, grouped the way hits are.
+		const key = `${flags[i].category}:${normalized(flags[i].match)}:${flags[i]._re?.source ?? ''}`;
 		const n = seen.get(key) ?? 0;
 		seen.set(key, n + 1);
 		const re = flags[i]._re
-			? new RegExp(flags[i]._re.source, 'gi')
+			? new RegExp(flags[i]._re.source, flags[i]._re.flags.replace('g', '') + 'g')
 			: literalRegex(flags[i].match);
 		delete flags[i]._re;
-		flags[i].span = refineSpan(text, span, re, n) ?? span;
+		// A grammar finding that cannot be placed exactly is dropped: its
+		// hint replaces the matched text, and a sentence-wide span would
+		// replace the whole sentence.
+		const grammar = flags[i].category === 'grammar';
+		const source = grammar ? grammarText : text;
+		const hitKey = `${grammar}:${re.source}:${re.flags}`;
+		if (!hits.has(hitKey)) hits.set(hitKey, hitsByText(source.slice(span[0], span[1]), re));
+		const m = hits.get(hitKey).get(normalized(flags[i].match))?.[n];
+		flags[i].span = m ? [span[0] + m.index, span[0] + m.index + m[0].length]
+			: (grammar ? null : span);
+		if (grammar && flags[i].span) matchSource(rawText, grammarText, flags[i]);
 	}
+}
+
+// A grammar match that covers markup saw only what stripping left: a mask
+// for inline code, blanks for link brackets and comments. The match shows
+// the source instead, and a replacement hint loses its span: it was written
+// from the stripped text ("use "XXXXXs""), and applying it would edit the
+// code or the link ("use "the"" over "the [the").
+function matchSource(rawText, grammarText, flag) {
+	const [start, end] = flag.span;
+	const source = rawText.slice(start, end);
+	if (grammarText.slice(start, end) === source) return;
+	if (flag.hint.startsWith('use "')) flag.span = null;
+	else flag.match = source.replace(/\s+/g, ' ');
 }
 
 function literalRegex(match) {
@@ -793,15 +793,19 @@ function literalRegex(match) {
 		.replace(/\s+/g, '\\s+').replace(/['’]/g, "['’]"), 'gi');
 }
 
-function refineSpan(text, span, re, occurrence = 0) {
-	const slice = text.slice(span[0], span[1]);
-	let m;
-	for (let i = 0; (m = re.exec(slice)) !== null; i++) {
-		if (i === occurrence) {
-			return [span[0] + m.index, span[0] + m.index + m[0].length];
-		}
+const normalized = (s) => s.replace(/\s+/g, ' ').replace(/’/g, "'").toLowerCase();
+
+// Every hit of re in a sentence, grouped by its normalized text. One
+// pattern can match different text in one sentence ("this approach", "that
+// tension"), so a flag counts only the hits that share its text.
+function hitsByText(slice, re) {
+	const groups = new Map();
+	for (const m of slice.matchAll(re)) {
+		const key = normalized(m[0]);
+		if (!groups.has(key)) groups.set(key, []);
+		groups.get(key).push(m);
 	}
-	return null;
+	return groups;
 }
 
 function isLiteralSimplerUse(sentence, phrase, match) {
@@ -868,7 +872,13 @@ function checkLexicon(sentence, flags, file, line, impersonal) {
 				hint: `use the verb: "${verb ?? NOMINAL_VERB[m[1].toLowerCase()]}"` });
 		}
 	}
-	for (const { re, hint } of GRAMMAR_PATTERNS) {
+}
+
+// A list item may be a fragment by design, so prose-only patterns skip it;
+// so may the answer to a question, which fragment patterns skip.
+function checkGrammar(sentence, flags, file, line, { listItem, afterQuestion }) {
+	for (const { re, hint, prose, fragment } of GRAMMAR_PATTERNS) {
+		if ((prose && listItem) || (fragment && afterQuestion)) continue;
 		for (const m of sentence.matchAll(re)) {
 			flags.push({ file, line, category: 'grammar', _re: re,
 				match: m[0].replace(/\s+/g, ' '), hint: hint(m) });
@@ -1043,6 +1053,7 @@ export function checkText(rawText,
 	ignore = Array.isArray(ignore) ? ignore : [];
 	targets = targets && typeof targets === 'object' ? targets : {};
 	const text = stripMarkdown(rawText);
+	const grammarText = stripMarkdown(rawText, 'X');
 	const lineAt = makeLineIndex(text);
 	const flags = [];
 	for (const m of text.matchAll(/—/g)) {
@@ -1088,15 +1099,24 @@ export function checkText(rawText,
 	const allWords = [];
 	const sentenceLengths = [];
 	for (const s of splitSentences(text)) {
-		const line = lineAt(s.offset + (s.text.length - s.text.trimStart().length));
-		const clean = s.text.replace(/\s+/g, ' ').trim()
-			.replace(/^(?:[-*+]|\d{1,2}[.)])\s+/, '');
+		const start = s.offset + (s.text.length - s.text.trimStart().length);
+		const line = lineAt(start);
+		// The raw text keeps headings, so "## Why?" counts as the question.
+		const afterQuestion = /\?[)"'”’*_]*\s*$/.test(rawText.slice(Math.max(0, start - 200), start));
+		const trimmed = s.text.replace(/\s+/g, ' ').trim();
+		const clean = trimmed.replace(/^(?:[-*+]|\d{1,2}[.)])\s+/, '');
+		const grammarClean = grammarText.slice(s.offset, s.offset + s.text.length)
+			.replace(/\s+/g, ' ').trim().replace(/^(?:[-*+]|\d{1,2}[.)])\s+/, '');
 		const words = wordsOf(clean);
 		if (words.length === 0) continue; // horizontal rules, stray symbols
 		const before = flags.length;
 			checkSentence(clean, maxGrade, flags, file, line);
 			checkLexicon(clean, flags, file, line, impersonal);
-			assignSpans(text, flags, before, [s.offset, s.offset + s.text.length]);
+			checkGrammar(grammarClean, flags, file, line,
+				{ listItem: clean !== trimmed, afterQuestion });
+			assignSpans({ rawText, text, grammarText }, flags, before,
+				[s.offset, s.offset + s.text.length]);
+			for (let i = flags.length - 1; i >= before; i--) if (!flags[i].span) flags.splice(i, 1);
 			for (let i = before; i < flags.length; i++) {
 				if (!SENTENCE_LEVEL.has(flags[i].category)) flags[i].line = lineAt(flags[i].span[0]);
 			}

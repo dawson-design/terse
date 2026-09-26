@@ -11,16 +11,17 @@ Terse has two layers:
 
 - **Mechanical checks** run offline in `scripts/style-check.mjs`. They cover
   readability, passive voice, adverbs, and qualifiers. They also find wordy
-  phrases, grammar faults, long asides, and common model-writing patterns.
-  The checker reports a file,
-  line, category, matched text, and suggested fix for each finding.
+  phrases, long asides, and common model-writing patterns. Their grammar
+  checks target the faults that edits leave in a model's draft. The checker
+  reports a file, line, category, matched text, and suggested fix for each
+  finding.
 - **Writing skills** apply judgment. They preserve a useful passive, keep a
   meaningful hedge, and follow an approved voice template. They also check
   structure, evidence, flow, and the reader's needs.
 
 The [GPT and Codex research note](docs/research/gpt-writing-tells.md) records
-the evidence and false-positive limits behind model-writing signals. Those
-signals guide edits; they do not identify who wrote a passage.
+the evidence behind the model-writing signals and where they give false
+alarms. Those signals guide edits; they do not identify who wrote a passage.
 
 ## Install
 
@@ -99,8 +100,8 @@ so local checks match CI. This example enables broad US spelling and adds projec
 ```
 
 The same file can set `maxGrade`, enable `impersonal` checks, select `targets`,
-or ignore a category or match. Without broad spelling, Terse still runs its
-small typo list, conservative grammar patterns, and pinned offline grammar
+or ignore a category or match. Without broad spelling, Terse still checks a
+small typo list, its own grammar patterns, and a pinned offline grammar
 engine.
 
 To keep a finding in one paragraph, record the reason in the document:
@@ -164,7 +165,14 @@ fragment. Offline mode makes no network request.
 npm ci
 npm test
 npm run benchmark:grammar
+npm run benchmark:accuracy
 ```
+
+The accuracy benchmark scores grammar recall on an error suite written
+without access to the checker. It also counts false alarms on clean human
+and model prose. With the public CoNLL-2014 and CEFR-SP data, it scores
+grammar detection and sentence difficulty too. It prints how to fetch that
+data.
 
 The committed Codex marketplace points to this GitHub repository. Start a new
 Codex task after reinstalling so the host loads the current skills and hook.

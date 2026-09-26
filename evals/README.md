@@ -15,8 +15,8 @@ arms; llm and tool_used graders wait for the real tool. The runner
 needs `ANTHROPIC_API_KEY` exported: `--bare` sessions never read OAuth,
 so a subscription login cannot carry them.
 
-`npm run eval:codex` runs four approved genres through the active Codex
-default model: README, explainer, launch post, and planted-tell edit. It uses
+`npm run eval:codex` runs four approved genres through the active Codex default
+model. They are README, explainer, launch post, and planted-tell edit. It uses
 ephemeral temporary workspaces with project rules disabled. The with arm sets
 `plugins."terse@terse".enabled=true`; the without arm changes only that value
 to `false`. Each arm uses an isolated Codex home that shares the installed
@@ -81,5 +81,5 @@ Acceptance bar:
 
 The without-arm need not fail every individual tell grader. The required
 contrast is fewer total flags in each with-arm output. If authentication or
-skill telemetry is unavailable, the runner fails with an actionable message
-and the live A/B claim remains unproven.
+skill telemetry is missing, the runner fails with an actionable message.
+The live A/B claim then remains unproven.

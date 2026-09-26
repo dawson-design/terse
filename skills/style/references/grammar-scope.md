@@ -2,16 +2,31 @@
 
 The mechanics stage of the findings contract covers correctness errors
 and nothing else. It must leave style, structure, and voice as found.
-The checker catches a tested deterministic subset. The model owns the
-rest of this scope.
+The checker catches a tested subset: the errors that edits leave in a
+model's draft. The model owns the rest of this scope. A clean checker
+run proves nothing here: the checker finds about half the errors in
+its held-out suite, and few of those that need a parse.
 
-The native checker flags selected doubled function words, `could of`,
-`its` before a word only `it's` precedes, `their` before a be-verb, and
-misspellings with one correct form. The combined document check also
-uses the pinned Harper 2.7.0 rules `AnA`, `CommaFixes`,
-`ItsPossessive`, `ModalOf`, `NounVerbConfusion`,
-`PronounVerbAgreement`, and `RepeatedWords`. Every other Harper rule
-stays off. Those results arrive as ordinary `grammar` findings.
+The native checker reads narrow frames where only one form is correct:
+
+- a subject whose number changed while its verb did not (`the
+  artifacts is`, `each request take`, `there is three`)
+- a homophone in its one grammatical frame (`it's own`, `your going
+  to`, `to complex to`, `might loose`)
+- a compound noun in a verb slot (`setup the server`, `need to login
+  to`)
+- a comma splice before `however` or `therefore`, a question closed
+  with a period, and a clause with no main clause
+- a verb that disagrees across an `of` phrase or a relative clause
+  (`the list of open issues are`)
+- a comma splice between two clauses that each open on a pronoun or
+  `the` (`we tried a larger heap, it did not help`)
+- a wrong form after a modal or `to` (`will fixed`, `to runs`), `could
+  of`, doubled words, and misspellings with one correct form
+
+The combined document check adds 30 pinned Harper 2.7.0 rules. Terse
+keeps each one to the context where its fix is certain, and every other
+Harper rule stays off. Both engines report ordinary `grammar` findings.
 
 Broad spelling is off by default. A project may opt in with an explicit
 dialect and its own dictionary:
@@ -32,16 +47,20 @@ the hint asks the editor to check them rather than asserting one fix.
 
 The model still checks:
 
-- spelling and typos outside the opt-in spelling check
-- subject-verb agreement beyond the admitted rule, tense consistency,
-  and pronoun agreement
-- homophones and near-homophones (`were/where`, `they're/their/there`,
-  `its/it's`, `your/you're`, `affect/effect`, `then/than`, `lose/loose`)
+- spelling and typos outside the checker's list and the opt-in
+  spelling check
+- agreement the frames cannot prove: across a participle phrase (`the
+  set of permissions granted to admins are`) or where a noun also reads
+  as a verb (`each stage run`)
+- tense and pronoun agreement
+- homophones outside their frames: `there` or `you're` before a noun,
+  `whose` and `who's`, `effect` as a verb, and `then` after a
+  comparative
 - articles and prepositions beyond `a/an` (a missing `the`, a wrong
   preposition)
-- punctuation errors: run-ons, comma splices, unmatched quotes and
-  parentheses, misplaced apostrophes
-- duplicated words outside the admitted rule and dropped words
+- punctuation: run-ons, most comma splices, quotes or brackets left
+  open, and stray apostrophes
+- dropped words
 
 Do not touch: word choice, sentence length, passive voice, tone,
 hedges, structure. A sentence that is grammatical but bad leaves this

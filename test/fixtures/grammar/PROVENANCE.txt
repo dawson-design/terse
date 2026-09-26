@@ -1,0 +1,32 @@
+Grammar error suites for scripts/accuracy-benchmark.mjs.
+
+Each suite maps an error category to [error, corrected] sentence pairs. Each
+error sentence holds one planted error, and its corrected twin differs only
+where the fix requires. A finding on the error sentence that the twin lacks
+counts as a catch; any grammar finding on the twin counts as a false alarm.
+The sentences read like software documentation a person wrote with an AI
+assistant and then edited by hand.
+
+- dev-suite.json: 172 pairs in 33 categories, written 2026-09-26 while the
+  native patterns were designed. The patterns were tuned against it, so its
+  score overstates recall.
+- heldout-suite.json: 180 pairs in 30 categories, written 2026-09-26 by a
+  fresh Claude Sonnet session with no access to Terse's code or patterns.
+  Its score is the recall estimate. One false alarm on a corrected twin led
+  to a precision fix after the recall figure was recorded.
+- clause-suite.json: agreement across a phrase, comma splices, and run-ons,
+  each with 25 [error, corrected] pairs and 25 correct lookalikes built to
+  trip a naive checker. Written 2026-09-26 by a fresh Claude Sonnet session
+  with no access to Terse, but its prompt gave example sentences drawn from
+  the patterns under test, so it is not an independent measure. Scored
+  before tuning at 4, 9, and 0 of 25 caught. The one false alarm on a
+  corrected sentence led to a precision fix in the AnA rule afterwards.
+- clause-suite-2.json: the same three categories, each with 30 pairs and 40
+  lookalikes. Written 2026-09-26 by a fresh Claude Opus session with no
+  access to Terse and no example sentences. Commit 0a7bdca scored it first:
+  2, 3, and 0 of 30 caught, with 3 of the 40 comma-splice lookalikes
+  flagged (two native splices and one AnA). Later fixes targeted those
+  three sentences, and near copies of two now sit among the tests, so the
+  suite's precision is no longer blind. The narrower splice frame also
+  dropped one catch, leaving 2, 2, and 0. Its recall remains the honest
+  estimate for these categories.

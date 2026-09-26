@@ -4,12 +4,15 @@ import { mkdtempSync, mkdirSync, writeFileSync, readdirSync, readFileSync } from
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createGrammarPool, normalizeGrammarConfig } from '../scripts/grammar-check.mjs';
-import { checkText, createDocumentChecker } from '../scripts/style-check.mjs';
+import { ADMITTED_RULES, createGrammarPool, normalizeGrammarConfig } from '../scripts/grammar-check.mjs';
+import { createDocumentChecker } from '../scripts/style-check.mjs';
 
 const HERE = fileURLToPath(new URL('.', import.meta.url));
 const styleScript = join(HERE, '..', 'scripts', 'style-check.mjs');
 const proseDir = join(HERE, 'fixtures', 'human-prose');
+const modelDir = join(HERE, 'fixtures', 'model-prose');
+// Real errors in the unedited model output, each confirmed by reading it.
+const MODEL_PROSE_ERRORS = ['haiku-runbook.md:74: Rollback'];
 let grammar;
 let documents;
 
@@ -22,16 +25,43 @@ afterAll(async () => {
 	await Promise.all([grammar.dispose(), documents.dispose()]);
 });
 
+// One planted error per admitted rule, with the match and the fix it must report.
+const POSITIVES = [
+	['AdjectiveDoubleDegree', 'The new build is more faster.', 'more faster', 'faster'],
+	['AfterAll', 'Afterall, the cache is warm.', 'Afterall', 'After all'],
+	['AnA', 'This is a error.', 'a', 'an'],
+	['CapitalizePersonalPronouns', 'After the patch i reran the suite.', 'i', 'I'],
+	['CommaFixes', 'This is wrong , and stays.', ' ', ''],
+	['DiscourseMarkers', 'However the migration is still running.', 'However', 'However,'],
+	['Discuss', 'This essay will discuss about the cache.', 'discuss about', 'discuss'],
+	['EveryTime', 'The job runs everytime a commit lands.', 'everytime', 'every time'],
+	['Everyday', 'I check the dashboard everyday.', 'everyday', 'every day'],
+	['Holidays', "We closed the office on mother's day.", "mother's day", "Mother's Day"],
+	['IsBeenAuxSequence', 'The data is been copied.', 'is been', 'has been'],
+	['ItsPossessive', "The dog ate it's food.", "it's", 'its'],
+	['ModalOf', 'We could of shipped.', 'could of', 'could have'],
+	['NounVerbConfusion', 'The affects of the change are clear.', 'affects', 'effects'],
+	['OpenCompounds', 'Stand infront of the rack.', 'infront', 'in front'],
+	['PointsOfView', 'There are many point of views.', 'point of views', 'points of view'],
+	['PronounInflectionBe', 'They was on call last weekend.', 'was', 'were'],
+	['PronounVerbAgreement', 'She go home.', 'go', 'goes'],
+	['RegularIrregulars', 'The workers helped their wifes.', 'wifes', 'wives'],
+	['RepeatedWords', 'Run the the job.', 'the the', 'the'],
+	['ResponsibilityFor', 'Take responsibility of the outage.', 'Take responsibility of',
+		'Take responsibility for'],
+	['SimplePastToPastParticiple', 'The job has went through three retries.', 'went', 'gone'],
+	['Somehow', 'The flag could some how be ignored.', 'some how', 'somehow'],
+	['Someone', 'Ask some one on the team.', 'some one', 'someone'],
+	['SupposedTo', 'We are suppose to ship on Friday.', 'suppose to', 'supposed to'],
+	['ThenThan', 'The new index is faster then the old one.', 'then', 'than'],
+	['ToSomeDegree', 'It helps in some degree.', 'in some degree', 'to some degree'],
+	['WayTooAdjective', 'That timeout is way to short.', 'to', 'too'],
+	['Widespread', 'The problem became wide spread.', 'wide spread', 'widespread'],
+	['WorseOrWorst', 'The latency will become worst.', 'become worst', 'become worse'],
+];
+
 describe('Harper admission gate', () => {
-	it.each([
-		['AnA', 'This is a error.', 'a', 'an'],
-		['CommaFixes', 'This is wrong , and stays.', ' ', ''],
-		['ItsPossessive', "The dog ate it's food.", "it's", 'its'],
-		['ModalOf', 'We could of shipped.', 'could of', 'could have'],
-		['NounVerbConfusion', 'The affects of the change are clear.', 'affects', 'effects'],
-		['PronounVerbAgreement', 'She go home.', 'go', 'goes'],
-		['RepeatedWords', 'Run the the job.', 'the the', 'the'],
-	])('detects every planted %s positive', async (rule, text, match, replacement) => {
+	it.each(POSITIVES)('detects every planted %s positive', async (rule, text, match, replacement) => {
 		const flags = await grammar.check(text);
 		expect(flags).toEqual([expect.objectContaining({
 			category: 'grammar', engine: 'harper', ruleId: `harper/${rule}`,
@@ -52,6 +82,42 @@ describe('Harper admission gate', () => {
 		expect(await grammar.check(text)).toEqual([]);
 	});
 
+	it('reports an insertion as the full replacement for the matched text', async () => {
+		const flags = await grammar.check('The tests passed,the build did not.');
+		expect(flags).toEqual([expect.objectContaining({
+			ruleId: 'harper/CommaFixes', match: ',', suggestions: [', '], hint: 'use ", "',
+		})]);
+	});
+
+	it('plants a positive for every admitted rule', () => {
+		expect(POSITIVES.map(([rule]) => rule)).toEqual([...ADMITTED_RULES].sort());
+	});
+
+	// Each sentence is correct text that a rule misread before Terse limited
+	// the rule to the context where its fix is certain.
+	it.each([
+		["It's been broken since Tuesday."],
+		["It's been deployed to staging."],
+		['The outage did not affect paying customers.'],
+		['The flag does not affect running jobs.'],
+		['You can see who a failing dependency affects.'],
+		['It has health effects comparable to dust.'],
+		['The property is famous for its rose garden.'],
+		['Four or more number-one hits.'],
+		['Those who advocate it are concerned.'],
+		['The team gave way to social media.'],
+		['They use it ( i.e. the cache ) daily.'],
+		['However you configure it, the result is the same.'],
+		['Nowadays the team deploys daily.'],
+		['Pick some one of these options.'],
+		['Both A- and U23 games were held.'],
+		['Writes started failing around 3 a.m.'],
+		['The token is stored in an HttpOnly cookie.'],
+		['We engineers need more context before we commit.'],
+	])('leaves the correct sentence %s alone', async (text) => {
+		expect(await grammar.check(text)).toEqual([]);
+	});
+
 	it('has zero unlabeled findings on the manually reviewed human-prose corpus', async () => {
 		const findings = [];
 		for (const name of readdirSync(proseDir).filter((x) => x.endsWith('.md'))) {
@@ -60,6 +126,43 @@ describe('Harper admission gate', () => {
 		}
 		expect(findings).toEqual([]);
 	});
+
+	it('finds only the labeled real errors in unedited model prose', async () => {
+		const findings = [];
+		for (const name of readdirSync(modelDir).filter((x) => x.endsWith('.md'))) {
+			const { flags } = await documents.checkDocument(
+				readFileSync(join(modelDir, name), 'utf8'), { file: name });
+			findings.push(...flags.filter((f) => f.category === 'grammar')
+				.map((f) => `${f.file}:${f.line}: ${f.match}`));
+		}
+		expect(findings).toEqual(MODEL_PROSE_ERRORS);
+	});
+
+	it.each(['clause-suite.json', 'clause-suite-2.json'])(
+		'flags no correct sentence of %s', async (name) => {
+		const suite = JSON.parse(readFileSync(join(HERE, 'fixtures', 'grammar', name), 'utf8'));
+		const correct = Object.values(suite).flatMap(({ errors, lookalikes }) =>
+			[...errors.map(([, corrected]) => corrected), ...lookalikes]);
+		const findings = [];
+		for (const text of correct) {
+			const { flags } = await documents.checkDocument(text);
+			findings.push(...flags.filter((f) => f.category === 'grammar')
+				.map((f) => `${text} -> ${f.match}`));
+		}
+		expect(findings).toEqual([]);
+	});
+
+	it.each(['dev-suite.json', 'heldout-suite.json'])(
+		'finds no error in any corrected sentence of %s', async (name) => {
+			const suite = JSON.parse(readFileSync(join(HERE, 'fixtures', 'grammar', name), 'utf8'));
+			const findings = [];
+			for (const [, corrected] of Object.values(suite).flat()) {
+				const { flags } = await documents.checkDocument(corrected);
+				findings.push(...flags.filter((f) => f.category === 'grammar')
+					.map((f) => `${corrected} -> ${f.match}`));
+			}
+			expect(findings).toEqual([]);
+		});
 });
 
 describe('combined document checker', () => {
@@ -110,12 +213,22 @@ describe('combined document checker', () => {
 		expect(flags.map((f) => f.hint)).toEqual(['use "could have"', 'use "the"']);
 	});
 
-	it('raises the default deterministic coverage from the 3/16 baseline to 6/16', async () => {
+	// The grader's sixteen planted errors. Four stay with the model: "stage
+	// run", "system revert", and "rate rise" read as compound nouns without a
+	// parse, and "You're on-call engineer" needs one.
+	it('catches 12 of the 16 planted fixture errors and the comma splice', async () => {
 		const prompt = readFileSync(join(HERE, '..',
 			'evals', 'grammar-repair', 'prompt.md'), 'utf8');
 		const fixture = prompt.match(/BEGIN\n([\s\S]*?)\nEND/)[1];
-		expect(checkText(fixture).stats.grammar).toBe(4); // includes the new native quater fix
-		expect((await documents.checkDocument(fixture)).stats.grammar).toBe(6);
+		const planted = /pipeline have|stage run\b|it['’]s own|tests passes|artifacts is|Their are|canary fail\b|system revert\b|happens automatic\b|You['’]re on-call engineer|rate rise\b|seperate|to complex|Its now|quater|the affects of|, however/gi;
+		const flags = (await documents.checkDocument(fixture)).flags
+			.filter((f) => f.category === 'grammar');
+		const errors = [...fixture.matchAll(planted)];
+		expect(errors).toHaveLength(17);
+		const caught = (m) => flags.some((f) =>
+			f.span[0] < m.index + m[0].length && m.index < f.span[1]);
+		expect(errors.filter((m) => !caught(m)).map((m) => m[0])).toEqual(['stage run',
+			'system revert', "You're on-call engineer", 'rate rise']);
 	});
 });
 

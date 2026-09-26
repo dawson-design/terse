@@ -48,13 +48,13 @@ states it.
    in brief. Show both and stop. The user strikes or adds items, then
    approves.
 4. Expand, under steps 5 through 8 of the Terse draft skill. Write `<name>.md`
-   from the approved skeleton and list, every added sentence answering
-   its recorded question, the ratio under the ceiling. Record any
+   from the approved skeleton and list. Every added sentence answers its
+   recorded question, and the ratio stays under the ceiling. Record any
    deviation in the outline file. Keep the working note of questions
    for the gate.
-5. Gate, under the Terse edit skill in fix mode. Collect every finding, run
-   the outline checker against the approved outline, then the reverse
-   outline and the claim inventory. Fix through the
+5. Gate, under the Terse edit skill in fix mode. Collect every finding and
+   run the outline checker against the approved outline. Then build the
+   reverse outline and the claim inventory. Fix through the
    staged loop with grammar last. In the edit skill, `structure`
    findings wait for the user. Here the approved outline and skeleton
    are the decided structure, so report them with the file instead of

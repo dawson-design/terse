@@ -22,7 +22,7 @@ resists is the wrong shape.
   reproduce it, and what it blocks. Impersonal throughout: the
   requirement belongs to the system, not to whoever filed it.
 - **Acceptance criteria**: one testable condition per line, each
-  stated as behavior the system exhibits. Nothing a reader can
+  stated as behavior the system shows. Nothing a reader can
   decline, so no preferences and no pronouns.
 - **White paper**: the problem and who has it, then why current
   approaches fall short. Then the approach on offer, its evidence, and
