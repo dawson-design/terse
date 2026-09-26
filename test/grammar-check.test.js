@@ -4,7 +4,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readdirSync, readFileSync } from
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createGrammarPool, normalizeGrammarConfig } from '../scripts/grammar-check.mjs';
+import { ADMITTED_RULES, createGrammarPool, normalizeGrammarConfig } from '../scripts/grammar-check.mjs';
 import { checkText, createDocumentChecker } from '../scripts/style-check.mjs';
 
 const HERE = fileURLToPath(new URL('.', import.meta.url));
@@ -22,16 +22,43 @@ afterAll(async () => {
 	await Promise.all([grammar.dispose(), documents.dispose()]);
 });
 
+// One planted error per admitted rule, with the match and the fix it must report.
+const POSITIVES = [
+	['AdjectiveDoubleDegree', 'The new build is more faster.', 'more faster', 'faster'],
+	['AfterAll', 'Afterall, the cache is warm.', 'Afterall', 'After all'],
+	['AnA', 'This is a error.', 'a', 'an'],
+	['CapitalizePersonalPronouns', 'After the patch i reran the suite.', 'i', 'I'],
+	['CommaFixes', 'This is wrong , and stays.', ' ', ''],
+	['DiscourseMarkers', 'However the migration is still running.', 'However', 'However,'],
+	['Discuss', 'This essay will discuss about the cache.', 'discuss about', 'discuss'],
+	['EveryTime', 'The job runs everytime a commit lands.', 'everytime', 'every time'],
+	['Everyday', 'I check the dashboard everyday.', 'everyday', 'every day'],
+	['Holidays', "We closed the office on mother's day.", "mother's day", "Mother's Day"],
+	['IsBeenAuxSequence', 'The data is been copied.', 'is been', 'has been'],
+	['ItsPossessive', "The dog ate it's food.", "it's", 'its'],
+	['ModalOf', 'We could of shipped.', 'could of', 'could have'],
+	['NounVerbConfusion', 'The affects of the change are clear.', 'affects', 'effects'],
+	['OpenCompounds', 'Stand infront of the rack.', 'infront', 'in front'],
+	['PointsOfView', 'There are many point of views.', 'point of views', 'points of view'],
+	['PronounInflectionBe', 'They was on call last weekend.', 'was', 'were'],
+	['PronounVerbAgreement', 'She go home.', 'go', 'goes'],
+	['RegularIrregulars', 'The workers helped their wifes.', 'wifes', 'wives'],
+	['RepeatedWords', 'Run the the job.', 'the the', 'the'],
+	['ResponsibilityFor', 'Take responsibility of the outage.', 'Take responsibility of',
+		'Take responsibility for'],
+	['SimplePastToPastParticiple', 'The job has went through three retries.', 'went', 'gone'],
+	['Somehow', 'The flag could some how be ignored.', 'some how', 'somehow'],
+	['Someone', 'Ask some one on the team.', 'some one', 'someone'],
+	['SupposedTo', 'We are suppose to ship on Friday.', 'suppose to', 'supposed to'],
+	['ThenThan', 'The new index is faster then the old one.', 'then', 'than'],
+	['ToSomeDegree', 'It helps in some degree.', 'in some degree', 'to some degree'],
+	['WayTooAdjective', 'That timeout is way to short.', 'to', 'too'],
+	['Widespread', 'The problem became wide spread.', 'wide spread', 'widespread'],
+	['WorseOrWorst', 'The latency will become worst.', 'become worst', 'become worse'],
+];
+
 describe('Harper admission gate', () => {
-	it.each([
-		['AnA', 'This is a error.', 'a', 'an'],
-		['CommaFixes', 'This is wrong , and stays.', ' ', ''],
-		['ItsPossessive', "The dog ate it's food.", "it's", 'its'],
-		['ModalOf', 'We could of shipped.', 'could of', 'could have'],
-		['NounVerbConfusion', 'The affects of the change are clear.', 'affects', 'effects'],
-		['PronounVerbAgreement', 'She go home.', 'go', 'goes'],
-		['RepeatedWords', 'Run the the job.', 'the the', 'the'],
-	])('detects every planted %s positive', async (rule, text, match, replacement) => {
+	it.each(POSITIVES)('detects every planted %s positive', async (rule, text, match, replacement) => {
 		const flags = await grammar.check(text);
 		expect(flags).toEqual([expect.objectContaining({
 			category: 'grammar', engine: 'harper', ruleId: `harper/${rule}`,
@@ -59,12 +86,29 @@ describe('Harper admission gate', () => {
 		})]);
 	});
 
+	it('plants a positive for every admitted rule', () => {
+		expect(POSITIVES.map(([rule]) => rule)).toEqual([...ADMITTED_RULES].sort());
+	});
+
+	// Each sentence is correct text that a rule misread before Terse limited
+	// the rule to the context where its fix is certain.
 	it.each([
 		["It's been broken since Tuesday."],
 		["It's been deployed to staging."],
 		['The outage did not affect paying customers.'],
 		['The flag does not affect running jobs.'],
-	])('leaves the verb in %s alone', async (text) => {
+		['You can see who a failing dependency affects.'],
+		['It has health effects comparable to dust.'],
+		['The property is famous for its rose garden.'],
+		['Four or more number-one hits.'],
+		['Those who advocate it are concerned.'],
+		['The team gave way to social media.'],
+		['They use it ( i.e. the cache ) daily.'],
+		['However you configure it, the result is the same.'],
+		['Nowadays the team deploys daily.'],
+		['Pick some one of these options.'],
+		['Both A- and U23 games were held.'],
+	])('leaves the correct sentence %s alone', async (text) => {
 		expect(await grammar.check(text)).toEqual([]);
 	});
 
@@ -76,6 +120,7 @@ describe('Harper admission gate', () => {
 		}
 		expect(findings).toEqual([]);
 	});
+
 });
 
 describe('combined document checker', () => {

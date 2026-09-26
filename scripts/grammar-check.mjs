@@ -13,14 +13,42 @@ if (!globalThis.crypto) {
 		configurable: true });
 }
 
+// Each rule earned admission on the same evidence: at least one real catch
+// in the error suites or CoNLL-2014, and no finding on clean human prose,
+// unedited model prose, the corrected suite sentences, or the CEFR-SP
+// Wikipedia sentences once the context rules below apply.
+// scripts/accuracy-benchmark.mjs reproduces the measurement.
 const ADMITTED_RULES = [
+	'AdjectiveDoubleDegree',
+	'AfterAll',
 	'AnA',
+	'CapitalizePersonalPronouns',
 	'CommaFixes',
+	'DiscourseMarkers',
+	'Discuss',
+	'EveryTime',
+	'Everyday',
+	'Holidays',
+	'IsBeenAuxSequence',
 	'ItsPossessive',
 	'ModalOf',
 	'NounVerbConfusion',
+	'OpenCompounds',
+	'PointsOfView',
+	'PronounInflectionBe',
 	'PronounVerbAgreement',
+	'RegularIrregulars',
 	'RepeatedWords',
+	'ResponsibilityFor',
+	'SimplePastToPastParticiple',
+	'Somehow',
+	'Someone',
+	'SupposedTo',
+	'ThenThan',
+	'ToSomeDegree',
+	'WayTooAdjective',
+	'Widespread',
+	'WorseOrWorst',
 ];
 
 const DIALECTS = {
@@ -38,21 +66,51 @@ const VALID_REPEATED_WORDS = new Set([
 	'a a', 'had had', 'in in', 'is is', 'on on', 'that that', 'this this',
 ]);
 
-// Harper 2.7.0 misreads two verb contexts. "It's been" is always "it has
-// been", since no noun follows a possessive as "been". A bare "affect" after
-// an auxiliary, "not", or "to" is always the verb, even when an -ing word
-// follows ("does not affect running jobs"). The swaps it proposes there
-// would break correct text.
-const AUXILIARY_BEFORE =
-	/(?:\b(?:not|do|does|did|will|would|can|could|may|might|must|should|shall|to)|n['’]t)\s+$/i;
+const HAVE_OR_BE_BEFORE = new RegExp('(?:\\b(?:am|is|are|was|were|be|been|being|get|' +
+	'gets|got|have|has|had|having)|[\'’](?:ve|d|s))\\s+(?:\\w+ly\\s+|not\\s+|never\\s+|' +
+	'already\\s+|just\\s+)?$', 'i');
+const NOUN_SLOT_BEFORE = new RegExp('\\b(?:the|a|an|no|its|their|his|her|our|your|my|' +
+	'side|adverse|positive|negative|net|desired|intended|unintended|lasting)\\s+$', 'i');
+const LINKING_VERB_BEFORE_WAY = new RegExp('\\b(?:am|is|are|was|were|be|been|being|' +
+	'seems?|seemed|looks?|looked|feels?|felt|gets?|got|becomes?|became|remains?|' +
+	'remained|stays?|stayed|sounds?|sounded|runs?|ran)\\s+way\\s+$', 'i');
+const COMMA_MARKERS = /^(?:however|moreover|furthermore|nevertheless|nonetheless|additionally)$/i;
 
-function misreadsVerb(ruleId, before, match, after) {
-	if (ruleId === 'ItsPossessive') return /^\s+been\b/i.test(after);
-	if (ruleId === 'NounVerbConfusion') {
-		return /^affect$/i.test(match) && AUXILIARY_BEFORE.test(before);
-	}
-	return false;
-}
+// Some admitted rules misfire on correct text outside a narrow context, so a
+// finding survives only where its context proves the fix. Each predicate
+// gets the text just before the match, the match, and the text after it.
+const ADMITTED_IN_CONTEXT = {
+	RepeatedWords: ({ match }) =>
+		!VALID_REPEATED_WORDS.has(match.toLowerCase().replace(/\s+/g, ' ')),
+	// A letter grade or team is not an article ("A- and U23 games").
+	AnA: ({ after }) => !after.startsWith('-'),
+	// "It's been" is always "it has been": no noun follows a possessive as "been".
+	ItsPossessive: ({ after }) => !/^\s+been\b/i.test(after),
+	// Only the noun slot ("the affects of", "no affect on", "side affects").
+	// The verb stays after a subject or an auxiliary ("did not affect paying
+	// customers", "who a failing dependency affects").
+	NounVerbConfusion: ({ before, match, after }) => /^affects?$/i.test(match) &&
+		(NOUN_SLOT_BEFORE.test(before) || /^\s+(?:of|on|upon)\b/i.test(after)),
+	// A participle is required after have or be ("has went", "was broke");
+	// elsewhere the past form stands ("its rose garden").
+	SimplePastToPastParticiple: ({ before }) => HAVE_OR_BE_BEFORE.test(before),
+	// "more faster", not "four or more number-one hits".
+	AdjectiveDoubleDegree: ({ match, after }) => !after.startsWith('-') &&
+		/\s(?:\w+(?:er|est)|better|best|worse|worst)$/i.test(match),
+	// "they was"; "it" and "you" can be objects ("those who advocate it are").
+	PronounInflectionBe: ({ before }) => /\b(?:I|he|she|we|they)\s+$/i.test(before),
+	// "is way to short"; "give way to" and "a long way to go" stay.
+	WayTooAdjective: ({ before }) => LINKING_VERB_BEFORE_WAY.test(before),
+	// A lone "i", not "i.e." or "i/o".
+	CapitalizePersonalPronouns: ({ after }) => !/^[./-]/.test(after),
+	// Markers that always take a comma. "However you configure it, ..." means
+	// "in whatever way", so an opening "However" counts only when no comma
+	// follows it before the sentence ends.
+	DiscourseMarkers: ({ match, after }) => COMMA_MARKERS.test(match) &&
+		(!/^however$/i.test(match) || /^[^,;.!?\n]*[.!?]/.test(after)),
+	// "some one of these options" is the numeral.
+	Someone: ({ after }) => !/^\s+of\b/i.test(after),
+};
 
 export function normalizeGrammarConfig(grammar) {
 	if (grammar === undefined) return { spelling: false, dialect: 'american', words: [] };
@@ -129,10 +187,9 @@ function findingOf(rawText, file, ruleId, lint, spelling) {
 	if (!Number.isInteger(start) || !Number.isInteger(end) ||
 			start < 0 || end <= start || end > rawText.length) return null;
 	const match = rawText.slice(start, end);
-	if (ruleId === 'RepeatedWords' &&
-		VALID_REPEATED_WORDS.has(match.toLowerCase().replace(/\s+/g, ' '))) return null;
-	if (misreadsVerb(ruleId, rawText.slice(Math.max(0, start - 24), start), match,
-		rawText.slice(end, end + 24))) return null;
+	const inContext = ADMITTED_IN_CONTEXT[ruleId];
+	if (inContext && !inContext({ before: rawText.slice(Math.max(0, start - 40), start),
+		match, after: rawText.slice(end, end + 200) })) return null;
 	const suggestions = uniqueSuggestions(lint, match)
 		.filter((suggestion) => suggestion !== match);
 	if (spelling) {
