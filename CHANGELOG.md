@@ -6,6 +6,13 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.14.0] (2026-09-26)
+
+Upgrading from 0.13: a `~/.terse/config.json` now applies in every
+project, so set `"personal": false` in a project that should ignore it.
+The sentence and grammar checks flag text that 0.13 passed, and
+`/terse:voice` replaces `voice-analysis.md`.
+
 ### Added
 
 - `/terse:voice` (`$terse:voice` in Codex) learns the user's voice from
