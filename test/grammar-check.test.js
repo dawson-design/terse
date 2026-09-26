@@ -207,10 +207,12 @@ describe('combined document checker', () => {
 		const planted = /pipeline have|stage run\b|it['’]s own|tests passes|artifacts is|Their are|canary fail\b|system revert\b|happens automatic\b|You['’]re on-call engineer|rate rise\b|seperate|to complex|Its now|quater|the affects of|, however/gi;
 		const flags = (await documents.checkDocument(fixture)).flags
 			.filter((f) => f.category === 'grammar');
-		const missed = [...fixture.matchAll(planted)].filter((m) => !flags.some((f) =>
-			f.span[0] < m.index + m[0].length && m.index < f.span[1])).map((m) => m[0]);
-		expect(missed).toEqual(['stage run', 'system revert', "You're on-call engineer",
-			'rate rise']);
+		const errors = [...fixture.matchAll(planted)];
+		expect(errors).toHaveLength(17);
+		const caught = (m) => flags.some((f) =>
+			f.span[0] < m.index + m[0].length && m.index < f.span[1]);
+		expect(errors.filter((m) => !caught(m)).map((m) => m[0])).toEqual(['stage run',
+			'system revert', "You're on-call engineer", 'rate rise']);
 	});
 });
 
