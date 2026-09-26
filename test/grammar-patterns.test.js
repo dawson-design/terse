@@ -255,6 +255,10 @@ describe('sentence mechanics', () => {
 		expectOne('We saw [less](x) errors.', 'less', 'use "fewer"');
 	});
 
+	it('offers no replacement across link markup', () => {
+		expect(grammar('Report it to the [the Heartbleed bug](https://x.y) team.')).toEqual([]);
+	});
+
 	it('shows inline code in the match, not the mask the patterns saw', () => {
 		const text = 'Because `levelup` would overwrite the options.';
 		expectOne(text, text, expect.stringMatching(/^a subordinate clause needs a main clause/));

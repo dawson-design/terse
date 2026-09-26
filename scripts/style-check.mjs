@@ -767,18 +767,21 @@ function assignSpans({ rawText, text, grammarText }, flags, from, span) {
 		const m = hits.get(hitKey).get(normalized(flags[i].match))?.[n];
 		flags[i].span = m ? [span[0] + m.index, span[0] + m.index + m[0].length]
 			: (grammar ? null : span);
-		if (grammar && flags[i].span) unmaskCode(rawText, text, grammarText, flags[i]);
+		if (grammar && flags[i].span) matchSource(rawText, grammarText, flags[i]);
 	}
 }
 
-// A grammar match that covers inline code saw only its mask. The match
-// shows the source instead, and a replacement hint loses its span: it was
-// written from the mask ("use "XXXXXs""), and applying it would delete code.
-function unmaskCode(rawText, text, grammarText, flag) {
+// A grammar match that covers markup saw only what stripping left: a mask
+// for inline code, blanks for link brackets and comments. The match shows
+// the source instead, and a replacement hint loses its span: it was written
+// from the stripped text ("use "XXXXXs""), and applying it would edit the
+// code or the link ("use "the"" over "the [the").
+function matchSource(rawText, grammarText, flag) {
 	const [start, end] = flag.span;
-	if (grammarText.slice(start, end) === text.slice(start, end)) return;
+	const source = rawText.slice(start, end);
+	if (grammarText.slice(start, end) === source) return;
 	if (flag.hint.startsWith('use "')) flag.span = null;
-	else flag.match = rawText.slice(start, end).replace(/\s+/g, ' ');
+	else flag.match = source.replace(/\s+/g, ' ');
 }
 
 function literalRegex(match) {
