@@ -331,10 +331,10 @@ first. The model's own pass owns the rest.
       main clause.
 - [x] Lead sentence difficulty with grade, calibrated on CEFR-SP
       ratings. Rewrite the repo's own dense sentences to match.
-- [x] `npm run benchmark:accuracy` reproduces every number below.
+- [x] `npm run benchmark:accuracy` reproduces the table below.
 - [x] Narrow frames for agreement across a phrase and comma splices
-      with no linking word. On a suite written blind, they catch 2 of
-      30 of each and flag none of 210 correct sentences.
+      with no linking word. On a suite written blind, they first caught
+      5 of 60 and flagged 3 of 210 correct sentences.
 - [ ] Catch more of those two, and run-ons. The frames skip every
       reading they cannot prove, and the run-on frame tried caught none
       of 30. A parser would catch more; the model's pass owns the rest.
@@ -353,20 +353,24 @@ Proof, recorded 2026-09-26 with `npm run benchmark:accuracy`:
 | CoNLL-2014 errors found (annotator 0) | 0.6% at 46% precision | 1.4% at 71% precision |
 | CEFR-SP F0.5, mean rating C1 or harder | 32.2 | 43.2 |
 | CEFR-SP F0.5, mean rating 4.5 or harder | 34.5 | 52.3 |
-| Blind clause suite errors caught | 0/90 | 4/90 |
-| Blind clause suite correct sentences flagged | 1/210 | 0/210 |
+| Blind clause suite errors caught | 0/90 | 4/90, 5/90 when first scored |
+| Blind clause suite correct sentences flagged | 1/210 | 0/210, 3/210 when first scored |
 
 A separate session wrote the held-out suite blind. But its three clause
 categories shaped the clause frames, so its score there runs high. The
-blind clause suite gives the honest figure. A fresh session wrote it
-with no access to Terse and no example sentences.
+blind clause suite gives the honest recall. A fresh session wrote it
+with no access to Terse and no example sentences, and commit 0a7bdca
+scored it first. Fixes for its three false alarms came after, so its
+0/210 is no longer a blind figure.
 
 A third-party corpus checks precision on prose no one wrote for Terse.
-It holds 1.7 million words in 2,363 README and doc files, taken from the
-cargo registry and global npm packages. The milestone adds 93 findings to the ones
-before it. All 14 comma splices among them are real. Of the other 79,
-all but a few informal usages (`real quick`, `there's many`) are clear
-errors.
+It holds 2.2 million words in 2,760 README, doc, and changelog files
+from the cargo registry and global npm packages. A local script
+measured it; the benchmark does not. The milestone adds 114 findings to
+the ones before it. All 15 comma splices among them are real. Of the
+other 99, all but a few informal usages (`real quick`, `there's many`)
+are clear errors. The corpus turned up the false alarms these fixes
+remove, so it shows what remains, not an unseen rate.
 
 Hemingway App's default rule scores 28.2 and 49.1 on the same CEFR-SP
 sentences. Grammarly's research model corrects 40.1% of CoNLL-2014

@@ -23,8 +23,10 @@ assistant and then edited by hand.
   corrected sentence led to a precision fix in the AnA rule afterwards.
 - clause-suite-2.json: the same three categories, each with 30 pairs and 40
   lookalikes. Written 2026-09-26 by a fresh Claude Opus session with no
-  access to Terse and no example sentences, then scored once: 2, 2, and 0
-  of 30 caught, with 2 of the 40 comma-splice lookalikes flagged. Precision
-  fixes made after that score, and checked against a corpus of third-party
-  Markdown, cleared both false alarms without changing the catches. Its
-  recall is the honest estimate for these categories.
+  access to Terse and no example sentences. Commit 0a7bdca scored it first:
+  2, 3, and 0 of 30 caught, with 3 of the 40 comma-splice lookalikes
+  flagged (two native splices and one AnA). Later fixes targeted those
+  three sentences, and near copies of two now sit among the tests, so the
+  suite's precision is no longer blind. The narrower splice frame also
+  dropped one catch, leaving 2, 2, and 0. Its recall remains the honest
+  estimate for these categories.
