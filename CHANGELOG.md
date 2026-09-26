@@ -33,6 +33,11 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   hint names the fix: split a long sentence, or use plainer words in a
   dense one.
 - The repo's docs lose the dense sentences the new rule flags.
+- `NounVerbConfusion` now reports only `affect` in a noun slot, as in
+  `the affects of`. It no longer catches `effect` used as a verb; the
+  model's pass owns that.
+- `npm run benchmark:grammar` times the check the hook runs, native
+  patterns included, not Harper alone.
 
 ### Fixed
 
@@ -44,10 +49,13 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   It used to say `use " "`, which told the fixer to delete the comma.
 - A second, different match of one pattern in a sentence gets its own
   span.
-- Inline code that wraps onto the next line stays code.
+- Inline code that wraps onto the next line stays code. It still ends
+  at a new list item, quote, or heading.
+- In wrapped text, a sentence that opens with `Note that` or `That
+  said` reports its own line, not the line before.
 - The 0.13.0 notes said the checker catches what a grammar assistant's
   free tier catches. It found 20.6% of the held-out suite's errors
-  then, and it finds 48.3% now.
+  then, and it finds 47.8% now.
 
 ## [0.13.1] (2026-09-04)
 
