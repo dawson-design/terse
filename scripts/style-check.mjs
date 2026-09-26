@@ -746,7 +746,11 @@ function assignSpans(text, flags, from, span) {
 			? new RegExp(flags[i]._re.source, flags[i]._re.flags.replace('g', '') + 'g')
 			: literalRegex(flags[i].match);
 		delete flags[i]._re;
-		flags[i].span = refineSpan(text, span, re, flags[i].match, n) ?? span;
+		// A grammar finding that cannot be placed exactly is dropped: its
+		// hint replaces the matched text, and a sentence-wide span would
+		// replace the whole sentence.
+		flags[i].span = refineSpan(text, span, re, flags[i].match, n) ??
+			(flags[i].category === 'grammar' ? null : span);
 	}
 }
 
@@ -1015,6 +1019,7 @@ export function checkText(rawText,
 			checkLexicon(clean, flags, file, line, impersonal);
 			checkGrammar(clean, flags, file, line, clean !== trimmed);
 			assignSpans(text, flags, before, [s.offset, s.offset + s.text.length]);
+			for (let i = flags.length - 1; i >= before; i--) if (!flags[i].span) flags.splice(i, 1);
 			for (let i = before; i < flags.length; i++) {
 				if (!SENTENCE_LEVEL.has(flags[i].category)) flags[i].line = lineAt(flags[i].span[0]);
 			}
