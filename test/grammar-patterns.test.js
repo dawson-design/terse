@@ -33,6 +33,7 @@ describe('agreement at an edit seam', () => {
 		['These setting is ignored in production.', 'These', 'use "This"'],
 		['There is three open incidents this week.', 'There is', 'use "There are"'],
 		['There is 2,000 users on the waitlist.', 'There is', 'use "There are"'],
+		['There is 10 new failing checks.', 'There is', 'use "There are"'],
 		['The server were down all night.', 'were', 'use "was"'],
 		['The tests has had three failures.', 'has', 'use "have"'],
 		['It need a restart after the upgrade.', 'need', 'use "needs"'],
@@ -65,6 +66,7 @@ describe('agreement at an edit seam', () => {
 		['Each time run the smoke tests first.'],
 		['I wish the build were faster. Suppose the cache were empty.'],
 		['The sales calls happen weekly. The ops runs happen at night.'],
+		['The sales calls last an hour. The sales calls usually happen weekly.'],
 		['The schemata are versioned. The radii are equal.'],
 		['If the primary were to fail, the replica takes over.'],
 		['Even if the cache were empty, the job would run.'],
@@ -95,6 +97,7 @@ describe('homophones and confusables in their only grammatical frame', () => {
 		['The principle engineer approved the design.', 'principle', 'use "principal"'],
 		['Whose going to own the migration?', 'Whose', `use "Who's"`],
 		['We need to decide weather to roll back.', 'weather', 'use "whether"'],
+		['We need to check weather this flag is set.', 'weather', 'use "whether"'],
 		['Please advice the customer to upgrade.', 'advice', 'use "advise"'],
 		['The dashboard loads real slow on mobile.', 'real', 'use "really"'],
 		['We deploy everyday at noon.', 'everyday', 'use "every day"'],
@@ -116,6 +119,7 @@ describe('homophones and confusables in their only grammatical frame', () => {
 		['There is 99.9% availability. There is 10.5 GB free.'],
 		['There is 2 TB left. There is 24/7 support.'],
 		['There is 10 kB free. There is 5 min left. There is 50 cents due.'],
+		['There is 20 ms of latency. There is 30 mins left.'],
 		['The agent checked weather this morning.'],
 		['We built it for everyday and professional use.'],
 	])('leaves the correct sentence %s alone', (text) => {
@@ -155,6 +159,9 @@ describe('phrasal verbs written as nouns', () => {
 		['Can setup be automated? Will cleanup run nightly?'],
 		['We email you login instructions.'],
 		['Rollout this quarter is behind schedule. Will setup this week be faster?'],
+		['How long will failover to the replica take? When will rollout to all regions finish?'],
+		['How can login for SSO users be simplified?'],
+		['Setup each time takes an hour. Rollout every quarter follows the same plan.'],
 	])('leaves the noun in %s alone', (text) => {
 		expect(grammar(text)).toEqual([]);
 	});
@@ -168,6 +175,8 @@ describe('forms that break after a verb, modal, or quantity', () => {
 		['The client can retries three times.', 'retries', 'use "retry"'],
 		['I seen this error before.', 'seen', 'use "saw"'],
 		['Remember to runs the linter.', 'runs',
+			'the verb after "to" takes its base form ("to run", not "to runs")'],
+		['We need to going live on Monday.', 'going',
 			'the verb after "to" takes its base form ("to run", not "to runs")'],
 		['We plan to migrating next week.', 'migrating',
 			'the verb after "to" takes its base form ("to run", not "to runs")'],
@@ -195,6 +204,8 @@ describe('forms that break after a verb, modal, or quantity', () => {
 		["It's for the build, and that's all."],
 		['Most of the budget is going to salaries. The fix is going to users next week.'],
 		['Assign each plan to users in the admin panel.'],
+		['Apply the plan to existing clusters. We moved the plan to pending.'],
+		['Keep it tight but not to loose.'],
 		["Yesterday's builds failed, but today's are green. Everyone else's are failing."],
 		['Less happens at startup. Less depends on the cache now.'],
 		['Mark the run successful. Follow a process consistent with the policy.'],
@@ -208,7 +219,7 @@ describe('forms that break after a verb, modal, or quantity', () => {
 
 describe('sentence mechanics', () => {
 	it.each([
-		['The build passed, however the deploy was blocked.', ', however',
+		['The build passed, however the deploy was still red.', ', however',
 			'use "; however,"'],
 		['The team split the config, however the migration was too complex.', ', however',
 			'use "; however,"'],
@@ -234,6 +245,9 @@ describe('sentence mechanics', () => {
 		['Keep the date, however it is formatted.'],
 		['Keep the date, however the client has formatted it.'],
 		['Which is better depends on your workload.'],
+		['Which is more reliable depends on your workload.'],
+		['Which causes the error is still unknown.'],
+		['Keep the timestamp, however the field is formatted.'],
 		['Which approach you choose depends on your needs.'],
 		['It is, therefore, the best option.'],
 		['Although it works, it is slow.'],
