@@ -17,6 +17,9 @@ The native checker reads narrow frames where only one form is correct:
   to`)
 - a comma splice before `however` or `therefore`, a question closed
   with a period, and a clause with no main clause
+- a verb that disagrees across an `of` phrase or a relative clause
+  (`the list of open issues are`), a comma splice with no linking word,
+  and a run-on whose second clause opens on `we` or `they`
 - a wrong form after a modal or `to` (`will fixed`, `to runs`), `could
   of`, doubled words, and misspellings with one correct form
 
@@ -45,16 +48,17 @@ The model still checks:
 
 - spelling and typos outside the checker's list and the opt-in
   spelling check
-- agreement across a phrase (`the list of issues are`) or where a
-  noun also reads as a verb (`each stage run`)
+- agreement the frames cannot prove: across a participle phrase (`the
+  set of permissions granted to admins are`) or where a noun also reads
+  as a verb (`each stage run`)
 - tense and pronoun agreement
 - homophones outside their frames: `there` or `you're` before a noun,
   `whose` and `who's`, `effect` as a verb, and `then` after a
   comparative
 - articles and prepositions beyond `a/an` (a missing `the`, a wrong
   preposition)
-- punctuation: run-ons, comma splices with no linking word, quotes or
-  brackets left open, and stray apostrophes
+- punctuation: most run-ons and comma splices, quotes or brackets left
+  open, and stray apostrophes
 - dropped words
 
 Do not touch: word choice, sentence length, passive voice, tone,

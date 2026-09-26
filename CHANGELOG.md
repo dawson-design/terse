@@ -21,6 +21,12 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   comma splices before `however`, questions closed with a period, and
   clauses with no main clause.
 - 23 more Harper rules, each kept to the context that proves its fix.
+- Frames for grammar across a phrase or a clause boundary. They catch
+  agreement across an `of` phrase or a relative clause (`the list of
+  open issues are`) and a comma splice with no linking word. They also
+  catch a run-on whose second clause opens on a subject pronoun. On a
+  suite written without access to the checker, they catch 4, 9, and 0
+  of 25 and flag none of 75 correct lookalikes.
 - Unedited model prose from Claude and GPT joins the precision gates.
 
 ### Changed
@@ -33,6 +39,11 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   hint names the fix: split a long sentence, or use plainer words in a
   dense one.
 - The repo's docs lose the dense sentences the new rule flags.
+  Released changelog entries keep their wording under a `terse-ignore`
+  comment for sentence difficulty.
+- `npm test` gives every test 30 seconds. Tests that start the CLI load
+  the grammar engine cold and ran past five seconds when every core was
+  busy.
 - `NounVerbConfusion` now reports only `affect` in a noun slot, as in
   `the affects of`. It no longer catches `effect` used as a verb; the
   model's pass owns that.
@@ -49,7 +60,8 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Four admitted Harper rules misread correct text. `ItsPossessive`
   flagged `It's been broken`, and `NounVerbConfusion` flagged `did not
   affect paying customers`. `PronounVerbAgreement` flagged `We engineers
-  need`, and `AnA` flagged the grade in `A- and U23 games`.
+  need`, and `AnA` flagged the grade in `A- and U23 games` and the `a`
+  in `3 a.m.`
 - A comma lint that inserts a space reports the full fix (`use ", "`).
   It used to say `use " "`, which told the fixer to delete the comma.
 - A second, different match of one pattern in a sentence gets its own
@@ -165,6 +177,7 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `that said` flagged inside `a note that said goodbye`; the hedge now
   matches only at the start of a sentence.
 
+<!-- terse-ignore: hard-sentence very-hard-sentence -->
 - The checker flags `carry` as a figure for `hold`, `include`, or
   `have` (`domains carry fixed weights`, `the report carries the line`,
   `each option carries a risk`). A porter carrying a crate stays
@@ -177,7 +190,6 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   that reason. The tripwire table's false alarms were the only
   escape before; the test is now the rule behind them.
 - The checker flags metadiscourse pointers (`as we will see`,
-<!-- terse-ignore: hard-sentence very-hard-sentence -->
   `as noted above`) and the verdict announced before its evidence
   (`and it does not need to`, `nor should it`, `and that is fine`).
   The style skill names both under never commenting on the writing:
@@ -217,6 +229,7 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+<!-- terse-ignore: hard-sentence very-hard-sentence -->
 - Skills and package metadata use provider-neutral language and shared
   package-relative references. The model-defaults reference now covers shared,
   Claude, and GPT/Codex writing tendencies.
@@ -229,7 +242,6 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [0.11.0] (2026-08-21)
 
 ### Added
-<!-- terse-ignore: hard-sentence very-hard-sentence -->
 
 - The checker frames six ordinary verbs in their metaphorical
   shapes: `holds`, `buys`, `mints`, `carries`, `forces`, and
@@ -246,6 +258,7 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+<!-- terse-ignore: hard-sentence very-hard-sentence -->
 - An action standing as subject or object takes a gerund or a full
   clause: `renaming`, never `a rename`. A noun the domain owns
   (`a commit`) stays.
@@ -258,7 +271,6 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - `/terse:write` is now one request to a finished document. It runs
-<!-- terse-ignore: hard-sentence very-hard-sentence -->
   the outline, the skeleton with its additions, the expansion, and
   the edit gate in fix mode. It stops twice for sign-off, at the
   outline and at the skeleton. Pieces under 200 words skip the stops.
@@ -277,6 +289,7 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+<!-- terse-ignore: hard-sentence very-hard-sentence -->
 - The `write` skill drafts short and expands under proof. The first
   draft is the outline's claims as bare prose, shown to the user on
   documents over 200 words. Every sentence added after that answers
@@ -289,9 +302,9 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   approval. Expansion concentrates on disputable claims. The ceilings
   are 1.25x, 1.5x, and 2x. Outline budgets come from the claims and
   report their sum against the target. The edit gate audits a short
-<!-- terse-ignore: hard-sentence very-hard-sentence -->
   draft for omission.
 
+<!-- terse-ignore: hard-sentence very-hard-sentence -->
 - Restatement detection at any distance. The reverse outline now
   records the claim each paragraph makes, and the repetition audit
   groups paragraphs by claim across the whole document. A claim in
@@ -304,7 +317,6 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [0.8.0] (2026-08-20)
 
 ### Added
-<!-- terse-ignore: hard-sentence very-hard-sentence -->
 
 <!-- terse-ignore: hard-sentence very-hard-sentence -->
 - The claudism families from the community lists, eight of them, from
@@ -443,6 +455,7 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+<!-- terse-ignore: hard-sentence very-hard-sentence -->
 - Word budgets. The outline assigns every section a target word count
   summing to the document's length. Write drafts to the budget and
   treats big misses as outline signals. A section far under target
@@ -455,7 +468,6 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - The drafted lead. The outline writes out the first sentence or two
   as the cheapest test of the entry point, and decides both ends
   before any middle.
-<!-- terse-ignore: hard-sentence very-hard-sentence -->
 - Trim mode in edit ("cut 15%", "this runs long"). Cuts are
   structural: proposed against the reverse outline, approved by the
   user, and made by removing whole units. Trimming a claim to fit is
@@ -470,6 +482,7 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+<!-- terse-ignore: hard-sentence very-hard-sentence -->
 - The shape decides where the answer goes. Memos, reports, specs, and
   design docs open with it; a narrative shape may hold it for a nut
   graf. Delay is a placement the shape licenses, never a reveal saved
@@ -482,8 +495,8 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [0.3.0] (2026-08-18)
 
 ### Added
-<!-- terse-ignore: hard-sentence very-hard-sentence -->
 
+<!-- terse-ignore: hard-sentence very-hard-sentence -->
 - Stock figures as AI tells. The checker lexicon catches the common
   ones: `earns its place`, `moves the needle`, `heavy lifting`,
   `low-hanging fruit`, `secret sauce`, `table stakes`,
@@ -496,10 +509,10 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   subsection makes one point, that point supports its section's
   claim, and the sections in order walk the reader from question to
   answer.
-<!-- terse-ignore: hard-sentence very-hard-sentence -->
 
 ### Changed
 
+<!-- terse-ignore: hard-sentence very-hard-sentence -->
 - The skill docs pass their own checker. Slogan openers cut,
   figurative verbs replaced with plain ones, passives given actors,
   hard sentences split into sub-bullets.
@@ -512,9 +525,9 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.2.0] (2026-08-18)
 
-<!-- terse-ignore: hard-sentence very-hard-sentence -->
 ### Added
 
+<!-- terse-ignore: hard-sentence very-hard-sentence -->
 - `/terse:draft`: outline-first composition. You polish the structure
   as bullets with a one-line claim per section, and you sign off
   before any prose exists. The outline lives as its own markdown file
@@ -527,7 +540,6 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   hover hints, chips that filter by category, a quality score. You
   direct fixes in chat.
 - `ai-tell` category: machine-writing phrases and banned vocabulary,
-<!-- terse-ignore: hard-sentence very-hard-sentence -->
   plus structural patterns. Those cover negation triples, stop-start
   slogans, triadic `whether` openers, and `it's not X, it's Y`.
 - `weak-verb` category: 27 phrases where a plain verb does the job,

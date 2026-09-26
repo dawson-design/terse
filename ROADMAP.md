@@ -332,8 +332,12 @@ first. The model's own pass owns the rest.
 - [x] Lead sentence difficulty with grade, calibrated on CEFR-SP
       ratings. Rewrite the repo's own dense sentences to match.
 - [x] `npm run benchmark:accuracy` reproduces every number below.
-- [ ] Agreement across a phrase, comma splices with no linking word,
-      and run-ons need a parser. The model's pass owns them.
+- [x] Narrow frames for agreement across a phrase, comma splices with
+      no linking word, and run-ons. On an unseen suite they catch 4, 9,
+      and 0 of 25, and flag none of 75 correct lookalikes.
+- [ ] Catch more of those three. The frames skip every reading they
+      cannot prove; a parser would catch more. The model's pass owns
+      the rest.
 - [ ] Run Terse head to head against Grammarly. No public API has
       returned single errors since its Text Editor SDK closed on
       2024-01-10.
@@ -342,13 +346,18 @@ Proof, recorded 2026-09-26 with `npm run benchmark:accuracy`:
 
 | Measure | Before | After |
 |---|---|---|
-| Held-out suite errors caught | 37/180 (20.6%) | 87/180 (48.3%) |
+| Held-out suite errors caught | 37/180 (20.6%) | 95/180 (52.8%) |
 | Held-out corrected sentences flagged | 2 | 0 |
 | Grammar-repair fixture errors caught | 6/16 | 12/16, plus the comma splice |
 | False alarms on unedited model prose | 1 | 0, and one real error caught |
 | CoNLL-2014 errors found (annotator 0) | 0.6% at 46% precision | 1.4% at 71% precision |
 | CEFR-SP F0.5, mean rating C1 or harder | 32.2 | 43.2 |
 | CEFR-SP F0.5, mean rating 4.5 or harder | 34.5 | 52.3 |
+| Clause suite errors caught, unseen | 0/75 | 13/75, no lookalike flagged |
+
+A separate session wrote the held-out suite blind, but I read its three
+clause categories while building the clause frames. It scored 87 of 180
+before that, and the clause suite gives the unbiased figure for them.
 
 Hemingway App's default rule scores 28.2 and 49.1 on the same CEFR-SP
 sentences. Grammarly's research model corrects 40.1% of CoNLL-2014
@@ -363,7 +372,7 @@ target is the narrower set of faults an edit leaves in a model's draft.
 | Readability grading | yes | partial | yes, ahead of Hemingway on CEFR-SP (M11) |
 | Passive, adverbs, wordiness | yes | yes | yes |
 | AI-tell detection | no | tagging only | yes, with removal |
-| Grammar repair | paid tier | yes | model: parity eval (M1); checker: 48% (M11) |
+| Grammar repair | paid tier | yes | model: parity eval (M1); checker: about half (M11) |
 | Tone presets | paid tier | yes | yes, eval pending (M6) |
 | Voice capture with sign-off | no | partial | yes |
 | Colored highlight view | yes | yes | yes (M3) |
