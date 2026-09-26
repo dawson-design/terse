@@ -81,7 +81,7 @@ const NOT_PLURAL_NOUN = alt(['news', 'series', 'species', 'means', 'lens', 'canv
 	'alias', 'atlas', 'bias', 'gas', 'chaos', 'ethos', 'kudos', 'always', 'sometimes',
 	'perhaps', 'towards', 'afterwards', 'besides', 'nowadays', 'whereas', 'yes',
 	'hers', 'ours', 'yours', 'theirs', 'its', 'has', 'was', 'does', 'thus', 'plus',
-	'minus', 'us', 'headquarters', 'whereabouts', 'wants', 'needs', 'likes', 'says',
+	'minus', 'us', 'as', 'headquarters', 'whereabouts', 'wants', 'needs', 'likes', 'says',
 	'thinks', 'sees', 'knows', 'cares', 'matters', 'counts', 'costs', 'gets', 'takes',
 	'makes', 'gives', 'expects', 'requires', 'prefers', 'uses', 'asks', 'feels',
 	'finds', 'hears', 'believes', 'intends', 'plans', 'wishes', 'hopes', 'seems',
@@ -126,10 +126,10 @@ const NOT_SINGULAR_NOUN = alt(['people', 'children', 'men', 'women', 'police',
 	'whom', 'whose', 'taken', 'given', 'written', 'chosen', 'driven', 'broken', 'spoken',
 	'stolen', 'forgotten', 'hidden', 'known', 'shown', 'seen', 'done', 'gone', 'made',
 	'held', 'built', 'sent', 'found', 'left', 'kept', 'said', 'paid', 'set', 'put']);
-// -ae covers Latin plurals such as algae; -men, -people, -children, and
+// -ae and -i cover Latin plurals such as algae and ocelli; -men, -people, -children, and
 // -data cover compounds such as salesmen and metadata; -ed covers
 // participles ("the user approved are").
-const PLURAL_ENDING = '(?:s|ing|ly|ae|ata|ii|ed|men|people|children|data)';
+const PLURAL_ENDING = '(?:s|ing|ly|ae|ata|i|ed|men|people|children|data)';
 const SINGULAR_NOUN = `(?![a-z]*${PLURAL_ENDING}\\b)(?!(?:${NOT_SINGULAR_NOUN})\\b)` +
 	"[a-z]+\\b(?![-'’])";
 // After "these" or "those" an -ing word is a noun ("these setting is").
@@ -455,6 +455,126 @@ const FORMS = [
 		hint: (m) => `use "${m[0][0].toUpperCase() + m[0].slice(1)}"` },
 ];
 
+// Grammar that spans a phrase or a clause boundary. A regular expression
+// cannot parse, so each frame anchors on the words that settle the reading.
+
+// Past forms that end a clause, and the finite verbs that start one.
+const IRREGULAR_PAST = ['ran', 'went', 'broke', 'fell', 'left', 'froze', 'hung', 'came',
+	'took', 'made', 'got', 'gave', 'kept', 'sent', 'held', 'built', 'began', 'brought',
+	'grew', 'rose', 'spent', 'lost', 'won', 'paid', 'met', 'led', 'stood', 'drove', 'chose',
+	'shook', 'stole', 'struck', 'threw', 'woke', 'became', 'did', 'had', 'was', 'were',
+	'saw', 'found', 'told', 'knew', 'wrote', 'forgot', 'understood'];
+const NEGATED_AUX = "(?:is|are|was|were|has|have|had|did|does|do|wo|ca|could|should|would)n['’]t";
+const FINITE = `(?:${AUXILIARY}|${NEGATED_AUX}|[a-z]+ed|${alt(IRREGULAR_PAST)}|` +
+	`${alt(SINGULAR_VERBS)}|${alt(NOUN_LIKE_VERBS)})`;
+
+// Heads that take a plural verb after "of" ("a number of jobs are", "the rest
+// of the files are") or read either way ("a set of tools is").
+const QUANTITY_HEAD = alt(['number', 'lot', 'majority', 'minority', 'rest', 'remainder',
+	'bulk', 'couple', 'dozen', 'handful', 'bunch', 'variety', 'range', 'total', 'half',
+	'third', 'quarter', 'percent', 'fraction', 'portion', 'part', 'kind', 'sort', 'type',
+	'series', 'set', 'group', 'pair', 'host', 'plenty', 'none', 'all', 'most', 'some',
+	'any', 'team', 'staff', 'crew', 'family', 'board', 'committee']);
+const OF_PLURAL = '\\s+of\\s+(?:(?:the|these|those|our|your|their|its|all|his|her|my|' +
+	`both|several|many)\\s+)?(?:[a-z][a-z-]*\\s+){0,2}?${PLURAL_NOUN}\\s+`;
+const PLURAL_AUX_VERB = "(?:are|were|have|aren['’]t|weren['’]t|haven['’]t)(?![\\w'’-])";
+// Words that open a new clause inside a relative clause, so the verb after
+// them belongs to that clause ("the page that shows which users are active").
+const CLAUSE_WORD = alt(['and', 'or', 'but', 'that', 'which', 'who', 'whom', 'whose', 'whether',
+	'if', 'when', 'where', 'how', 'why', 'what', 'we', 'they', 'you', 'i', 'he', 'she', 'it']);
+
+const PHRASE_SUBJECT_START = `(?:${LINE_START}|[,;:(]\\s*)`;
+
+const ACROSS_A_PHRASE = [
+	// "The list of open issues are longer": the verb agrees with "list". The
+	// head must open the sentence or follow a comma: after "since" or "when"
+	// it may be a fronted phrase ("since the end of the series rumors have").
+	{ re: new RegExp(`(?<=${PHRASE_SUBJECT_START}(?:${SINGULAR_DETERMINER})\\s+` +
+		`${SINGULAR_MODIFIER}(?!(?:${QUANTITY_HEAD})\\b)${SINGULAR_NOUN}${OF_PLURAL})` +
+		PLURAL_AUX_VERB, 'g'), hint: (m) => `use "${sameMarks(m[0], singularVerb(m[0]))}"` },
+	// "The number of open tickets have grown"; "a number of" is plural.
+	{ re: new RegExp(`(?<=${PHRASE_SUBJECT_START}[Tt]he\\s+number${OF_PLURAL})` +
+		PLURAL_AUX_VERB, 'g'), hint: (m) => `use "${sameMarks(m[0], singularVerb(m[0]))}"` },
+	// "One of the servers were down"; "one of the servers that are down" stays.
+	{ re: new RegExp(`(?<=${PHRASE_SUBJECT_START}(?:[Oo]ne|[Ee]ach|[Ee]very\\s+one)` +
+		`${OF_PLURAL})${PLURAL_AUX_VERB}`, 'g'),
+		hint: (m) => `use "${sameMarks(m[0], singularVerb(m[0]))}"` },
+	// "The service that handles retries were restarted": the relative verb
+	// proves the head singular.
+	{ re: new RegExp(`(?<=${SINGULAR_SUBJECT_START}(?:${SINGULAR_DETERMINER})\\s+` +
+		`${SINGULAR_MODIFIER}${SINGULAR_NOUN}\\s+(?:that|which|who)\\s+(?:is|was|has|does|` +
+		`${alt(SINGULAR_VERBS)}|${alt(NOUN_LIKE_VERBS)})\\s+(?:(?!(?:${CLAUSE_WORD})\\b)` +
+		`[a-z][a-z-]*\\s+){0,4})${PLURAL_AUX_VERB}`, 'g'),
+		hint: (m) => `use "${sameMarks(m[0], singularVerb(m[0]))}"` },
+];
+
+// A sentence can open with a clause only when its first word does not make
+// it subordinate, prepositional, or adverbial. "The more we tested, the more
+// we found" is a comparative pair, not two sentences.
+const NOT_CLAUSE_OPENER = alt(['When', 'If', 'Once', 'Because', 'While', 'After', 'Before',
+	'Since', 'Until', 'Unless', 'Although', 'Though', 'As', 'Whether', 'Where', 'In', 'On',
+	'At', 'For', 'With', 'By', 'From', 'During', 'Without', 'To', 'Of', 'About', 'Over',
+	'Under', 'Between', 'Through', 'Also', 'However', 'Then', 'Now', 'Today', 'Yesterday',
+	'First', 'Finally', 'Next', 'Here', 'There', 'So', 'Yes', 'No', 'Well', 'Instead',
+	'Otherwise', 'Still', 'Even', 'Only', 'Just', 'Meanwhile', 'Later', 'Earlier', 'Again',
+	'Sometimes', 'Thus', 'Hence', 'Therefore', 'Moreover', 'Furthermore', 'Besides',
+	'Nevertheless', 'Nonetheless', 'Every', 'Each', 'Whenever', 'Wherever', 'Like',
+	'Unlike', 'Despite', 'Given', 'Please', 'Note', 'Last', 'By']);
+// The opening must be capitalized: a lowercase start is the tail of a
+// sentence the splitter cut at an abbreviation ("the U.S. joined").
+const CLAUSE_OPENING = `${LINE_START}(?=[A-Z])(?!(?:${NOT_CLAUSE_OPENER})\\b)` +
+	'(?![A-Z][a-z]*(?:ly|ed|ing)\\b)(?!The\\s+(?:more|less|fewer|better|worse|bigger|smaller|' +
+	'faster|slower|longer|shorter|higher|lower|sooner|later|earlier|larger|harder|easier)\\b)' +
+	'(?!(?:The\\s+)?(?:last|next|first)\\s+time\\b)';
+// The words after the determiner are modifiers and a noun: a pronoun, a
+// relative word, a preposition, or an article there means an appositive
+// ("a broken leg, an injury he suffered") or an absolute phrase ("47
+// prefectures, each overseen by an elected governor").
+const NOT_SUBJECT_WORD = `(?!(?:${CLAUSE_WORD}|by|of|in|on|at|for|with|from|to|as|a|an|the)\\b)`;
+// An -ed word after a noun may be a participle rather than a verb: an
+// absolute phrase ("the buildings mixed with new ones") or a gapped series
+// ("barb wire is crunched, trenches crossed and ..."). So an -ed verb counts
+// only after a determiner or pronoun subject and not before "with" or "by".
+const FINITE_NOT_ED = `(?:${AUXILIARY}|${NEGATED_AUX}|${alt(IRREGULAR_PAST)}|` +
+	`${alt(SINGULAR_VERBS)}|${alt(NOUN_LIKE_VERBS)})`;
+const SECOND_CLAUSE = '(?:(?:(?:the|this|these|those|our|their|its|my|your|a|an|each|every|' +
+	`no|some|all)\\s+(?:${NOT_SUBJECT_WORD}[a-z][a-z-]*\\s+){0,2}?${NOT_SUBJECT_WORD}` +
+	'[a-z][a-z-]*|we|they|he|she|I|it|you|nobody|nothing|everyone|everything|someone|' +
+	`something)\\s+(?:not\\s+)?(?:${FINITE_NOT_ED}|[a-z]+ed(?!\\s+(?:with|by)\\b))|` +
+	`${PLURAL_NOUN}\\s+(?:not\\s+)?${FINITE_NOT_ED})\\b`;
+const REPORTING_VERB = alt(['said', 'says', 'noted', 'added', 'explained', 'replied', 'wrote',
+	'asked', 'answered', 'argued', 'claimed', 'warned', 'announced']);
+// Verbs that take a clause without "that" ("we found we needed more memory").
+const CLAUSE_TAKING_VERB = alt(['found', 'thought', 'knew', 'said', 'realized', 'noticed',
+	'decided', 'felt', 'heard', 'believed', 'assumed', 'guessed', 'figured', 'learned',
+	'discovered', 'showed', 'meant', 'hoped', 'wished', 'expected', 'suspected', 'confirmed',
+	'proved', 'argued', 'claimed', 'agreed', 'admitted', 'announced', 'reported', 'mentioned',
+	'explained', 'warned', 'promised', 'insisted', 'suggested', 'recommended', 'ensured',
+	'verified', 'checked', 'asked', 'told', 'understood', 'remembered', 'forgot',
+	'guaranteed', 'predicted', 'estimated', 'determined', 'concluded', 'noted', 'observed',
+	'recognized', 'acknowledged', 'accepted', 'demonstrated', 'indicated', 'revealed',
+	'seemed', 'appeared', 'wondered', 'doubted', 'feared', 'worried', 'replied', 'added',
+	'wrote', 'stated', 'saw', 'wanted', 'needed', 'liked', 'preferred', 'hated']);
+const CLAUSE_END_ADVERB = '(?:early|late|again|today|yesterday|overnight|twice|down|up|out|' +
+	'off|back|[a-z]+ly)';
+
+const CLAUSE_JOINS = [
+	// "The deploy finished early, the team moved on." A comma alone cannot
+	// join two sentences; a later ", and" makes it a series ("the build
+	// passed, the tests passed, and we shipped").
+	{ re: new RegExp(`(?<=${CLAUSE_OPENING}[^,;:.?!]*?\\b${FINITE}\\b[^,;:.?!]*?` +
+		`(?<!\\b(?:${REPORTING_VERB})))` + `,(?=\\s+${SECOND_CLAUSE}` +
+		'(?![^.?!]*,\\s+(?:and|or|but|so|yet)\\b))', 'g'), prose: true,
+		hint: () => 'two sentences joined by a comma: use a period, a semicolon, or ' +
+			'"and", "but", or "so"' },
+	// "The server crashed we lost an hour of data." Two clauses with nothing
+	// between them; the second opens on a subject-only pronoun.
+	{ re: new RegExp(`(?<=${CLAUSE_OPENING}[^,;:.?!]*?\\b(?!(?:${CLAUSE_TAKING_VERB})\\b)` +
+		`(?:[a-z]+ed|${alt(IRREGULAR_PAST)})(?:\\s+${CLAUSE_END_ADVERB})?\\s+)` +
+		`(?:we|they|he|she|I)(?=\\s+(?:not\\s+)?${FINITE}\\b)`, 'g'), prose: true,
+		hint: (m) => `two sentences run together: end the first before "${m[0]}"` },
+];
+
 const DOUBLED_MARKS = [
 	{ re: /!{2,}|\?{2,}/g, hint: (m) => `use "${m[0][0]}"` },
 ];
@@ -487,5 +607,7 @@ export const GRAMMAR_PATTERNS = [
 	...SPLICES,
 	...SENTENCE_SHAPES,
 	...FORMS,
+	...ACROSS_A_PHRASE,
+	...CLAUSE_JOINS,
 	...DOUBLED_MARKS,
 ];

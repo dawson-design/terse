@@ -283,6 +283,46 @@ describe('sentence mechanics', () => {
 	});
 });
 
+describe('grammar across a phrase or a clause boundary', () => {
+	it.each([
+		['The list of open issues are longer than last week.', 'are', 'use "is"'],
+		['The quality of the test fixtures have improved.', 'have', 'use "has"'],
+		['The number of open tickets have grown since the outage.', 'have', 'use "has"'],
+		['One of the servers were down overnight.', 'were', 'use "was"'],
+		['The service that handles retries were restarted.', 'were', 'use "was"'],
+		['The canary failed, the system reverted to the previous release.', ',',
+			'two sentences joined by a comma: use a period, a semicolon, or "and", "but", or "so"'],
+		['I checked the logs, nothing looked wrong.', ',',
+			'two sentences joined by a comma: use a period, a semicolon, or "and", "but", or "so"'],
+		['The server crashed we lost an hour of data.', 'we',
+			'two sentences run together: end the first before "we"'],
+	])('%s', (text, match, hint) => {
+		expectOne(text, match, hint);
+	});
+
+	it.each([
+		['A number of jobs are queued. The rest of the files are cached.'],
+		['The majority of users prefer the CLI. A set of tools is bundled.'],
+		['One of the servers that are down needs a reboot.'],
+		['The page that shows which users are active loads slowly.'],
+		['Since the end of the series rumors have circulated.'],
+		['When the job fails, the pager fires.'],
+		['The build passed, the tests passed, and the deploy shipped.'],
+		['The job failed, leaving the queue full.'],
+		['Our lead, the engineer who wrote it, approved the change.'],
+		['We support Linux, the BSDs, and macOS.'],
+		['He said, the build is green.'],
+		['The more we tested, the more we found.'],
+		['Japan has 47 prefectures, each overseen by a governor.'],
+		['The town is residential today, the old buildings mixed with new ones.'],
+		['The tool we built last year still runs.'],
+		['We found we needed more memory.'],
+		['The last time it failed we paged the whole team.'],
+	])('leaves the correct sentence %s alone', (text) => {
+		expect(grammar(text)).toEqual([]);
+	});
+});
+
 describe('hints that rebuild the right word', () => {
 	it.each([
 		['The tests goes green on every run.', 'goes', 'use "go"'],
@@ -301,9 +341,15 @@ describe('corpus gates', () => {
 		.map((name) => [name, readFileSync(join(dir, name), 'utf8')]);
 
 	// Haiku's runbook really does say "Action: Rollback the last deployment".
+	// Hemingway's journalism joins some clauses with a comma ("It seems a
+	// pity, they are such a charming lot."): by the standard a technical
+	// document follows, each is a comma splice.
 	it.each([
-		['edited human prose', join(HERE, 'fixtures', 'human-prose'), []],
-		['Hemingway samples', join(HERE, '..', 'samples', 'hemingway'), []],
+		['edited human prose', join(HERE, 'fixtures', 'human-prose'),
+			['living-on-1000-a-year-in-paris.md: ,', 'paris-is-full-of-russians.md: ,']],
+		['Hemingway samples', join(HERE, '..', 'samples', 'hemingway'),
+			['living-on-1000-a-year.md: ,', 'paris-full-of-russians.md: ,',
+				'recruits-for-tanks.md: ,']],
 		['unedited model prose', join(HERE, 'fixtures', 'model-prose'),
 			['haiku-runbook.md: Rollback']],
 	])('finds only the labeled real errors in %s', (label, dir, errors) => {
