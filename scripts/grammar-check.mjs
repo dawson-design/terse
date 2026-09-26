@@ -99,6 +99,10 @@ const ADMITTED_IN_CONTEXT = {
 		/\s(?:\w+(?:er|est)|better|best|worse|worst)$/i.test(match),
 	// "they was"; "it" and "you" can be objects ("those who advocate it are").
 	PronounInflectionBe: ({ before }) => /\b(?:I|he|she|we|they)\s+$/i.test(before),
+	// "We engineers need more context": an agent noun after "we", "us", or
+	// "you" stands in apposition; it is not a verb.
+	PronounVerbAgreement: ({ before, match }) => !(/\b(?:we|us|you)\s+$/i.test(before) &&
+		/(?:ers|ors|ists|ians|ants|ents|ees)$/i.test(match)),
 	// "is way to short"; "give way to" and "a long way to go" stay.
 	WayTooAdjective: ({ before }) => LINKING_VERB_BEFORE_WAY.test(before),
 	// A lone "i", not "i.e." or "i/o".
