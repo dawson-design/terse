@@ -7,7 +7,7 @@ import { describe, it, expect } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkText } from '../scripts/style-check.mjs';
+import { checkText, splitSentences, stripMarkdown } from '../scripts/style-check.mjs';
 
 const HERE = fileURLToPath(new URL('.', import.meta.url));
 const grammar = (text) => checkText(text).flags.filter((f) => f.category === 'grammar');
@@ -253,6 +253,11 @@ describe('sentence mechanics', () => {
 
 	it('places a finding inside a link label on the label', () => {
 		expectOne('We saw [less](x) errors.', 'less', 'use "fewer"');
+	});
+
+	it('reads an image inside a sentence as part of it', () => {
+		const text = 'The diagram ![architecture overview](docs/arch.png) shows the flow.';
+		expect(splitSentences(stripMarkdown(text))).toHaveLength(1);
 	});
 
 	it('offers no replacement across link markup', () => {

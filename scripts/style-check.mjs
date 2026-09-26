@@ -526,9 +526,10 @@ export function stripMarkdown(text, codeMark = ' ') {
 		.replace(/```[\s\S]*?```/g, (m) => m.replace(/[^\n]/g, ' '))
 		.replace(INLINE_CODE, (m) => m.replace(/[^\n]/g, codeMark))
 		.replace(/<!--[\s\S]*?-->/g, (m) => m.replace(/[^\n]/g, ' '))
-		// A link keeps its label at the label's own offsets.
-		.replace(/\[([^\]]*)\]\((?:[^()\n]|\([^()\n]*\))*\)/g, (m, label) =>
-			` ${label}`.padEnd(m.length, ' '))
+		// A link keeps its label at the label's own offsets. An image's "!"
+		// blanks with the brackets, since "!" before a space ends a sentence.
+		.replace(/!?\[([^\]]*)\]\((?:[^()\n]|\([^()\n]*\))*\)/g, (m, label) =>
+			`${' '.repeat(m.indexOf('[') + 1)}${label}`.padEnd(m.length, ' '))
 		.replace(/^[ \t]*[|].*$/gm, (m) => ' '.repeat(m.length))
 		.replace(/^ {0,3}#{1,6}\s.*$/gm, (m) => ' '.repeat(m.length));
 }
