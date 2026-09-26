@@ -730,7 +730,7 @@ function assignSpans(text, flags, from, span) {
 			? new RegExp(flags[i]._re.source, 'gi')
 			: literalRegex(flags[i].match);
 		delete flags[i]._re;
-		flags[i].span = refineSpan(text, span, re, n) ?? span;
+		flags[i].span = refineSpan(text, span, re, flags[i].match, n) ?? span;
 	}
 }
 
@@ -739,13 +739,18 @@ function literalRegex(match) {
 		.replace(/\s+/g, '\\s+').replace(/['’]/g, "['’]"), 'gi');
 }
 
-function refineSpan(text, span, re, occurrence = 0) {
+const normalized = (s) => s.replace(/\s+/g, ' ').replace(/’/g, "'").toLowerCase();
+
+// The nth hit of re whose text is the flag's match. One pattern can match
+// different text in one sentence ("this approach", "that tension"), so the
+// count skips hits that belong to another flag.
+function refineSpan(text, span, re, match, occurrence = 0) {
 	const slice = text.slice(span[0], span[1]);
-	let m;
-	for (let i = 0; (m = re.exec(slice)) !== null; i++) {
-		if (i === occurrence) {
-			return [span[0] + m.index, span[0] + m.index + m[0].length];
-		}
+	const target = normalized(match);
+	let seen = 0;
+	for (const m of slice.matchAll(re)) {
+		if (normalized(m[0]) !== target) continue;
+		if (seen++ === occurrence) return [span[0] + m.index, span[0] + m.index + m[0].length];
 	}
 	return null;
 }

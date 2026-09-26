@@ -265,6 +265,12 @@ describe('checkText', () => {
 		expect(spans[0]).not.toEqual(spans[1]);
 	});
 
+	it('gives each different match of one pattern its own span', () => {
+		const text = 'We weighed this approach against that tension.';
+		const tells = checkText(text).flags.filter((f) => f.category === 'ai-tell');
+		expect(tells.map((f) => text.slice(...f.span))).toEqual(['this approach', 'that tension']);
+	});
+
 	it('suppresses the next line under a terse-ignore comment', () => {
 		const doc = '<!-- terse-ignore -->\nWe utilize robust things.\n\nWe utilize more.\n';
 		const { flags } = checkText(doc);
