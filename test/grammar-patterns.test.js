@@ -32,6 +32,10 @@ describe('agreement at an edit seam', () => {
 		['It run every night at midnight.', 'run', 'use "runs"'],
 		['These setting is ignored in production.', 'These', 'use "This"'],
 		['There is three open incidents this week.', 'There is', 'use "There are"'],
+		['There is 2,000 users on the waitlist.', 'There is', 'use "There are"'],
+		['The server were down all night.', 'were', 'use "was"'],
+		['The tests has had three failures.', 'has', 'use "have"'],
+		['It need a restart after the upgrade.', 'need', 'use "needs"'],
 		["There's two ways to roll back.", "There's", 'use "There are"'],
 	])('%s', (text, match, hint) => {
 		expectOne(text, match, hint);
@@ -59,6 +63,9 @@ describe('agreement at an edit seam', () => {
 		['The change passed review because it read as a small tweak.'],
 		['There is 10 GB free. There is two-factor auth on every account.'],
 		['Each time run the smoke tests first.'],
+		['I wish the build were faster. Suppose the cache were empty.'],
+		['The sales calls happen weekly. The ops runs happen at night.'],
+		['The schemata are versioned. The radii are equal.'],
 		['If the primary were to fail, the replica takes over.'],
 		['Even if the cache were empty, the job would run.'],
 		['It behaves as if the token were valid.'],
@@ -108,6 +115,8 @@ describe('homophones and confusables in their only grammatical frame', () => {
 		['The agent checks weather forecasts hourly.'],
 		['There is 99.9% availability. There is 10.5 GB free.'],
 		['There is 2 TB left. There is 24/7 support.'],
+		['There is 10 kB free. There is 5 min left. There is 50 cents due.'],
+		['The agent checked weather this morning.'],
 		['We built it for everyday and professional use.'],
 	])('leaves the correct sentence %s alone', (text) => {
 		expect(grammar(text)).toEqual([]);
@@ -121,6 +130,10 @@ describe('phrasal verbs written as nouns', () => {
 		['Action: Rollback the last deployment.', 'Rollback', 'use "Roll back"'],
 		['We shutdown the old cluster on Friday.', 'shutdown', 'use "shut down"'],
 		['You need to login to the console first.', 'login', 'use "log in"'],
+		['You can login to the dashboard.', 'login', 'use "log in"'],
+		['Please login to your account.', 'login', 'use "log in"'],
+		['We should signup for the new monitoring service.', 'signup', 'use "sign up"'],
+		['I backup to S3 every night.', 'backup', 'use "back up"'],
 		['Please cleanup the temp files after the run.', 'cleanup', 'use "clean up"'],
 	])('%s', (text, match, hint) => {
 		expectOne(text, match, hint);
@@ -141,6 +154,7 @@ describe('phrasal verbs written as nouns', () => {
 		['Note: Failover to the secondary is manual.'],
 		['Can setup be automated? Will cleanup run nightly?'],
 		['We email you login instructions.'],
+		['Rollout this quarter is behind schedule. Will setup this week be faster?'],
 	])('leaves the noun in %s alone', (text) => {
 		expect(grammar(text)).toEqual([]);
 	});
@@ -155,6 +169,9 @@ describe('forms that break after a verb, modal, or quantity', () => {
 		['I seen this error before.', 'seen', 'use "saw"'],
 		['Remember to runs the linter.', 'runs',
 			'the verb after "to" takes its base form ("to run", not "to runs")'],
+		['We plan to migrating next week.', 'migrating',
+			'the verb after "to" takes its base form ("to run", not "to runs")'],
+		['Be careful not to loose the key.', 'loose', 'use "lose"'],
 		['We saw less errors after the patch.', 'less', 'use "fewer"'],
 		['Send the report to Sam and I.', 'I', 'use "me"'],
 		['Between you and I, the estimate is low.', 'Between you and I', 'use "Between you and me"'],
@@ -183,6 +200,7 @@ describe('forms that break after a verb, modal, or quantity', () => {
 		['Mark the run successful. Follow a process consistent with the policy.'],
 		["We don't have no-code support."],
 		["Haven't you seen the logs?"],
+		['We need to wing it.'],
 	])('leaves the correct sentence %s alone', (text) => {
 		expect(grammar(text)).toEqual([]);
 	});
@@ -204,6 +222,7 @@ describe('sentence mechanics', () => {
 
 	it('flags a subordinate clause with no main clause, or no comma before one', () => {
 		for (const text of ['Which means the cache is stale.', 'Because the build failed.',
+			'The cache expired. Which caused the outage.',
 			'Because the town is in a valley it had no railway.']) {
 			expect(grammar(text).map((f) => f.hint)).toEqual([expect.stringMatching(
 				/^a subordinate clause needs a main clause/)]);
@@ -213,6 +232,8 @@ describe('sentence mechanics', () => {
 	it.each([
 		['Name it, however the team prefers.'],
 		['Keep the date, however it is formatted.'],
+		['Keep the date, however the client has formatted it.'],
+		['Which is better depends on your workload.'],
 		['Which approach you choose depends on your needs.'],
 		['It is, therefore, the best option.'],
 		['Although it works, it is slow.'],
@@ -234,6 +255,15 @@ describe('sentence mechanics', () => {
 		expect(text.slice(...flag.span)).toBe(match);
 	});
 
+	it.each([
+		['1) Him and Bob went home.\n', 'Him'],
+		['1) Me and Bob went home.\n', 'Me and Bob'],
+		['- The artifacts is uploaded.\n', 'is'],
+	])('places a finding inside a list item exactly: %j', (text, match) => {
+		const flags = grammar(text);
+		expect(flags.map((f) => text.slice(...f.span))).toEqual([match]);
+	});
+
 	it('lets a list item be a fragment', () => {
 		expect(grammar('Why cache it?\n\n- Because the query is slow.\n')).toEqual([]);
 	});
@@ -243,7 +273,8 @@ describe('hints that rebuild the right word', () => {
 	it.each([
 		['The tests goes green on every run.', 'goes', 'use "go"'],
 		['It can goes wrong at startup.', 'goes', 'use "go"'],
-		['Each caches is warm after startup.', 'caches', 'use "cache"'],
+		['Each checks is green after startup.', 'checks', 'use "check"'],
+		['Each statuses is shown.', 'statuses', '"each" takes a singular noun'],
 		["It's own design is simple.", "It's", 'use "Its"'],
 		['The artifacts isn’t ready.', 'isn’t', 'use "aren’t"'],
 	])('%s', (text, match, hint) => {
