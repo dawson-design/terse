@@ -492,7 +492,7 @@ const STATE_IDIOMS = {
 };
 
 function isStateIdiom(aux, participle, rest) {
-	if (!(participle in STATE_IDIOMS)) return false;
+	if (!Object.hasOwn(STATE_IDIOMS, participle)) return false;
 	const follow = STATE_IDIOMS[participle];
 	if (follow === null) return /^g(?:et|ets|ot)$/i.test(aux); // get/got started
 	return follow.test(rest.trimStart());

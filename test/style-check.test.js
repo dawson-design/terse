@@ -14,6 +14,11 @@ describe('checkText', () => {
 		expect(flags).toEqual([]);
 	});
 
+	it('checks a sentence whose participle names an Object.prototype key', () => {
+		expect(() => checkText('The dependency is constructor-injected.')).not.toThrow();
+		expect(() => checkText('The flag is toString-based.')).not.toThrow();
+	});
+
 	it('flags passive voice, adverbs, and qualifiers', () => {
 		const { flags } = checkText(
 			'The cache was invalidated by the scheduler, and I think this could possibly be improved significantly.'
