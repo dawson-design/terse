@@ -55,24 +55,30 @@ const keepCase = (from, to) => (/^[A-Z]/.test(from) ? to[0].toUpperCase() + to.s
 // are lowercase, so product names stay out. And a noun that may be plural or
 // collective in either form stays out.
 
+// "after", "before", "since", and "until" stay out: as prepositions they
+// put a noun phrase before the real subject ("arguments after the command
+// are appended").
 const CLAUSE_OPENERS = ['[Ww]hen', '[Ii]f', '[Oo]nce', '[Bb]ecause', '[Ww]hile',
-	'[Aa]fter', '[Bb]efore', '[Ss]ince', '[Uu]ntil', '[Uu]nless', '[Ww]hether',
-	'[Aa]lthough', '[Tt]hough', '[Ww]here', '[Ww]hich', '[Ww]ho', '[Bb]ut', '[Ss]o',
-	'[Tt]hen'];
+	'[Uu]nless', '[Ww]hether', '[Aa]lthough', '[Tt]hough', '[Ww]here', '[Ww]hich',
+	'[Ww]ho', '[Bb]ut', '[Ss]o', '[Tt]hen'];
 const clauseStart = (openers) => `(?:${LINE_START}|[,;:(]\\s*|\\b(?:${alt(openers)})\\s+)`;
-// "that" opens a clause for a plural subject ("ensure that the tests
-// passes"), but not for a singular one, where "requires that the client have
-// a token" is a subjunctive. "and" and "or" open no clause here: they join
-// nouns inside a phrase as often as clauses ("Britain and its inhabitants").
-const PLURAL_SUBJECT_START = clauseStart([...CLAUSE_OPENERS, '[Tt]hat']);
+// "that" opens no clause here: it is often a relative pronoun ("the config
+// that the installer writes lives"), and "requires that the client have a
+// token" is a subjunctive. "and" and "or" join nouns inside a phrase as
+// often as clauses ("Britain and its inhabitants").
+const PLURAL_SUBJECT_START = clauseStart(CLAUSE_OPENERS);
 const SINGULAR_SUBJECT_START = clauseStart(CLAUSE_OPENERS);
 // "were" after a singular subject is a subjunctive after "if", "though",
 // "unless", or "whether" ("if the primary were to fail"), and before "to".
 const WERE_SUBJECT_START = clauseStart(CLAUSE_OPENERS.filter((w) =>
 	!/^\[..\](?:f|hough|lthough|nless|hether)$/.test(w)));
-const MODIFIER = '(?:[a-z][a-z-]*\\s+)?';
+// A modifier is not a function word or a superlative: "the most useful are"
+// uses an adjective as the noun, and a preposition means a phrase.
+const NOT_MODIFIER = '(?!(?:most|least|best|worst|only|of|in|on|at|for|with|from|to|by|as|' +
+	'about|after|before|into|than|and|or|but|that|which|who|whose)\\s)';
+const MODIFIER = `(?:${NOT_MODIFIER}[a-z][a-z-]*\\s+)?`;
 // A plural modifier would make the next word the noun: "the users now have".
-const SINGULAR_MODIFIER = '(?:(?![a-z-]*s\\s)[a-z][a-z-]*\\s+)?';
+const SINGULAR_MODIFIER = `(?:${NOT_MODIFIER}(?![a-z-]*s\\s)[a-z][a-z-]*\\s+)?`;
 
 // Words that end in s but are singular, adverbs, pronouns, verbs that open a
 // pseudo-cleft ("what the team needs is"), or lowercase product names. The
@@ -109,7 +115,7 @@ const NOT_SINGULAR_NOUN = alt(['people', 'children', 'men', 'women', 'police',
 	'wealthy', 'unemployed', 'homeless', 'sick', 'dead', 'living', 'injured',
 	'i', 'you', 'we', 'they', 'he', 'she', 'it', 'who', 'which', 'what', 'there', 'here',
 	'larvae', 'elytra', 'microglia', 'strata', 'genera', 'corpora', 'dice', 'lice', 'oxen',
-	'loci', 'foci', 'cacti',
+	'loci', 'foci', 'cacti', 'alumni', 'ocelli', 'bacilli', 'termini', 'syllabi', 'radii',
 	'club', 'garrison', 'army', 'navy', 'group', 'council', 'jury', 'squad', 'faculty',
 	'parliament', 'cabinet', 'management', 'department', 'union', 'firm',
 	// time words open an adverbial, not a subject ("each time, take a backup")
@@ -126,10 +132,10 @@ const NOT_SINGULAR_NOUN = alt(['people', 'children', 'men', 'women', 'police',
 	'whom', 'whose', 'taken', 'given', 'written', 'chosen', 'driven', 'broken', 'spoken',
 	'stolen', 'forgotten', 'hidden', 'known', 'shown', 'seen', 'done', 'gone', 'made',
 	'held', 'built', 'sent', 'found', 'left', 'kept', 'said', 'paid', 'set', 'put']);
-// -ae and -i cover Latin plurals such as algae and ocelli; -men, -people, -children, and
+// -ae and -ii cover Latin plurals such as algae and radii; -men, -people, -children, and
 // -data cover compounds such as salesmen and metadata; -ed covers
 // participles ("the user approved are").
-const PLURAL_ENDING = '(?:s|ing|ly|ae|ata|i|ed|men|people|children|data)';
+const PLURAL_ENDING = '(?:s|ing|ly|ae|ata|ii|ed|men|people|children|data)';
 const SINGULAR_NOUN = `(?![a-z]*${PLURAL_ENDING}\\b)(?!(?:${NOT_SINGULAR_NOUN})\\b)` +
 	"[a-z]+\\b(?![-'’])";
 // After "these" or "those" an -ing word is a noun ("these setting is").
@@ -169,7 +175,7 @@ const BASE_VERBS = ['take', 'contain', 'require', 'include', 'get', 'send',
 	'create', 'provide', 'expose', 'accept', 'reject', 'expect', 'allow', 'emit',
 	'depend', 'belong', 'seem', 'appear', 'become', 'remain', 'exist', 'happen',
 	'occur', 'receive', 'ensure', 'prevent', 'give', 'go', 'come', 'know', 'compile',
-	'listen', 'connect', 'parse', 'render', 'resolve', 'have', 'do', 'fail'];
+	'listen', 'connect', 'resolve', 'have', 'do', 'fail'];
 
 const apostrophe = (word) => word.replace("'", "['’]");
 const straight = (word) => word.replace('’', "'");
@@ -474,16 +480,26 @@ const QUANTITY_HEAD = alt(['number', 'lot', 'majority', 'minority', 'rest', 'rem
 	'bulk', 'couple', 'dozen', 'handful', 'bunch', 'variety', 'range', 'total', 'half',
 	'third', 'quarter', 'percent', 'fraction', 'portion', 'part', 'kind', 'sort', 'type',
 	'series', 'set', 'group', 'pair', 'host', 'plenty', 'none', 'all', 'most', 'some',
-	'any', 'team', 'staff', 'crew', 'family', 'board', 'committee']);
-const OF_PLURAL = '\\s+of\\s+(?:(?:the|these|those|our|your|their|its|all|his|her|my|' +
-	`both|several|many)\\s+)?(?:[a-z][a-z-]*\\s+){0,2}?${PLURAL_NOUN}\\s+`;
-const PLURAL_AUX_VERB = "(?:are|were|have|aren['’]t|weren['’]t|haven['’]t)(?![\\w'’-])";
+	'any', 'team', 'staff', 'crew', 'family', 'board', 'committee', 'percentage', 'minimum',
+	'maximum', 'fourth', 'fifth', 'tenth', 'hundredth', 'ton', 'tons', 'best', 'worst', 'least',
+	'fraction', 'share', 'proportion', 'average', 'total', 'sum']);
 // Words that open a new clause inside a relative clause, so the verb after
 // them belongs to that clause ("the page that shows which users are active").
 const CLAUSE_WORD = alt(['and', 'or', 'but', 'that', 'which', 'who', 'whom', 'whose', 'whether',
 	'if', 'when', 'where', 'how', 'why', 'what', 'we', 'they', 'you', 'i', 'he', 'she', 'it']);
 
+// The words inside the "of" phrase are modifiers: a relative word there
+// opens a clause ("the list of users whose accounts are locked is empty").
+const OF_PLURAL = '\\s+of\\s+(?:(?:the|these|those|our|your|their|its|all|his|her|my|' +
+	`both|several|many)\\s+)?(?:(?!(?:${CLAUSE_WORD})\\b)[a-z][a-z-]*\\s+){0,2}?` +
+	`(?!(?:${CLAUSE_WORD})\\b)${PLURAL_NOUN}\\s+`;
+const PLURAL_AUX_VERB = "(?:are|were|have|aren['’]t|weren['’]t|haven['’]t)(?![\\w'’-])";
 const PHRASE_SUBJECT_START = `(?:${LINE_START}|[,;:(]\\s*)`;
+const CLAUSE_VERBS_3SG = ['ensures', 'checks', 'confirms', 'reports', 'verifies', 'shows',
+	'means', 'says', 'assumes', 'requires', 'expects', 'guarantees', 'proves', 'indicates',
+	'suggests', 'implies', 'determines', 'decides', 'knows', 'finds', 'notes', 'states',
+	'warns', 'asserts', 'claims', 'argues', 'needs', 'wants', 'makes', 'lets', 'helps',
+	'returns'];
 
 const ACROSS_A_PHRASE = [
 	// "The list of open issues are longer": the verb agrees with "list". The
@@ -500,10 +516,13 @@ const ACROSS_A_PHRASE = [
 		`${OF_PLURAL})${PLURAL_AUX_VERB}`, 'g'),
 		hint: (m) => `use "${sameMarks(m[0], singularVerb(m[0]))}"` },
 	// "The service that handles retries were restarted": the relative verb
-	// proves the head singular.
-	{ re: new RegExp(`(?<=${SINGULAR_SUBJECT_START}(?:${SINGULAR_DETERMINER})\\s+` +
+	// proves the head singular. A verb that takes a clause stays out, since
+	// "the hook that ensures the tests are green runs" has its own subject.
+	{ re: new RegExp(`(?<=${PHRASE_SUBJECT_START}(?:${SINGULAR_DETERMINER})\\s+` +
 		`${SINGULAR_MODIFIER}${SINGULAR_NOUN}\\s+(?:that|which|who)\\s+(?:is|was|has|does|` +
-		`${alt(SINGULAR_VERBS)}|${alt(NOUN_LIKE_VERBS)})\\s+(?:(?!(?:${CLAUSE_WORD})\\b)` +
+		`${alt(SINGULAR_VERBS.filter((v) => !CLAUSE_VERBS_3SG.includes(v)))}|` +
+		`${alt(NOUN_LIKE_VERBS.filter((v) => !CLAUSE_VERBS_3SG.includes(v)))})\\s+` +
+		`(?:(?!(?:${CLAUSE_WORD})\\b)` +
 		`[a-z][a-z-]*\\s+){0,4})${PLURAL_AUX_VERB}`, 'g'),
 		hint: (m) => `use "${sameMarks(m[0], singularVerb(m[0]))}"` },
 ];

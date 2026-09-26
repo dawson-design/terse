@@ -35,6 +35,7 @@ describe('agreement at an edit seam', () => {
 		['There is 2,000 users on the waitlist.', 'There is', 'use "There are"'],
 		['There is 10 new failing checks.', 'There is', 'use "There are"'],
 		['The server were down all night.', 'were', 'use "was"'],
+		['The wiki have three pages.', 'have', 'use "has"'],
 		['The tests has had three failures.', 'has', 'use "have"'],
 		['It need a restart after the upgrade.', 'need', 'use "needs"'],
 		["There's two ways to roll back.", "There's", 'use "There are"'],
@@ -214,6 +215,10 @@ describe('forms that break after a verb, modal, or quantity', () => {
 		['Less happens at startup. Less depends on the cache now.'],
 		['Mark the run successful. Follow a process consistent with the policy.'],
 		["We don't have no-code support."],
+		['Arguments after the command are appended to the prompt.'],
+		['The most useful are the merge and get helpers.'],
+		['The config that the installer writes lives in the home folder.'],
+		['The initial render happens after the layout pass.'],
 		["Haven't you seen the logs?"],
 		['We need to wing it.'],
 	])('leaves the correct sentence %s alone', (text) => {
@@ -331,6 +336,12 @@ describe('grammar across a phrase or a clause boundary', () => {
 		['And if the job is not running, you will not get alerts.'],
 		['It worries us since if the queue keeps growing, it will stall the workers.'],
 		['The fix is risky but with a feature flag, it will be safe to ship.'],
+		['A small percentage of requests are retried.'],
+		['A minimum of two approvals are required for a release.'],
+		['The best of these tools are free.'],
+		['The list of users whose accounts are locked is empty.'],
+		['The hook that ensures the tests are green runs before push.'],
+		['An object of keys whose values are strings.'],
 	])('leaves the correct sentence %s alone', (text) => {
 		expect(grammar(text)).toEqual([]);
 	});
