@@ -396,6 +396,9 @@ describe('grammar across a phrase or a clause boundary', () => {
 		['The cache is warm, it seems. The bug was in the parser, it turned out.'],
 		['The service was down, he explained.'],
 		['It failed, we assumed, because the cache was cold.'],
+		['The cache was stale, we discovered. It was a regression, we concluded.'],
+		['The job is idempotent, we verified. The service was down, she reported.'],
+		['The limit is 100, we decided. The build was green, everyone agreed.'],
 	])('leaves the correct sentence %s alone', (text) => {
 		expect(grammar(text)).toEqual([]);
 	});
