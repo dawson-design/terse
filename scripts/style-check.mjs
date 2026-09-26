@@ -866,10 +866,11 @@ function checkLexicon(sentence, flags, file, line, impersonal) {
 	}
 }
 
-// A list item may be a fragment by design, so prose-only patterns skip it.
-function checkGrammar(sentence, flags, file, line, listItem) {
-	for (const { re, hint, prose } of GRAMMAR_PATTERNS) {
-		if (prose && listItem) continue;
+// A list item may be a fragment by design, so prose-only patterns skip it;
+// so may the answer to a question, which fragment patterns skip.
+function checkGrammar(sentence, flags, file, line, { listItem, afterQuestion }) {
+	for (const { re, hint, prose, fragment } of GRAMMAR_PATTERNS) {
+		if ((prose && listItem) || (fragment && afterQuestion)) continue;
 		for (const m of sentence.matchAll(re)) {
 			flags.push({ file, line, category: 'grammar', _re: re,
 				match: m[0].replace(/\s+/g, ' '), hint: hint(m) });
@@ -1035,7 +1036,10 @@ export function checkText(rawText,
 	const allWords = [];
 	const sentenceLengths = [];
 	for (const s of splitSentences(text)) {
-		const line = lineAt(s.offset + (s.text.length - s.text.trimStart().length));
+		const start = s.offset + (s.text.length - s.text.trimStart().length);
+		const line = lineAt(start);
+		// The raw text keeps headings, so "## Why?" counts as the question.
+		const afterQuestion = /\?[)"'”’*_]*\s*$/.test(rawText.slice(Math.max(0, start - 200), start));
 		const trimmed = s.text.replace(/\s+/g, ' ').trim();
 		const clean = trimmed.replace(/^(?:[-*+]|\d{1,2}[.)])\s+/, '');
 		const grammarClean = grammarText.slice(s.offset, s.offset + s.text.length)
@@ -1045,7 +1049,8 @@ export function checkText(rawText,
 		const before = flags.length;
 			checkSentence(clean, maxGrade, flags, file, line);
 			checkLexicon(clean, flags, file, line, impersonal);
-			checkGrammar(grammarClean, flags, file, line, clean !== trimmed);
+			checkGrammar(grammarClean, flags, file, line,
+				{ listItem: clean !== trimmed, afterQuestion });
 			assignSpans({ rawText, text, grammarText }, flags, before,
 				[s.offset, s.offset + s.text.length]);
 			for (let i = flags.length - 1; i >= before; i--) if (!flags[i].span) flags.splice(i, 1);

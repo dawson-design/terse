@@ -404,7 +404,8 @@ const SENTENCE_SHAPES = [
 	// stale." or "Because the build failed." The same shape catches an opening
 	// clause that runs into its main clause without a comma. The lowercase
 	// letter before the period keeps an abbreviation such as "U.S." from
-	// ending the sentence.
+	// ending the sentence. As `fragment`, it skips the answer to a question
+	// ("How come? Because ..."), where a fragment is idiomatic.
 	// "Which approach you choose depends on your needs" is a whole sentence,
 	// so "Which" counts only as the relative pronoun before its verb, and not
 	// in a question used as a subject ("Which is better depends on ...",
@@ -416,7 +417,7 @@ const SENTENCE_SHAPES = [
 		'triggers|triggered|would|will|also)\\b(?![^.]*\\b(?:depends|matters|varies|' +
 		'determines|decides|is\\s+(?:still\\s+)?(?:unknown|unclear|up\\s+to))\\b)|' +
 		'Because(?!\\s+of\\b)|Although|Whereas|Such as)\\b[^,;:?!]*[a-z0-9]\\.$', 'g'),
-		prose: true,
+		prose: true, fragment: true,
 		hint: () => 'a subordinate clause needs a main clause: join it to the sentence ' +
 			'it depends on, or add a comma where the main clause starts' },
 ];
