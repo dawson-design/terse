@@ -79,8 +79,8 @@ a blind test: can you pick its writing as yours?
 Your voice lives in `~/.terse/voice.md` and follows you into every project. A
 project can hold its own `.terse/voice.md`, which the skills use in its place
 inside that project.
-Measured sentence length, grade, hedging, and recorded exceptions then bound
-later drafts and edits.
+The voice file's measured sentence length, grade, and hedging then bound
+later drafts and edits. So do its recorded exceptions.
 
 Checker settings live in `.terse/config.json`. The checker reads your personal
 `~/.terse/config.json` and layers the nearest project file over it. Project

@@ -64,9 +64,9 @@ Four layers mark keeps before a finding reaches the report or the loop:
 1. The checker itself. Lexical findings inside quotes and blockquotes
    never emit. A `<!-- terse-ignore -->` line in the file suppresses
    the next paragraph's findings, all of them or by category. The
-   `.terse/config.json` files, the project's layered over the personal
-   one in `~/.terse`, remove whole categories, or one finding within a
-   category, everywhere.
+   `.terse/config.json` files remove whole categories, or one finding
+   within a category, everywhere. The project's file layers over the
+   personal one in `~/.terse`.
 2. The approved voice template, as the `style` skill finds it: its
    exceptions remove matching findings, named as covered.
 3. The `style` skill's tripwires: matching findings stay listed,

@@ -11,9 +11,10 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `/terse:voice` (`$terse:voice` in Codex) learns the user's voice from
   their past writing. It reads a folder, the user's GitHub PRs and issues, or
   a connected document or mail tool once the user agrees. It compares each
-  sample with what Terse writes from the same facts, and keeps only the
-  differences as traits. The user answers yes-or-no questions backed by their
-  own sentences, then picks between two blind versions before approving.
+  sample with what Terse writes from the same facts. Only the differences
+  become traits. The user answers yes-or-no questions backed by their
+  own sentences. Then they pick between two blind versions before
+  approving.
 - `scripts/voice-profile.mjs` screens samples and measures the voice. It
   sets aside a sample with 2 or more AI tells, at 3 or more per 1,000 words,
   so the voice never learns a model's polish. Emoji do not count toward the

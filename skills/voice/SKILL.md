@@ -209,7 +209,7 @@ folder the user named for it, or the project's own PRs and issues.
 
 ## How the other skills use it
 
-- The edit skill: exceptions suppress matching findings, the measured
+- The edit skill: exceptions suppress matching findings. The measured
   ranges bound every rewrite, and habits to drop become `voice-drift`
   findings. A 12-word-average author does not get 30-word rewrites.
 - The draft skill: the expansion lands inside the measured ranges.

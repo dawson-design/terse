@@ -62,8 +62,8 @@ every mode.
    wherever the document shows it. Ignore a `draft` template and say
    so. The checker reads
    the mechanical half of those exceptions from the `config.json`
-   files beside them: the grade, the ignored categories, and the
-   rates. A finding the template covers should not reach you. When
+   files beside them. That half is the grade, the ignored categories,
+   and the rates. A finding the template covers should not reach you. When
    one does, add it to the `config.json` beside the template rather
    than skipping it by hand each pass.
 2. Load the `style` skill's Core Ideas and Tripwires, and its
