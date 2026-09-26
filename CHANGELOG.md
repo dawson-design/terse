@@ -24,10 +24,10 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Frames for grammar across a phrase or a clause boundary. They catch
   agreement across an `of` phrase or a relative clause (`the list of
   open issues are`) and a comma splice with no linking word. On a suite
-  written blind, they first caught 5 of 60 and flagged 3 of 210
-  correct sentences. Fixes for those three leave 4 caught and none
-  flagged. Run-ons stay with the model: the frame tried for them caught
-  none of 30 and misfired on third-party docs.
+  written blind, they first caught 5 of 60. The checker flagged 3 of its
+  210 correct sentences, 2 through these frames. Fixes for those three
+  leave 4 caught and none flagged. Run-ons stay with the model: the frame
+  tried for them caught none of 30 and misfired on third-party docs.
 - Unedited model prose from Claude and GPT joins the precision gates.
 
 ### Changed

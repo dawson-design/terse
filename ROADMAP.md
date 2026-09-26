@@ -331,10 +331,13 @@ first. The model's own pass owns the rest.
       main clause.
 - [x] Lead sentence difficulty with grade, calibrated on CEFR-SP
       ratings. Rewrite the repo's own dense sentences to match.
-- [x] `npm run benchmark:accuracy` reproduces the table below.
+- [x] `npm run benchmark:accuracy` reproduces the After column below.
+      Copied with its fixtures onto 664fb58, it gives Before; onto
+      0a7bdca, it gives the first blind score.
 - [x] Narrow frames for agreement across a phrase and comma splices
       with no linking word. On a suite written blind, they first caught
-      5 of 60 and flagged 3 of 210 correct sentences.
+      5 of 60. The checker flagged 3 of its 210 correct sentences, 2
+      through these frames.
 - [ ] Catch more of those two, and run-ons. The frames skip every
       reading they cannot prove, and the run-on frame tried caught none
       of 30. A parser would catch more; the model's pass owns the rest.
