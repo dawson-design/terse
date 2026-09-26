@@ -4,8 +4,8 @@ The mechanics stage of the findings contract covers correctness errors
 and nothing else. It must leave style, structure, and voice as found.
 The checker catches a tested subset: the errors that edits leave in a
 model's draft. The model owns the rest of this scope. A clean checker
-run proves nothing here, since the checker finds about half the errors
-in its held-out suite.
+run proves nothing here: the checker finds about half the errors in
+its held-out suite, and few of those that need a parse.
 
 The native checker reads narrow frames where only one form is correct:
 
@@ -18,8 +18,9 @@ The native checker reads narrow frames where only one form is correct:
 - a comma splice before `however` or `therefore`, a question closed
   with a period, and a clause with no main clause
 - a verb that disagrees across an `of` phrase or a relative clause
-  (`the list of open issues are`), a comma splice with no linking word,
-  and a run-on whose second clause opens on `we` or `they`
+  (`the list of open issues are`)
+- a comma splice between two clauses that each open on a pronoun or
+  `the` (`we tried a larger heap, it did not help`)
 - a wrong form after a modal or `to` (`will fixed`, `to runs`), `could
   of`, doubled words, and misspellings with one correct form
 
@@ -57,7 +58,7 @@ The model still checks:
   comparative
 - articles and prepositions beyond `a/an` (a missing `the`, a wrong
   preposition)
-- punctuation: most run-ons and comma splices, quotes or brackets left
+- punctuation: run-ons, most comma splices, quotes or brackets left
   open, and stray apostrophes
 - dropped words
 

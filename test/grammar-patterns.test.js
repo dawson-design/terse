@@ -1,8 +1,8 @@
 // Native grammar patterns (scripts/grammar-patterns.mjs), tested through the
 // checkText API a caller uses. Each pattern has a planted error with its
 // fix, and the correct lookalikes that once misfired stay silent. The corpus
-// gates hold the patterns to zero findings on edited human prose and
-// unedited model prose.
+// gates hold the patterns to the labeled real errors in edited human prose
+// and unedited model prose, by file and line.
 import { describe, it, expect } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -304,12 +304,10 @@ describe('grammar across a phrase or a clause boundary', () => {
 		['The number of open tickets have grown since the outage.', 'have', 'use "has"'],
 		['One of the servers were down overnight.', 'were', 'use "was"'],
 		['The service that handles retries were restarted.', 'were', 'use "was"'],
-		['The canary failed, the system reverted to the previous release.', ',',
+		['We tried a larger heap, it did not help.', ',',
 			'two sentences joined by a comma: use a period, a semicolon, or "and", "but", or "so"'],
 		['I checked the logs, nothing looked wrong.', ',',
 			'two sentences joined by a comma: use a period, a semicolon, or "and", "but", or "so"'],
-		['The server crashed we lost an hour of data.', 'we',
-			'two sentences run together: end the first before "we"'],
 	])('%s', (text, match, hint) => {
 		expectOne(text, match, hint);
 	});
@@ -336,12 +334,30 @@ describe('grammar across a phrase or a clause boundary', () => {
 		['And if the job is not running, you will not get alerts.'],
 		['It worries us since if the queue keeps growing, it will stall the workers.'],
 		['The fix is risky but with a feature flag, it will be safe to ship.'],
+		['That is, the cache is rebuilt on every deploy.'],
+		['All things considered, the design is sound.'],
+		['Kept encrypted at rest, the keys are never logged.'],
+		['That settled, we moved on to the rollout.'],
+		['The week we launched, the site went down twice.'],
+		['The second time it failed, we paged the whole team.'],
+		['This crate provides a parser, a small tool designed for config files.'],
+		['The build passed, the tests passed and we shipped.'],
+		['We shipped v2 on Friday, the decision made weeks earlier.'],
+		['Among the options, the second is the cheapest.'],
+		['It turned out we had a typo in the config.'],
+		["I'm not convinced we need a new flag."],
+		['The problem was we had no alerts on the queue.'],
+		['Deploys are allowed provided they are tagged.'],
+		['We realised we had a problem with the cache.'],
 		['A small percentage of requests are retried.'],
 		['A minimum of two approvals are required for a release.'],
 		['The best of these tools are free.'],
 		['The list of users whose accounts are locked is empty.'],
 		['The hook that ensures the tests are green runs before push.'],
 		['An object of keys whose values are strings.'],
+		['The next time the notifier runs, the result is cached.'],
+		['The problem was, the right fix was going to break valid use cases.'],
+		['Its cache warmed, the edge node began serving traffic.'],
 	])('leaves the correct sentence %s alone', (text) => {
 		expect(grammar(text)).toEqual([]);
 	});
@@ -365,20 +381,19 @@ describe('corpus gates', () => {
 		.map((name) => [name, readFileSync(join(dir, name), 'utf8')]);
 
 	// Haiku's runbook really does say "Action: Rollback the last deployment".
-	// Hemingway's journalism joins some clauses with a comma ("It seems a
-	// pity, they are such a charming lot."): by the standard a technical
-	// document follows, each is a comma splice.
+	// Hemingway joins two clauses with a comma in "It seems a pity, they are
+	// such a charming lot.": by the standard a technical document follows,
+	// that is a comma splice.
 	it.each([
 		['edited human prose', join(HERE, 'fixtures', 'human-prose'),
-			['living-on-1000-a-year-in-paris.md: ,', 'paris-is-full-of-russians.md: ,']],
+			['paris-is-full-of-russians.md:11: ,']],
 		['Hemingway samples', join(HERE, '..', 'samples', 'hemingway'),
-			['living-on-1000-a-year.md: ,', 'paris-full-of-russians.md: ,',
-				'recruits-for-tanks.md: ,']],
+			['paris-full-of-russians.md:9: ,']],
 		['unedited model prose', join(HERE, 'fixtures', 'model-prose'),
-			['haiku-runbook.md: Rollback']],
+			['haiku-runbook.md:74: Rollback']],
 	])('finds only the labeled real errors in %s', (label, dir, errors) => {
 		const findings = corpus(dir).flatMap(([name, text]) => grammar(text)
-			.map((f) => `${name}: ${f.match}`));
+			.map((f) => `${name}:${f.line}: ${f.match}`));
 		expect(findings).toEqual(errors);
 	});
 });

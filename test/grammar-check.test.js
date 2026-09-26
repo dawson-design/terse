@@ -12,7 +12,7 @@ const styleScript = join(HERE, '..', 'scripts', 'style-check.mjs');
 const proseDir = join(HERE, 'fixtures', 'human-prose');
 const modelDir = join(HERE, 'fixtures', 'model-prose');
 // Real errors in the unedited model output, each confirmed by reading it.
-const MODEL_PROSE_ERRORS = ['haiku-runbook.md: Rollback'];
+const MODEL_PROSE_ERRORS = ['haiku-runbook.md:74: Rollback'];
 let grammar;
 let documents;
 
@@ -132,7 +132,7 @@ describe('Harper admission gate', () => {
 			const { flags } = await documents.checkDocument(
 				readFileSync(join(modelDir, name), 'utf8'), { file: name });
 			findings.push(...flags.filter((f) => f.category === 'grammar')
-				.map((f) => `${f.file}: ${f.match}`));
+				.map((f) => `${f.file}:${f.line}: ${f.match}`));
 		}
 		expect(findings).toEqual(MODEL_PROSE_ERRORS);
 	});

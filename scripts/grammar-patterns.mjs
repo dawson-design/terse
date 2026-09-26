@@ -464,16 +464,6 @@ const FORMS = [
 // Grammar that spans a phrase or a clause boundary. A regular expression
 // cannot parse, so each frame anchors on the words that settle the reading.
 
-// Past forms that end a clause, and the finite verbs that start one.
-const IRREGULAR_PAST = ['ran', 'went', 'broke', 'fell', 'left', 'froze', 'hung', 'came',
-	'took', 'made', 'got', 'gave', 'kept', 'sent', 'held', 'built', 'began', 'brought',
-	'grew', 'rose', 'spent', 'lost', 'won', 'paid', 'met', 'led', 'stood', 'drove', 'chose',
-	'shook', 'stole', 'struck', 'threw', 'woke', 'became', 'did', 'had', 'was', 'were',
-	'saw', 'found', 'told', 'knew', 'wrote', 'forgot', 'understood'];
-const NEGATED_AUX = "(?:is|are|was|were|has|have|had|did|does|do|wo|ca|could|should|would)n['’]t";
-const FINITE = `(?:${AUXILIARY}|${NEGATED_AUX}|[a-z]+ed|${alt(IRREGULAR_PAST)}|` +
-	`${alt(SINGULAR_VERBS)}|${alt(NOUN_LIKE_VERBS)})`;
-
 // Heads that take a plural verb after "of" ("a number of jobs are", "the rest
 // of the files are") or read either way ("a set of tools is").
 const QUANTITY_HEAD = alt(['number', 'lot', 'majority', 'minority', 'rest', 'remainder',
@@ -527,77 +517,57 @@ const ACROSS_A_PHRASE = [
 		hint: (m) => `use "${sameMarks(m[0], singularVerb(m[0]))}"` },
 ];
 
-// A sentence can open with a clause only when its first word does not make
-// it subordinate, prepositional, or adverbial. "The more we tested, the more
-// we found" is a comparative pair, not two sentences.
-const NOT_CLAUSE_OPENER = alt(['When', 'If', 'Once', 'Because', 'While', 'After', 'Before',
-	'Since', 'Until', 'Unless', 'Although', 'Though', 'As', 'Whether', 'Where', 'In', 'On',
-	'At', 'For', 'With', 'By', 'From', 'During', 'Without', 'To', 'Of', 'About', 'Over',
-	'Under', 'Between', 'Through', 'Also', 'However', 'Then', 'Now', 'Today', 'Yesterday',
-	'First', 'Finally', 'Next', 'Here', 'There', 'So', 'Yes', 'No', 'Well', 'Instead',
-	'Otherwise', 'Still', 'Even', 'Only', 'Just', 'Meanwhile', 'Later', 'Earlier', 'Again',
-	'Sometimes', 'Thus', 'Hence', 'Therefore', 'Moreover', 'Furthermore', 'Besides',
-	'Nevertheless', 'Nonetheless', 'Every', 'Each', 'Whenever', 'Wherever', 'Like',
-	'Unlike', 'Despite', 'Given', 'Please', 'Note', 'Last', 'By']);
-// The opening must be capitalized: a lowercase start is the tail of a
-// sentence the splitter cut at an abbreviation ("the U.S. joined").
-const CLAUSE_OPENING = `${LINE_START}(?=[A-Z])(?!(?:${NOT_CLAUSE_OPENER})\\b)` +
-	'(?![A-Z][a-z]*(?:ly|ed|ing)\\b)(?!The\\s+(?:more|less|fewer|better|worse|bigger|smaller|' +
-	'faster|slower|longer|shorter|higher|lower|sooner|later|earlier|larger|harder|easier)\\b)' +
-	'(?!(?:The\\s+)?(?:last|next|first)\\s+time\\b)';
-// The words after the determiner are modifiers and a noun: a pronoun, a
-// relative word, a preposition, or an article there means an appositive
-// ("a broken leg, an injury he suffered") or an absolute phrase ("47
-// prefectures, each overseen by an elected governor").
-const NOT_SUBJECT_WORD = `(?!(?:${CLAUSE_WORD}|by|of|in|on|at|for|with|from|to|as|a|an|the)\\b)`;
-// An -ed word after a noun may be a participle rather than a verb: an
-// absolute phrase ("the buildings mixed with new ones") or a gapped series
-// ("barb wire is crunched, trenches crossed and ..."). So an -ed verb counts
-// only after a determiner or pronoun subject and not before "with" or "by".
-const FINITE_NOT_ED = `(?:${AUXILIARY}|${NEGATED_AUX}|${alt(IRREGULAR_PAST)}|` +
-	`${alt(SINGULAR_VERBS)}|${alt(NOUN_LIKE_VERBS)})`;
-const SECOND_CLAUSE = '(?:(?:(?:the|this|these|those|our|their|its|my|your|a|an|each|every|' +
-	`no|some|all)\\s+(?:${NOT_SUBJECT_WORD}[a-z][a-z-]*\\s+){0,2}?${NOT_SUBJECT_WORD}` +
-	'[a-z][a-z-]*|we|they|he|she|I|it|you|nobody|nothing|everyone|everything|someone|' +
-	`something)\\s+(?:not\\s+)?(?:${FINITE_NOT_ED}|[a-z]+ed(?!\\s+(?:with|by)\\b))|` +
-	`${PLURAL_NOUN}\\s+(?:not\\s+)?${FINITE_NOT_ED})\\b`;
+// A comma splice: two sentences joined by a comma alone. Many correct
+// sentences put a comma between two stretches that each hold a noun and a
+// verb: an introductory phrase ("That is, the cache is rebuilt"), a time
+// clause ("The week we launched, the site went down"), an appositive with a
+// participle ("a parser, a small tool designed for configs"), an absolute
+// phrase ("the decision made weeks earlier"), or a series ("the build passed,
+// the tests passed and we shipped"). So the frame reads only the plainest
+// case. The first clause opens on a subject pronoun or a definite
+// determiner and holds no pronoun, subordinator, or conjunction after it.
+// The second clause opens on a subject pronoun with a finite verb, or on a
+// definite noun phrase with a verb that cannot be a participle. Nothing
+// later in the sentence joins a series. Recall stays low by design.
+// Time nouns open a fronted time clause ("the next time the notifier runs,").
+const NOT_IN_FIRST_CLAUSE = alt(['although', 'though', 'if', 'when', 'whenever', 'because',
+	'since', 'unless', 'while', 'whereas', 'as', 'after', 'before', 'until', 'once', 'whether',
+	'where', 'but', 'and', 'or', 'yet', 'so', 'that', 'which', 'who', 'we', 'they', 'he', 'she',
+	'i', 'you', 'it', 'provided', 'given', 'time', 'day', 'week', 'month', 'year', 'moment',
+	'minute', 'hour', 'night', 'morning', 'evening']);
+const DEFINITE_SUBJECT = '(?:The|This|These|Those|Our|Their|Its|My|Your)\\s+' +
+	`(?:(?!(?:${NOT_IN_FIRST_CLAUSE})\\b)[a-z][a-z-]*\\s+){0,3}?`;
+const PRONOUN_SUBJECT = '(?:I|We|They|He|She|It)\\s+';
 const REPORTING_VERB = alt(['said', 'says', 'noted', 'added', 'explained', 'replied', 'wrote',
-	'asked', 'answered', 'argued', 'claimed', 'warned', 'announced']);
-// Verbs that take a clause without "that" ("we found we needed more memory").
-const CLAUSE_TAKING_VERB = alt(['found', 'thought', 'knew', 'said', 'realized', 'noticed',
-	'decided', 'felt', 'heard', 'believed', 'assumed', 'guessed', 'figured', 'learned',
-	'discovered', 'showed', 'meant', 'hoped', 'wished', 'expected', 'suspected', 'confirmed',
-	'proved', 'argued', 'claimed', 'agreed', 'admitted', 'announced', 'reported', 'mentioned',
-	'explained', 'warned', 'promised', 'insisted', 'suggested', 'recommended', 'ensured',
-	'verified', 'checked', 'asked', 'told', 'understood', 'remembered', 'forgot',
-	'guaranteed', 'predicted', 'estimated', 'determined', 'concluded', 'noted', 'observed',
-	'recognized', 'acknowledged', 'accepted', 'demonstrated', 'indicated', 'revealed',
-	'seemed', 'appeared', 'wondered', 'doubted', 'feared', 'worried', 'replied', 'added',
-	'wrote', 'stated', 'saw', 'wanted', 'needed', 'liked', 'preferred', 'hated']);
-const CLAUSE_END_ADVERB = '(?:early|late|again|today|yesterday|overnight|twice|down|up|out|' +
-	'off|back|[a-z]+ly)';
-// The opening clause, word by word, up to the join. A subordinator or a
-// conjunction inside it means the comma may close a subordinate clause
-// ("we know that although the cache helps, it ...") or an introductory
-// phrase of a second clause ("risky but with a flag, it ...").
-const OPENING_CLAUSE = '(?:(?!\\b(?:although|though|if|when|whenever|because|since|unless|' +
-	'while|whereas|as|after|before|until|once|whether|where|but|and|or|yet|so)\\b)[^,;:.?!])*?';
+	'asked', 'answered', 'argued', 'claimed', 'warned', 'announced', 'thought', 'think']);
+const FIRST_CLAUSE_TAIL = `(?:(?!\\b(?:${NOT_IN_FIRST_CLAUSE})\\b)[^,;:.?!]){0,160}?`;
+// Verbs that are finite in any position: auxiliaries, their negations,
+// third-person forms, and past tenses no participle shares.
+const NEGATED_AUX = "(?:is|are|was|were|has|have|had|did|does|do|wo|ca|could|should|would)n['’]t";
+const PAST_ONLY = alt(['went', 'came', 'saw', 'took', 'gave', 'ran', 'began', 'fell', 'rose',
+	'knew', 'wrote', 'drove', 'chose', 'froze', 'shook', 'stole', 'threw', 'woke', 'became',
+	'did', 'was', 'were', 'had']);
+// A noun phrase's words are modifiers and a noun, never a pronoun, relative
+// word, preposition, or article.
+const NOT_SUBJECT_WORD = `(?!(?:${CLAUSE_WORD}|by|of|in|on|at|for|with|from|to|as|a|an|the)\\b)`;
+const FINITE_ANYWHERE = `(?:${AUXILIARY}|${NEGATED_AUX}|${PAST_ONLY}|${alt(SINGULAR_VERBS)})`;
+const SECOND_CLAUSE = '(?:(?:we|they|he|she|I|it|nobody|nothing|everyone|everything)\\s+' +
+	`(?:not\\s+)?(?:${FINITE_ANYWHERE}|[a-z]+ed)|(?:the|this|these|those|our|their|its|my|` +
+	`your)\\s+(?:${NOT_SUBJECT_WORD}[a-z][a-z-]*\\s+){0,2}?${NOT_SUBJECT_WORD}[a-z][a-z-]*\\s+` +
+	`(?:not\\s+)?${FINITE_ANYWHERE})\\b`;
 
 const CLAUSE_JOINS = [
-	// "The deploy finished early, the team moved on." A comma alone cannot
-	// join two sentences; a later ", and" makes it a series ("the build
-	// passed, the tests passed, and we shipped").
-	{ re: new RegExp(`(?<=${CLAUSE_OPENING}${OPENING_CLAUSE}\\b${FINITE}\\b${OPENING_CLAUSE}` +
-		`(?<!\\b(?:${REPORTING_VERB})))` + `,(?=\\s+${SECOND_CLAUSE}` +
-		'(?![^.?!]*,\\s+(?:and|or|but|so|yet)\\b))', 'g'), prose: true,
+	// The first clause needs a finite verb: after a pronoun an -ed verb is
+	// one, but after a noun it may be a participle ("its cache warmed, ...").
+	// A comma straight after a copula introduces a clause ("the problem was,
+	// the fix ...").
+	{ re: new RegExp(`(?<=${LINE_START}(?:${PRONOUN_SUBJECT}${FIRST_CLAUSE_TAIL}` +
+		`\\b(?:${FINITE_ANYWHERE}|[a-z]+ed)|${DEFINITE_SUBJECT}${FIRST_CLAUSE_TAIL}` +
+		`\\b${FINITE_ANYWHERE})\\b${FIRST_CLAUSE_TAIL})(?<!\\b(?:${REPORTING_VERB}|is|are|was|were))` +
+		`,(?=\\s+${SECOND_CLAUSE}(?![^.?!]*\\b(?:and|or)\\b))`, 'g'),
+		prose: true,
 		hint: () => 'two sentences joined by a comma: use a period, a semicolon, or ' +
 			'"and", "but", or "so"' },
-	// "The server crashed we lost an hour of data." Two clauses with nothing
-	// between them; the second opens on a subject-only pronoun.
-	{ re: new RegExp(`(?<=${CLAUSE_OPENING}${OPENING_CLAUSE}\\b(?!(?:${CLAUSE_TAKING_VERB})\\b)` +
-		`(?:[a-z]+ed|${alt(IRREGULAR_PAST)})(?:\\s+${CLAUSE_END_ADVERB})?\\s+)` +
-		`(?:we|they|he|she|I)(?=\\s+(?:not\\s+)?${FINITE}\\b)`, 'g'), prose: true,
-		hint: (m) => `two sentences run together: end the first before "${m[0]}"` },
 ];
 
 const DOUBLED_MARKS = [
