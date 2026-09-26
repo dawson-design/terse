@@ -36,10 +36,11 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `NounVerbConfusion` now reports only `affect` in a noun slot, as in
   `the affects of`. It no longer catches `effect` used as a verb; the
   model's pass owns that.
-- Two code reviews traded some recall for precision. The checker no
-  longer flags a `however` splice after a pronoun or `there`, or an
-  apostrophe plural before `are` (`test's are`). The model's pass owns
-  both.
+- Three code reviews traded some recall for precision. The checker no
+  longer flags a `however` splice after a pronoun, `there`, a perfect,
+  or a passive, or an apostrophe plural before `are` (`test's are`). A
+  verb such as `calls` after a plural noun counts only before an object.
+  The model's pass owns the rest.
 - `npm run benchmark:grammar` times the check the hook runs, native
   patterns included, not Harper alone.
 
