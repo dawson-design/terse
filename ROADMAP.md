@@ -342,7 +342,7 @@ Proof, recorded 2026-09-26 with `npm run benchmark:accuracy`:
 
 | Measure | Before | After |
 |---|---|---|
-| Held-out suite errors caught | 37/180 (20.6%) | 86/180 (47.8%) |
+| Held-out suite errors caught | 37/180 (20.6%) | 87/180 (48.3%) |
 | Held-out corrected sentences flagged | 2 | 0 |
 | Grammar-repair fixture errors caught | 6/16 | 12/16, plus the comma splice |
 | False alarms on unedited model prose | 1 | 0, and one real error caught |
