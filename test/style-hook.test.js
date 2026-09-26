@@ -60,7 +60,7 @@ describe('style-hook', () => {
 		const result = run(payload, undefined, home);
 		expect(result.status).toBe(0);
 		expect(result.stderr).toBe('');
-	}, 15_000);
+	});
 
 	it.each([
 		['malformed JSON', '{not json'],

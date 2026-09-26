@@ -167,7 +167,7 @@ describe('CLI honors the config and lets flags override it', () => {
 		const r = spawnSync(process.execPath, [script, doc], { encoding: 'utf8', env });
 		expect(run(doc).stdout).toContain('[em-dash]');
 		expect(r.stdout).not.toContain('[em-dash]');
-	}, 15_000);
+	});
 
 	it('exits 2 on a malformed config', () => {
 		const bad = mkdtempSync(join(tmpdir(), 'terse-badcli-'));
