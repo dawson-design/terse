@@ -399,9 +399,11 @@ const SPLICES = [
 const SENTENCE_SHAPES = [
 	// A question closed with a period, with a pronoun subject: API docs open
 	// descriptions on a bare verb ("Does the same thing as ...", "Has the same
-	// effect"), though not on "Did". "Do" and "Have" also open imperatives,
-	// and a comma may mark an inverted condition ("Should the canary fail, ...").
-	{ re: /(?<=^(?:\s|[-*+>]\s|\d{1,2}[.)]\s)*(?:(?:Did|Does|Is|Are|Was|Were|Has|Can|Could|Will|Would|Should)\s+(?:it|this|that|there|we|you|they|he|she|I|anyone|everyone)|Did\s+(?:the|our|your|their))\b[^.?!:;,]*)\.$/g,
+	// effect"), though not on "Did". "Do" and "Have" also open imperatives.
+	// "Should" and "Were" open an inverted condition, whose comma may be
+	// missing ("Should you need more control see the guide."), so they stay
+	// out, and a comma still ends the frame.
+	{ re: /(?<=^(?:\s|[-*+>]\s|\d{1,2}[.)]\s)*(?:(?:Did|Does|Is|Are|Was|Has|Can|Could|Will|Would)\s+(?:it|this|that|there|we|you|they|he|she|I|anyone|everyone)|Did\s+(?:the|our|your|their))\b[^.?!:;,]*)\.$/g,
 		prose: true, hint: () => 'use "?"' },
 	// A subordinate clause with no main clause: "Which means the cache is
 	// stale." or "Because the build failed." The same shape catches an opening

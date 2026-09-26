@@ -283,6 +283,7 @@ describe('sentence mechanics', () => {
 		['Is the cache warm?'],
 		['How come? Because humans read the whole file.'],
 		['## Why not wrap it?\n\nBecause the wrapper would overwrite the options.'],
+		['Should you need more control see the advanced guide.'],
 	])('leaves the correct sentence %s alone', (text) => {
 		expect(grammar(text)).toEqual([]);
 	});
