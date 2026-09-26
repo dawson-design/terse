@@ -411,6 +411,14 @@ const DOUBLED_MARKS = [
 	{ re: /!{2,}|\?{2,}/g, hint: (m) => `use "${m[0][0]}"` },
 ];
 
+/**
+ * Every native grammar pattern, in report order. Each entry holds `re`, a
+ * global regular expression run on one whitespace-normalized sentence;
+ * `hint(m)`, which returns the finding's hint for a match (`use "X"` means
+ * replace the matched text with X); and `prose`, set when a list item is
+ * exempt. The match must be text a fixer can replace in place: style-check.mjs
+ * re-runs `re` on the raw sentence to find the finding's span.
+ */
 export const GRAMMAR_PATTERNS = [
 	// Function words English never doubles. Particles and determiners stay
 	// out: "log in in a tab", "turns on on boot", "what it is is", "this
