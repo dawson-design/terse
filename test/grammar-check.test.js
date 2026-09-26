@@ -52,6 +52,13 @@ describe('Harper admission gate', () => {
 		expect(await grammar.check(text)).toEqual([]);
 	});
 
+	it('reports an insertion as the full replacement for the matched text', async () => {
+		const flags = await grammar.check('The tests passed,the build did not.');
+		expect(flags).toEqual([expect.objectContaining({
+			ruleId: 'harper/CommaFixes', match: ',', suggestions: [', '], hint: 'use ", "',
+		})]);
+	});
+
 	it.each([
 		["It's been broken since Tuesday."],
 		["It's been deployed to staging."],

@@ -2,7 +2,7 @@
 // grammar rules; Terse owns rule admission, output shape, and false-positive
 // policy. No upstream rule is enabled merely because Harper enables it.
 import { webcrypto } from 'node:crypto';
-import { LocalLinter, Dialect } from '../vendor/harper-2.7.0/index.js';
+import { LocalLinter, Dialect, SuggestionKind } from '../vendor/harper-2.7.0/index.js';
 import { binary } from '../vendor/harper-2.7.0/binary.js';
 
 // Harper's WASM glue reads Web Crypto from the global. Node 18 exposes the
@@ -109,10 +109,17 @@ async function createChecker(config) {
 	}
 }
 
-function uniqueSuggestions(lint) {
-	return [...new Set(lint.suggestions()
-		.map((suggestion) => suggestion.get_replacement_text())
-		.filter((suggestion) => typeof suggestion === 'string'))];
+// Every suggestion becomes the full text that replaces the match. Harper
+// reports an insertion as the inserted text alone; passed through, a hint
+// such as `use " "` on a comma would tell the fixer to delete the comma.
+function uniqueSuggestions(lint, match) {
+	return [...new Set(lint.suggestions().map((suggestion) => {
+		const text = suggestion.get_replacement_text();
+		if (typeof text !== 'string') return null;
+		if (suggestion.kind() === SuggestionKind.InsertAfter) return match + text;
+		if (suggestion.kind() === SuggestionKind.Remove) return '';
+		return text;
+	}).filter((suggestion) => suggestion !== null))];
 }
 
 function findingOf(rawText, file, ruleId, lint, spelling) {
@@ -126,7 +133,7 @@ function findingOf(rawText, file, ruleId, lint, spelling) {
 		VALID_REPEATED_WORDS.has(match.toLowerCase().replace(/\s+/g, ' '))) return null;
 	if (misreadsVerb(ruleId, rawText.slice(Math.max(0, start - 24), start), match,
 		rawText.slice(end, end + 24))) return null;
-	const suggestions = uniqueSuggestions(lint)
+	const suggestions = uniqueSuggestions(lint, match)
 		.filter((suggestion) => suggestion !== match);
 	if (spelling) {
 		if (suggestions.length === 0) return null;
