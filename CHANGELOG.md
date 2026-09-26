@@ -72,7 +72,7 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   said` reports its own line, not the line before.
 - The 0.13.0 notes said the checker catches what a grammar assistant's
   free tier catches. It found 20.6% of the held-out suite's errors
-  then, and it finds 48.3% now.
+  then, and it finds about half now.
 
 ## [0.13.1] (2026-09-04)
 
