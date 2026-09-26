@@ -749,8 +749,8 @@ function assignSpans({ rawText, text, grammarText }, flags, from, span) {
 			continue;
 		}
 		// Two patterns can report the same text in one sentence, so each
-		// pattern counts its own occurrences.
-		const key = `${flags[i].category}:${flags[i].match}:${flags[i]._re?.source ?? ''}`;
+		// pattern counts its own occurrences, grouped the way hits are.
+		const key = `${flags[i].category}:${normalized(flags[i].match)}:${flags[i]._re?.source ?? ''}`;
 		const n = seen.get(key) ?? 0;
 		seen.set(key, n + 1);
 		const re = flags[i]._re

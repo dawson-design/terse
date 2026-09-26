@@ -259,6 +259,11 @@ describe('sentence mechanics', () => {
 		expect(grammar('Report it to the [the Heartbleed bug](https://x.y) team.')).toEqual([]);
 	});
 
+	it('gives each repeat of an error its own span, whatever its case', () => {
+		const text = 'The the cache and the the queue are full.';
+		expect(grammar(text).map((f) => text.slice(...f.span))).toEqual(['The the', 'the the']);
+	});
+
 	it('shows inline code in the match, not the mask the patterns saw', () => {
 		const text = 'Because `levelup` would overwrite the options.';
 		expectOne(text, text, expect.stringMatching(/^a subordinate clause needs a main clause/));
