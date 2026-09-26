@@ -563,13 +563,18 @@ const NOT_IN_FIRST_CLAUSE = alt(['although', 'though', 'if', 'when', 'whenever',
 	'i', 'you', 'it', 'provided', 'given', 'time', 'day', 'week', 'month', 'year', 'moment',
 	'minute', 'hour', 'night', 'morning', 'evening']);
 // "The bigger the file gets, the longer parsing takes" pairs two clauses on
-// purpose, so a comparative after "The" opens no clause here.
+// purpose, so a comparative after the determiner opens no clause here. Nor
+// does "The" before a noun that runs straight into a subject: "The second
+// the job fails, ..." and "The way the loader resolves paths, ..." front a
+// clause of their own.
 const COMPARATIVE = alt(['more', 'less', 'fewer', 'better', 'worse', 'bigger', 'smaller',
 	'faster', 'slower', 'longer', 'shorter', 'higher', 'lower', 'sooner', 'later', 'earlier',
 	'larger', 'harder', 'easier', 'greater', 'older', 'newer', 'simpler', 'cheaper', 'safer',
 	'deeper', 'wider', 'stronger', 'weaker', 'further', 'farther', 'closer', 'heavier',
 	'lighter', 'busier', 'quicker', 'louder', 'tighter', 'looser', 'cleaner', 'clearer']);
-const DEFINITE_SUBJECT = `(?:The|This|These|Those|Our|Their|Its|My|Your)\\s+(?!(?:${COMPARATIVE})\\b)` +
+const OWN_SUBJECT = 'the|a|an|this|these|those|our|their|its|my|your|we|they|he|she|I|it|you';
+const DEFINITE_SUBJECT = `(?:The\\s+(?![a-z]+\\s+(?:${OWN_SUBJECT})\\b)|` +
+	`(?:This|These|Those|Our|Their|Its|My|Your)\\s+)(?!(?:${COMPARATIVE})\\b)` +
 	`(?:(?!(?:${NOT_IN_FIRST_CLAUSE})\\b)[a-z][a-z-]*\\s+){0,3}?`;
 const PRONOUN_SUBJECT = '(?:I|We|They|He|She|It)\\s+';
 const REPORTING_VERB = alt(['said', 'says', 'noted', 'added', 'explained', 'replied', 'wrote',
