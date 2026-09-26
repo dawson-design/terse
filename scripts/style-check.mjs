@@ -506,12 +506,13 @@ const NOT_PARTICIPLES = new Set([
 	'convoluted', 'nuanced',
 ]);
 
-// Exported for the conservation property tests.
+// Exported for the conservation property tests. Inline code may wrap onto
+// the next line, as CommonMark allows, but never across a blank line.
 export function stripMarkdown(text) {
 	return text
 		.replace(/^---\n[\s\S]*?\n---(?=\n|$)/, (m) => m.replace(/[^\n]/g, ' '))
 		.replace(/```[\s\S]*?```/g, (m) => m.replace(/[^\n]/g, ' '))
-		.replace(/`[^`\n]+`/g, (m) => ' '.repeat(m.length))
+		.replace(/`(?:[^`\n]|\n(?![ \t]*\n))+`/g, (m) => m.replace(/[^\n]/g, ' '))
 		.replace(/<!--[\s\S]*?-->/g, (m) => m.replace(/[^\n]/g, ' '))
 		.replace(/\[([^\]]*)\]\((?:[^()\n]|\([^()\n]*\))*\)/g, (m, label) =>
 			label.padEnd(m.length, ' '))

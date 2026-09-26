@@ -98,6 +98,16 @@ describe('checkText', () => {
 		expect(flags).toEqual([]);
 	});
 
+	it('ignores inline code that wraps onto the next line', () => {
+		const doc = 'Examples such as `we utilize\nthe helper` and `utilize` stay code.\n';
+		expect(checkText(doc).flags).toEqual([]);
+	});
+
+	it('keeps a paragraph break between unmatched backticks as prose', () => {
+		const doc = 'A stray ` mark.\n\nWe utilize the helper. Another ` mark.\n';
+		expect(checkText(doc).flags.map((f) => f.match)).toEqual(['utilize']);
+	});
+
 	it('flags long parenthetical asides but not short ones', () => {
 		const { flags } = checkText(
 			'The scheduler runs at night (except on the last day of each fiscal quarter) and deletes stale entries (see docs).'
