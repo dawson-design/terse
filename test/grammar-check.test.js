@@ -12,7 +12,7 @@ const styleScript = join(HERE, '..', 'scripts', 'style-check.mjs');
 const proseDir = join(HERE, 'fixtures', 'human-prose');
 const modelDir = join(HERE, 'fixtures', 'model-prose');
 // Real errors in the unedited model output, each confirmed by reading it.
-const MODEL_PROSE_ERRORS = [];
+const MODEL_PROSE_ERRORS = ['haiku-runbook.md: Rollback'];
 let grammar;
 let documents;
 

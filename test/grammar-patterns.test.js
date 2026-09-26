@@ -95,6 +95,7 @@ describe('phrasal verbs written as nouns', () => {
 	it.each([
 		['Setup the server before you run the tests.', 'Setup', 'use "Set up"'],
 		['Rollback the last deployment.', 'Rollback', 'use "Roll back"'],
+		['Action: Rollback the last deployment.', 'Rollback', 'use "Roll back"'],
 		['We shutdown the old cluster on Friday.', 'shutdown', 'use "shut down"'],
 		['You need to login to the console first.', 'login', 'use "log in"'],
 		['Please cleanup the temp files after the run.', 'cleanup', 'use "clean up"'],
@@ -104,6 +105,7 @@ describe('phrasal verbs written as nouns', () => {
 
 	it.each([
 		['Setup takes about half a day.'],
+		['Note: Setup takes about half a day.'],
 		['Rollback completes in two minutes.'],
 		['Checkout success rate dropped to zero.'],
 		['Go to checkout to pay.'],
@@ -194,13 +196,15 @@ describe('corpus gates', () => {
 	const corpus = (dir) => readdirSync(dir).filter((x) => x.endsWith('.md'))
 		.map((name) => [name, readFileSync(join(dir, name), 'utf8')]);
 
+	// Haiku's runbook really does say "Action: Rollback the last deployment".
 	it.each([
-		['edited human prose', join(HERE, 'fixtures', 'human-prose')],
-		['Hemingway samples', join(HERE, '..', 'samples', 'hemingway')],
-		['unedited model prose', join(HERE, 'fixtures', 'model-prose')],
-	])('finds no native grammar error in %s', (label, dir) => {
+		['edited human prose', join(HERE, 'fixtures', 'human-prose'), []],
+		['Hemingway samples', join(HERE, '..', 'samples', 'hemingway'), []],
+		['unedited model prose', join(HERE, 'fixtures', 'model-prose'),
+			['haiku-runbook.md: Rollback']],
+	])('finds only the labeled real errors in %s', (label, dir, errors) => {
 		const findings = corpus(dir).flatMap(([name, text]) => grammar(text)
 			.map((f) => `${name}: ${f.match}`));
-		expect(findings).toEqual([]);
+		expect(findings).toEqual(errors);
 	});
 });

@@ -1,8 +1,9 @@
 Model-written prose: the precision gate for LLM-assisted writing.
 
 Terse checks prose that a model drafted and a person or agent edited. Model
-drafts are grammatical, so any grammar finding here is a false alarm unless a
-test labels it as a real error. Each file is unedited model output.
+drafts are nearly always grammatical, so a grammar finding here is a false
+alarm unless a test labels it as a real error. Each file is unedited model
+output, real errors included.
 
 - haiku-*.md, sonnet-*.md, opus-*.md: written 2026-09-26 by fresh Claude Haiku,
   Sonnet, and Opus sessions with no Terse context, asked for common software

@@ -251,7 +251,9 @@ const HOMOPHONES = [
 // A closed compound noun used as a verb: "Setup the server", "we shutdown the
 // old cluster", "need to login to the console". Only verb slots count: after a
 // subject pronoun, a modal, or "please"; after an infinitive "to"; or opening
-// an imperative with an object. "Setup takes a day" and "go to checkout" stay.
+// an imperative with an object, at the sentence start or after a label and
+// colon ("Action: Rollback the last deployment"). "Setup takes a day" and "go
+// to checkout" stay.
 const PHRASAL = { setup: 'set up', login: 'log in', logout: 'log out', signup: 'sign up',
 	signin: 'sign in', backup: 'back up', checkout: 'check out', shutdown: 'shut down',
 	cleanup: 'clean up', rollout: 'roll out', rollback: 'roll back', lookup: 'look up',
@@ -269,7 +271,7 @@ const PHRASAL_VERBS = [
 		'remember|forget|able|have|has|had|going|plan|plans|decide|decided|allowed|' +
 		'required|unable|easy|hard|possible|time|order|used|ask|asked)\\s+to\\s+)' +
 		`${COMPOUND}\\b${OBJECT_AFTER}`, 'g'), hint: phrasalHint },
-	{ re: new RegExp('(?<=^(?:\\s|[-*+>]\\s|\\d{1,2}[.)]\\s)*)(?:' +
+	{ re: new RegExp('(?<=^(?:\\s|[-*+>]\\s|\\d{1,2}[.)]\\s)*|:\\s+)(?:' +
 		`${Object.keys(PHRASAL).map((w) => w[0].toUpperCase() + w.slice(1)).join('|')})` +
 		`\\b${OBJECT_AFTER}`, 'g'), hint: phrasalHint },
 ];
