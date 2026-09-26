@@ -490,9 +490,12 @@ const QUANTITY_HEAD = alt(['number', 'lot', 'majority', 'minority', 'rest', 'rem
 	'maximum', 'fourth', 'fifth', 'tenth', 'hundredth', 'ton', 'tons', 'best', 'worst', 'least',
 	'share', 'proportion', 'average', 'sum']);
 // Words that open a new clause inside a relative clause, so the verb after
-// them belongs to that clause ("the page that shows which users are active").
+// them belongs to that clause ("the page that shows which users are active",
+// "the hook that runs before commits are pushed").
 const CLAUSE_WORD = alt(['and', 'or', 'but', 'that', 'which', 'who', 'whom', 'whose', 'whether',
-	'if', 'when', 'where', 'how', 'why', 'what', 'we', 'they', 'you', 'i', 'he', 'she', 'it']);
+	'if', 'when', 'where', 'how', 'why', 'what', 'we', 'they', 'you', 'i', 'he', 'she', 'it',
+	'before', 'after', 'until', 'once', 'while', 'because', 'since', 'unless', 'although',
+	'though', 'so', 'as']);
 
 // The words inside the "of" phrase are modifiers: a relative word there
 // opens a clause ("the list of users whose accounts are locked is empty").
