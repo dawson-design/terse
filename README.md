@@ -19,8 +19,8 @@ Terse has two layers:
   structure, evidence, flow, and the reader's needs.
 
 The [GPT and Codex research note](docs/research/gpt-writing-tells.md) records
-the evidence and false-positive limits behind model-writing signals. Those
-signals guide edits; they do not identify who wrote a passage.
+the evidence behind the model-writing signals and where they give false
+alarms. Those signals guide edits; they do not identify who wrote a passage.
 
 ## Install
 
@@ -87,8 +87,8 @@ spelling and adds project words:
 ```
 
 The same file can set `maxGrade`, enable `impersonal` checks, select `targets`,
-or ignore a category or match. Without broad spelling, Terse still runs its
-small typo list, conservative grammar patterns, and pinned offline grammar
+or ignore a category or match. Without broad spelling, Terse still checks a
+small typo list, its own grammar patterns, and a pinned offline grammar
 engine.
 
 To keep a finding in one paragraph, record the reason in the document:

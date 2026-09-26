@@ -18,11 +18,10 @@ Workflow:
    of adverbs, passive voice, and qualifiers per thousand words.
    These are the numbers the template records as observed, not
    aspirational.
-3. Read the samples for the voice on the page: typical sentence
+3. Read the samples for the voice on the page. Note typical sentence
    openers and connectors, paragraph length, formatting habits, and
    vocabulary register. Note recurring phrases, how the author
-   handles hedging and emphasis, first or third person, and
-   contractions.
+   hedges and adds emphasis, first or third person, and contractions.
 4. Draft `voice.md` in the project's `.terse/` directory (create it)
    with:
    - frontmatter: `status: draft`, sample sources, date

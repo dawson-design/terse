@@ -13,14 +13,14 @@ prose.
 ## Runtime coverage
 
 The Codex port keeps the Claude package and command surface. It adds the Codex
-manifest, `$terse:*` syntax, shared hook payload handling, and an authenticated
-Codex ablation runner.
+manifest and the `$terse:*` syntax. It also shares hook payload handling and
+adds a Codex ablation runner that signs in.
 
 - [x] Package the same six skills for Codex and Claude at version 0.12.0.
 - [x] Parse Claude `file_path` and Codex `apply_patch` events in the always-on
       style hook.
 - [x] Add manifest, hook-process, GPT-signal, and human-corpus contract tests.
-- [x] Complete the eight authenticated Codex runs and record every result,
+- [x] Complete the eight authenticated Codex runs. Record every result,
       including invalid ablations and failed graders.
 - [x] Rerun the corrected A/B harness and meet every acceptance condition.
 - [x] Verify direct and automatic activation with Codex CLI.
@@ -117,8 +117,8 @@ recall. Edited human prose set the false-positive bar and the targets.
 - [x] Keep every property test green: conservation, metamorphic
       relations, and the CLI contract. 77 tests pass.
 - [x] 2026-08-19: the lexicon grew the claudism families from the
-      community lists, in every inflection, and `very` joined the
-      qualifiers. Sixty more corpus entries pin recall. The Hemingway
+      community lists, in every inflection. The qualifiers gained
+      `very`. Sixty more corpus entries pin recall. The Hemingway
       corpus still shows zero lexical false positives.
 - [x] 2026-08-20: caution on single words. A bare word is a tell only
       with no everyday literal sense. Words with one need their tell
@@ -248,11 +248,11 @@ a worklist, not an edit plan. Structure problems want structure tools.
 
 - [x] Outline-first composition, shipped first as one draft command and
       now split into `/terse:outline` and `/terse:write`. The user
-      polishes the structure as bullets, one claim per section, checked
-      for knowledge order and one-theme discipline. They sign off
-      before any prose exists. Expansion then writes each section
-      knowing its place in the whole, in the approved voice. A
-      whole-document read ends the pass.
+      polishes the structure as bullets, one claim per section. The
+      outline skill checks each for knowledge order and one theme. The
+      user signs off before any prose exists. Expansion then writes
+      each section knowing its place in the whole, in the approved
+      voice. A whole-document read ends the pass.
 - [x] `/terse:edit` gained the same ending. Re-read every touched
       section whole, and check the cadence spread against the voice
       range. Local fixes can no longer flatten the rhythm unnoticed.

@@ -60,6 +60,6 @@ skill reads.
 - [ ] No outline and no prose existed before the user picked.
 - [ ] The user's pick was explicit, and the brief records it with a
       status line.
-- [ ] The brief holds the subject, the reader, the question, the
-      governing thought, the proposed length, and the discarded
-      angles with their reasons.
+- [ ] The brief holds the subject, the reader, the question, and the
+      governing thought. It also holds the proposed length and the
+      discarded angles with their reasons.

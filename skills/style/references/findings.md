@@ -35,7 +35,7 @@ every category.
 
 Collect once, before the report and before any fix. The synchronous
 `checkText` API gathers native style, readability, and grammar flags.
-Executable consumers use async `checkDocument`, which adds admitted
+Executable consumers use async `checkDocument`. It adds admitted
 Harper grammar findings and applies the same suppressions. One model
 read emits the remaining `grammar`, and one quote-checker run proves
 every quotation against its source. The same collection produces the
@@ -48,12 +48,12 @@ claim across the whole document, at any distance. A group of two or
 more paragraphs emits one `structure` finding. The finding lists
 every paragraph in the group, names one as the keep, and marks the
 rest as candidates for cut or merge. A later paragraph that adds
-evidence, a qualification, or a new consequence advances the claim
-rather than repeating it, and emits nothing. The `unasked` findings
+evidence, a qualification, or a new consequence emits nothing. It
+advances the claim rather than repeating it. The `unasked` findings
 come from the `draft` skill's working note: a sentence the note does
 not tie to one of the five reader questions. Those are an unowned
-term, a disputable claim's evidence, a required step, an
-uninferred consequence, and a sentence too compressed to parse.
+term, a disputable claim's evidence, a required step, and an uninferred
+consequence. The fifth is a sentence too compressed to parse.
 On imported text with no note, ask the question of each
 sentence in the same read. Do not re-read the prose per category.
 
@@ -84,7 +84,7 @@ each sentence once, applying its findings in stage order:
 1. **structural**: split the sentence, convert the in-sentence list to
    bullets, cut or promote the aside
 2. **wording**: name the actor (capability statements keep their
-   passive), swap the flagged word or phrase, delete or evidence the
+   passive). Swap the flagged word or phrase, delete or evidence the
    qualifier, replace the em dash
 3. **mechanics**: grammar, spelling, and punctuation, on the wording
    that now exists. A quote finding never rewords the sentence. The

@@ -20,7 +20,7 @@ the reader from question to answer, ready to expand into prose later.
 1. Name the subject, the reader, the one question the document
    answers, and the target length. An approved brainstorm brief
    (`<name>-brainstorm.md`, from the Terse brainstorm skill) answers
-   these; take its subject, reader, question, and length. With no
+   these. Take its subject, reader, question, and length. With no
    brief, and the user has not said, ask; do
    not guess the reader. When the angle itself is open, offer the
    Terse brainstorm skill rather than asking the user to pick
@@ -78,7 +78,7 @@ the reader from question to answer, ready to expand into prose later.
    yours:
    - every section supports the governing thought; a bullet serving a
      different point moves out
-   - the sections form a question-answer chain: each answers the
+   - the sections form a question-answer chain. Each answers the
      question the previous section raised, and each uses only what an
      earlier section taught
    - the sections are MECE: no two sections make the same point, and

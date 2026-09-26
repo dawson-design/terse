@@ -29,8 +29,8 @@ shares.
    headings get the strictest reading.
 3. **The particular, not the abstraction.** Name the service, the
    number, the date. "Improved reliability" asks the reader to take it
-   on faith; "p99 fell from 800ms to 120ms in March" does not. This is
-   the rule behind Hemingway's narrator finding abstract words obscene
+   on faith; "p99 fell from 800ms to 120ms in March" does not. Hemingway
+   shows this rule at work. His narrator finds abstract words obscene
    beside "the concrete names of villages, the numbers of roads". Keep
    an abstraction only when it names a category the reader will meet
    again. The commonest abstraction is the pointer noun:
@@ -78,8 +78,8 @@ shares.
    where the emphasis falls. A run of sentences that each open with
    new information loses the reader, however clean each one is.
 9. **Never comment on the writing.** No significance announcements
-   (`worth noting`, `importantly`), no rhetorical questions answered
-   by the next sentence, no `it's not just X, it's Y`, no pointing
+   (`worth noting`, `importantly`). No rhetorical questions answered
+   by the next sentence. No `it's not just X, it's Y`. No pointing
    at the argument (`as we will see`). The test is deletion: cut
    the phrase, and if the passage loses no information, it was a
    signpost. A verdict delivered before its evidence is the same
@@ -109,7 +109,7 @@ three groups:
 
 - the chat defaults that carry over: minimal formatting, brief caveats
 - the defaults to redirect: warm tone, chat-sized summaries, writing
-  for the conversation partner instead of the document's reader
+  for the person in the chat instead of the document's reader
 - the trained habits to suppress: em dashes, `not just X but Y`,
   synonym cycling, closing summaries
 
