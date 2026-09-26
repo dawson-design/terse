@@ -66,8 +66,7 @@ const clauseStart = (openers) => `(?:${LINE_START}|[,;:(]\\s*|\\b(?:${alt(opener
 // that the installer writes lives"), and "requires that the client have a
 // token" is a subjunctive. "and" and "or" join nouns inside a phrase as
 // often as clauses ("Britain and its inhabitants").
-const PLURAL_SUBJECT_START = clauseStart(CLAUSE_OPENERS);
-const SINGULAR_SUBJECT_START = clauseStart(CLAUSE_OPENERS);
+const SUBJECT_START = clauseStart(CLAUSE_OPENERS);
 // "were" after a singular subject is a subjunctive after "if", "though",
 // "unless", or "whether" ("if the primary were to fail"), and before "to".
 const WERE_SUBJECT_START = clauseStart(CLAUSE_OPENERS.filter((w) =>
@@ -222,14 +221,14 @@ const AGREEMENT = [
 	// A plural subject with a singular verb: "the artifacts is uploaded". A
 	// lexical verb followed by another verb was a noun ("the ops runs
 	// happen"), and a noun-like one needs an object after it.
-	{ re: new RegExp(`(?<=${PLURAL_SUBJECT_START}(?:${PLURAL_DETERMINER})\\s+${MODIFIER}` +
+	{ re: new RegExp(`(?<=${SUBJECT_START}(?:${PLURAL_DETERMINER})\\s+${MODIFIER}` +
 		`${PLURAL_NOUN}\\s+)(?:(?:${alt(Object.keys(SINGULAR_AUX).map(apostrophe))})\\b|` +
 		`(?:${alt(SINGULAR_VERBS)})\\b(?!\\s+(?:${AUXILIARY}|${alt(BASE_VERBS)}|happen|run|` +
 		`work|start|stop|pass)\\b)|(?:${alt(NOUN_LIKE_VERBS)})\\b(?=\\s+(?:the|a|an|its|their|` +
 		'our|your|every|each|all|this|that|these|those|no|it|them)\\b))(?![-\'’])', 'g'),
 		hint: (m) => `use "${sameMarks(m[0], pluralVerb(m[0]))}"` },
 	// A singular subject with a plural verb: "the pipeline have three stages".
-	{ re: new RegExp(`(?<=${SINGULAR_SUBJECT_START}(?:${SINGULAR_DETERMINER})\\s+${SINGULAR_MODIFIER}` +
+	{ re: new RegExp(`(?<=${SUBJECT_START}(?:${SINGULAR_DETERMINER})\\s+${SINGULAR_MODIFIER}` +
 		`${SINGULAR_NOUN}\\s+)(?:${alt(Object.keys(PLURAL_AUX).filter((v) => !v.startsWith('were'))
 			.map(apostrophe))})(?![\\w'’-])`, 'g'),
 		hint: (m) => `use "${sameMarks(m[0], singularVerb(m[0]))}"` },
@@ -237,13 +236,13 @@ const AGREEMENT = [
 		`${SINGULAR_NOUN}\\s+)were(?:n['’]t)?(?![\\w'’-])(?!\\s+to\\b)`, 'g'),
 		hint: (m) => `use "${sameMarks(m[0], singularVerb(m[0]))}"` },
 	// ... or with a base verb that is rarely a noun: "the config file contain".
-	{ re: new RegExp(`(?<=${SINGULAR_SUBJECT_START}(?:${SINGULAR_DETERMINER})\\s+${SINGULAR_MODIFIER}` +
+	{ re: new RegExp(`(?<=${SUBJECT_START}(?:${SINGULAR_DETERMINER})\\s+${SINGULAR_MODIFIER}` +
 		`${SINGULAR_NOUN}\\s+)(?:${alt(BASE_VERBS.filter((v) => !PLURAL_AUX[v]))})\\b(?![-'’])`, 'g'),
 		hint: (m) => `use "${singularVerb(m[0])}"` },
 	// "it" with a base verb: "It run every night". "read" and "put" stay out:
 	// their past tense is spelled like the base ("because it read as").
 	// "need" counts unless it is the modal ("it need not be perfect").
-	{ re: new RegExp(`(?<=${SINGULAR_SUBJECT_START}[Ii]t\\s+)(?:${alt(BASE_VERBS)}|run|use|` +
+	{ re: new RegExp(`(?<=${SUBJECT_START}[Ii]t\\s+)(?:${alt(BASE_VERBS)}|run|use|` +
 		'need(?!\\s+(?:not|only|never|hardly|scarcely|no|be)\\b)|' +
 		"work|call|return|start|stop|update|check|build|load|write|store|handle|show|" +
 		"look|pass|break|crash|hang|wait|retry|poll)\\b(?![-'’])", 'g'),
@@ -485,7 +484,7 @@ const QUANTITY_HEAD = alt(['number', 'lot', 'majority', 'minority', 'rest', 'rem
 	'series', 'set', 'group', 'pair', 'host', 'plenty', 'none', 'all', 'most', 'some',
 	'any', 'team', 'staff', 'crew', 'family', 'board', 'committee', 'percentage', 'minimum',
 	'maximum', 'fourth', 'fifth', 'tenth', 'hundredth', 'ton', 'tons', 'best', 'worst', 'least',
-	'fraction', 'share', 'proportion', 'average', 'total', 'sum']);
+	'share', 'proportion', 'average', 'sum']);
 // Words that open a new clause inside a relative clause, so the verb after
 // them belongs to that clause ("the page that shows which users are active").
 const CLAUSE_WORD = alt(['and', 'or', 'but', 'that', 'which', 'who', 'whom', 'whose', 'whether',
