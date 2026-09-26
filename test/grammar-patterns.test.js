@@ -12,6 +12,14 @@ import { checkText } from '../scripts/style-check.mjs';
 const HERE = fileURLToPath(new URL('.', import.meta.url));
 const grammar = (text) => checkText(text).flags.filter((f) => f.category === 'grammar');
 
+// One finding, whose span covers exactly its match: a fixer that applies the
+// hint edits the span, so a span that drifts edits the wrong words.
+function expectOne(text, match, hint) {
+	const flags = grammar(text);
+	expect(flags).toEqual([expect.objectContaining({ match, hint })]);
+	expect(text.slice(...flags[0].span).replace(/\s+/g, ' ')).toBe(match);
+}
+
 describe('agreement at an edit seam', () => {
 	it.each([
 		['The artifacts is uploaded to the registry.', 'is', 'use "are"'],
@@ -26,7 +34,7 @@ describe('agreement at an edit seam', () => {
 		['There is three open incidents this week.', 'There is', 'use "There are"'],
 		["There's two ways to roll back.", "There's", 'use "There are"'],
 	])('%s', (text, match, hint) => {
-		expect(grammar(text)).toEqual([expect.objectContaining({ match, hint })]);
+		expectOne(text, match, hint);
 	});
 
 	it.each([
@@ -74,7 +82,7 @@ describe('homophones and confusables in their only grammatical frame', () => {
 		['The dashboard loads real slow on mobile.', 'real', 'use "really"'],
 		['We deploy everyday at noon.', 'everyday', 'use "every day"'],
 	])('%s', (text, match, hint) => {
-		expect(grammar(text)).toEqual([expect.objectContaining({ match, hint })]);
+		expectOne(text, match, hint);
 	});
 
 	it.each([
@@ -100,7 +108,7 @@ describe('phrasal verbs written as nouns', () => {
 		['You need to login to the console first.', 'login', 'use "log in"'],
 		['Please cleanup the temp files after the run.', 'cleanup', 'use "clean up"'],
 	])('%s', (text, match, hint) => {
-		expect(grammar(text)).toEqual([expect.objectContaining({ match, hint })]);
+		expectOne(text, match, hint);
 	});
 
 	it.each([
@@ -136,7 +144,7 @@ describe('forms that break after a verb, modal, or quantity', () => {
 		["We added test's are for the parser.", "test's", 'use "tests"'],
 		['We deploy on monday.', 'monday', 'use "Monday"'],
 	])('%s', (text, match, hint) => {
-		expect(grammar(text)).toEqual([expect.objectContaining({ match, hint })]);
+		expectOne(text, match, hint);
 	});
 
 	it.each([
@@ -163,7 +171,7 @@ describe('sentence mechanics', () => {
 		['Did the job finish.', '.', 'use "?"'],
 		['We shipped it!!', '!!', 'use "!"'],
 	])('%s', (text, match, hint) => {
-		expect(grammar(text)).toEqual([expect.objectContaining({ match, hint })]);
+		expectOne(text, match, hint);
 	});
 
 	it('flags a subordinate clause with no main clause, or no comma before one', () => {
@@ -185,6 +193,15 @@ describe('sentence mechanics', () => {
 		['Is the cache warm?'],
 	])('leaves the correct sentence %s alone', (text) => {
 		expect(grammar(text)).toEqual([]);
+	});
+
+	it.each([
+		['Setup is done.\nDid the job finish.\n', '.'],
+		['The build broke.\nBecause the cache was cold.\n', 'Because the cache was cold.'],
+	])('reports a sentence-shape finding on its own line in wrapped text: %j', (text, match) => {
+		const [flag] = grammar(text);
+		expect(flag).toMatchObject({ line: 2, match });
+		expect(text.slice(...flag.span)).toBe(match);
 	});
 
 	it('lets a list item be a fragment', () => {

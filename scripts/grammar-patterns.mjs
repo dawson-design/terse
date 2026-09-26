@@ -317,18 +317,19 @@ const SPLICES = [
 ];
 
 // Whole-sentence shapes, checked on prose only because a list item may be a
-// fragment by design.
+// fragment by design. Each anchors past leading whitespace: the span is
+// refined on the raw sentence, which can open with the line break before it.
 const SENTENCE_SHAPES = [
 	// A question closed with a period. "Do" and "Have" also open imperatives,
 	// and a comma may mark an inverted condition ("Should the canary fail, ...").
-	{ re: /(?<=^(?:Did|Does|Is|Are|Was|Were|Has|Can|Could|Will|Would|Should)\s+(?:the|it|this|that|these|those|there|we|you|they|he|she|I|our|your|their|anyone|everyone)\b[^.?!:;,]*)\.$/g,
+	{ re: /(?<=^\s*(?:Did|Does|Is|Are|Was|Were|Has|Can|Could|Will|Would|Should)\s+(?:the|it|this|that|these|those|there|we|you|they|he|she|I|our|your|their|anyone|everyone)\b[^.?!:;,]*)\.$/g,
 		prose: true, hint: () => 'use "?"' },
 	// A subordinate clause with no main clause: "Which means the cache is
 	// stale." or "Because the build failed." The same shape catches an opening
 	// clause that runs into its main clause without a comma. The lowercase
 	// letter before the period keeps an abbreviation such as "U.S." from
 	// ending the sentence.
-	{ re: /^(?:Which|Because(?!\s+of\b)|Although|Whereas|Such as)\b[^,;:?!]*[a-z0-9]\.$/g,
+	{ re: /(?<=^\s*)(?:Which|Because(?!\s+of\b)|Although|Whereas|Such as)\b[^,;:?!]*[a-z0-9]\.$/g,
 		prose: true,
 		hint: () => 'a subordinate clause needs a main clause: join it to the sentence ' +
 			'it depends on, or add a comma where the main clause starts' },

@@ -249,10 +249,11 @@ const AI_TELL_NOUNS = ['synergy', 'footgun', 'linchpin', 'workhorse',
 // Tells whose surface varies: a pattern per family, matched per sentence.
 const AI_TELL_REGEXES = [
 	// "Note that" opening a sentence is a signpost; "a note that said" is a
-	// note. The lexicon runs per sentence, so ^ is the sentence start.
-	{ re: /^note\s+that\b/gi },
+	// note. The lexicon runs per sentence, so ^ is the sentence start; the
+	// span is refined on the raw sentence, which may open with a line break.
+	{ re: /(?<=^\s*)note\s+that\b/gi },
 	// the hedge opens a sentence; "a note that said goodbye" is a note
-	{ re: /^that\s+said\b/gi },
+	{ re: /(?<=^\s*)that\s+said\b/gi },
 	{ re: /\bin\s+this\s+(?:document|article|post|guide|section|chapter|tutorial),?\s+(?:we|i|you)\b/gi },
 	{ re: /\bthis\s+(?:section|chapter|document|guide|article)\s+(?:describes|covers|explains|discusses|outlines|presents|introduces)\b/gi },
 	{ re: /\bthe\s+following\s+sections?\s+(?:cover|describe|explain|discuss|outline|present)s?\b/gi },
