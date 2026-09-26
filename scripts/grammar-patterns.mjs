@@ -98,6 +98,13 @@ const NOT_PLURAL_NOUN = alt(['news', 'series', 'species', 'means', 'lens', 'canv
 const PLURAL_NOUN = `(?![a-z]*(?:ss|us|is|ous|ics)\\b)(?!(?:${NOT_PLURAL_NOUN})\\b)` +
 	'[a-z]+s\\b(?![-\'’])';
 
+// Where a noun phrase ends: punctuation, a closed-class word, or a past-tense
+// verb, none of which can be the phrase's head noun.
+const PHRASE_END = '(?=\\s*(?:[.,;:!?)]|$)|\\s+(?:and|or|but|than|to|in|on|at|of|for|per|' +
+	'with|from|by|after|before|during|since|until|over|under|across|about|are|were|' +
+	'will|would|can|could|should|may|might|that|which|who|when|if|as|so|because|' +
+	'today|now|here|there|overall|(?![a-z]*eed\\b)[a-z]{3,}ed)\\b)';
+
 // Nouns without a plural s that may still take a plural verb: irregular
 // plurals, collectives (plural in British use), quantities, pronouns that
 // open a relative clause ("the code you have"), and adjectives used as nouns.
@@ -360,7 +367,7 @@ const PROCESS_VERB = '(?:happen|run|ran|work|update|load|respond|restart|retry|r
 const ADVERB_SLOT = [
 	{ re: new RegExp('(?<=(?<!\\b(?:the|a|an|each|every|its|our|your|their|my)\\s+)' +
 		`\\b${PROCESS_VERB}\\s+)(?:${alt(Object.keys(ADVERB_OF))})` +
-		'(?=\\s*[.,;:!?]|\\s+(?:when|if|on|in|at|after|before|and|but|for|with|during|' +
+		'(?=\\s*[.;:!?]|\\s+(?:when|if|on|in|at|after|before|but|for|with|during|' +
 		'every|once|until|unless|whenever|without|across|of)\\b)', 'g'),
 		hint: (m) => `use "${ADVERB_OF[m[0]]}"` },
 ];
@@ -387,9 +394,11 @@ const SPLICES = [
 // fragment by design. Each anchors past leading whitespace: the span is
 // refined on the raw sentence, which can open with the line break before it.
 const SENTENCE_SHAPES = [
-	// A question closed with a period. "Do" and "Have" also open imperatives,
+	// A question closed with a period, with a pronoun subject: API docs open
+	// descriptions on a bare verb ("Does the same thing as ...", "Has the same
+	// effect"), though not on "Did". "Do" and "Have" also open imperatives,
 	// and a comma may mark an inverted condition ("Should the canary fail, ...").
-	{ re: /(?<=^(?:\s|[-*+>]\s|\d{1,2}[.)]\s)*(?:Did|Does|Is|Are|Was|Were|Has|Can|Could|Will|Would|Should)\s+(?:the|it|this|that|these|those|there|we|you|they|he|she|I|our|your|their|anyone|everyone)\b[^.?!:;,]*)\.$/g,
+	{ re: /(?<=^(?:\s|[-*+>]\s|\d{1,2}[.)]\s)*(?:(?:Did|Does|Is|Are|Was|Were|Has|Can|Could|Will|Would|Should)\s+(?:it|this|that|there|we|you|they|he|she|I|anyone|everyone)|Did\s+(?:the|our|your|their))\b[^.?!:;,]*)\.$/g,
 		prose: true, hint: () => 'use "?"' },
 	// A subordinate clause with no main clause: "Which means the cache is
 	// stale." or "Because the build failed." The same shape catches an opening
@@ -430,6 +439,7 @@ const FORMS = [
 		'decided'].map(eitherCase).join('|')})\\s+to\\s+)` +
 		'(?![a-z]*(?:ss|us|is|as|eed)\\b)(?!(?:bring|sing|ring|sting|swing|spring|string|' +
 		'fling|cling|sling|wring|ping|wing|king|ding|zing|embed|shed|shred)\\b)' +
+		'(?!(?:always|sometimes|perhaps|nowadays|afterwards|towards|besides|thus)\\b)' +
 		'[a-z]+(?:ed|ing|s)\\b', 'g'),
 		hint: () => 'the verb after "to" takes its base form ("to run", not "to runs")' },
 	// "plan" is often a noun ("apply the plan to existing clusters"), so it
@@ -451,9 +461,11 @@ const FORMS = [
 		'(?:has|does|is|was|goes|retries|runs|returns|fixes|needs|takes|makes|gets|uses)\\b', 'g'),
 		hint: (m) => `use "${{ has: 'have', does: 'do', is: 'be', was: 'be' }[m[0]] ??
 			pluralVerb(m[0])}"` },
-	// "Less happens at startup" is a pronoun before its verb.
-	{ re: new RegExp(`(?<!\\bor\\s+)\\b([Ll]ess)(?=\\s+(?!(?:${alt(SINGULAR_VERBS)})\\b)` +
-		`${PLURAL_NOUN})`, 'g'),
+	// "Less happens at startup" is a pronoun before its verb, "field-less" a
+	// suffix, and a plural before another noun is a modifier ("less sales
+	// tax"), so the plural must end its phrase.
+	{ re: new RegExp(`(?<![\\w-]|\\bor\\s+)([Ll]ess)(?=\\s+(?!(?:${alt(SINGULAR_VERBS)})\\b)` +
+		`${PLURAL_NOUN}${PHRASE_END})`, 'g'),
 		hint: (m) => `use "${keepCase(m[1], 'fewer')}"` },
 	{ re: /\b[A-Z]{2,}['’]s(?=\s+(?:are|were|have|do|don['’]t)\b)/g,
 		hint: (m) => `use "${m[0].slice(0, -2)}s"` },
@@ -571,7 +583,8 @@ const CLAUSE_JOINS = [
 ];
 
 const DOUBLED_MARKS = [
-	{ re: /!{2,}|\?{2,}/g, hint: (m) => `use "${m[0][0]}"` },
+	// After a word, before a space or the end: "!!null" is a YAML tag.
+	{ re: /(?<=\w)(?:!{2,}|\?{2,})(?=\s|$)/g, hint: (m) => `use "${m[0][0]}"` },
 ];
 
 /**
