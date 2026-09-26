@@ -120,12 +120,15 @@ const NOT_SINGULAR_NOUN = alt(['people', 'children', 'men', 'women', 'police',
 	'whom', 'whose', 'taken', 'given', 'written', 'chosen', 'driven', 'broken', 'spoken',
 	'stolen', 'forgotten', 'hidden', 'known', 'shown', 'seen', 'done', 'gone', 'made',
 	'held', 'built', 'sent', 'found', 'left', 'kept', 'said', 'paid', 'set', 'put']);
-// -ae covers Latin plurals such as algae; -ed covers participles ("the user
-// approved are").
-const SINGULAR_NOUN = `(?![a-z]*(?:s|ing|ly|ae|ed)\\b)(?!(?:${NOT_SINGULAR_NOUN})\\b)` +
+// -ae covers Latin plurals such as algae; -men, -people, -children, and
+// -data cover compounds such as salesmen and metadata; -ed covers
+// participles ("the user approved are").
+const PLURAL_ENDING = '(?:s|ing|ly|ae|ed|men|people|children|data)';
+const SINGULAR_NOUN = `(?![a-z]*${PLURAL_ENDING}\\b)(?!(?:${NOT_SINGULAR_NOUN})\\b)` +
 	"[a-z]+\\b(?![-'’])";
 // After "these" or "those" an -ing word is a noun ("these setting is").
-const NOUN_AFTER_DEMONSTRATIVE = `(?![a-z]*(?:s|ly|ae|ed)\\b)(?!(?:${NOT_SINGULAR_NOUN})\\b)` +
+const NOUN_AFTER_DEMONSTRATIVE = `(?![a-z]*(?:s|ly|ae|ed|men|people|children|data)\\b)` +
+	`(?!(?:${NOT_SINGULAR_NOUN})\\b)` +
 	"[a-z]+\\b(?![-'’])";
 
 const PLURAL_DETERMINER = alt(['[Tt]he', '[Tt]hese', '[Tt]hose', '[Bb]oth', '[Mm]any',
@@ -148,6 +151,8 @@ const SINGULAR_VERBS = ['returns', 'polls', 'shares', 'supports', 'includes',
 	'renders', 'parses', 'compiles', 'deploys', 'builds', 'fetches', 'shows', 'runs',
 	'works', 'uses', 'needs', 'takes', 'gets', 'makes', 'looks', 'seems', 'calls',
 	'keeps', 'helps', 'tries', 'goes', 'comes', 'expects', 'requires', 'wants'];
+const AUXILIARY = '(?:is|are|was|were|has|have|had|did|does|do|will|would|can|could|' +
+	'should|may|might|must)';
 const PLURAL_AUX = { have: 'has', are: 'is', were: 'was', do: 'does',
 	"don't": "doesn't", "aren't": "isn't", "weren't": "wasn't", "haven't": "hasn't" };
 // Base forms that are rarely nouns, so "each request take" is a verb slot.
@@ -159,11 +164,14 @@ const BASE_VERBS = ['take', 'contain', 'require', 'include', 'get', 'send',
 
 const apostrophe = (word) => word.replace("'", "['’]");
 const straight = (word) => word.replace('’', "'");
+// A replacement keeps the author's apostrophe: "isn’t" becomes "aren’t".
+const sameMarks = (from, to) => (from.includes('’') ? to.replace(/'/g, '’') : to);
 
 /** The verb form a plural subject takes: "passes" -> "pass", "is" -> "are". */
 function pluralVerb(verb) {
 	const plain = straight(verb.toLowerCase());
 	if (SINGULAR_AUX[plain]) return SINGULAR_AUX[plain];
+	if (plain === 'goes') return 'go';
 	if (/ies$/.test(plain)) return plain.slice(0, -3) + 'y';
 	if (/(?:ss|x|z|ch|sh)es$/.test(plain)) return plain.slice(0, -2);
 	return plain.slice(0, -1);
@@ -181,29 +189,33 @@ function singularVerb(verb) {
 
 /** The singular of a regular plural noun: "checks" -> "check". */
 function singularNoun(noun) {
+	if (/(?:cach|nich|clich|avalanch|psych|(?:^|head)ach)es$/.test(noun)) return noun.slice(0, -1);
 	if (/ies$/.test(noun)) return noun.slice(0, -3) + 'y';
 	if (/(?:ss|x|ch|sh)es$/.test(noun)) return noun.slice(0, -2);
 	return noun.slice(0, -1);
 }
 
 const AGREEMENT = [
-	// A plural subject with a singular verb: "the artifacts is uploaded".
+	// A plural subject with a singular verb: "the artifacts is uploaded". A
+	// verb followed by an auxiliary was a noun ("the sales calls are").
 	{ re: new RegExp(`(?<=${PLURAL_SUBJECT_START}(?:${PLURAL_DETERMINER})\\s+${MODIFIER}` +
 		`${PLURAL_NOUN}\\s+)(?:${alt(Object.keys(SINGULAR_AUX).map(apostrophe))}|` +
-		`${alt(SINGULAR_VERBS)})\\b(?![-'’])`, 'g'),
-		hint: (m) => `use "${pluralVerb(m[0])}"` },
+		`${alt(SINGULAR_VERBS)})\\b(?![-'’])(?!\\s+${AUXILIARY}\\b)`, 'g'),
+		hint: (m) => `use "${sameMarks(m[0], pluralVerb(m[0]))}"` },
 	// A singular subject with a plural verb: "the pipeline have three stages".
+	// "were" stays out: "if the primary were to fail" is a subjunctive.
 	{ re: new RegExp(`(?<=${SINGULAR_SUBJECT_START}(?:${SINGULAR_DETERMINER})\\s+${SINGULAR_MODIFIER}` +
-		`${SINGULAR_NOUN}\\s+)(?:${alt(Object.keys(PLURAL_AUX).map(apostrophe))})` +
-		'(?![\\w\'’-])', 'g'),
-		hint: (m) => `use "${singularVerb(m[0])}"` },
+		`${SINGULAR_NOUN}\\s+)(?:${alt(Object.keys(PLURAL_AUX).filter((v) => !v.startsWith('were'))
+			.map(apostrophe))})(?![\\w'’-])`, 'g'),
+		hint: (m) => `use "${sameMarks(m[0], singularVerb(m[0]))}"` },
 	// ... or with a base verb that is rarely a noun: "the config file contain".
 	{ re: new RegExp(`(?<=${SINGULAR_SUBJECT_START}(?:${SINGULAR_DETERMINER})\\s+${SINGULAR_MODIFIER}` +
 		`${SINGULAR_NOUN}\\s+)(?:${alt(BASE_VERBS.filter((v) => !PLURAL_AUX[v]))})\\b(?![-'’])`, 'g'),
 		hint: (m) => `use "${singularVerb(m[0])}"` },
 	// "it" with a base verb: "It run every night". "read" and "put" stay out:
-	// their past tense is spelled like the base ("because it read as").
-	{ re: new RegExp(`(?<=${SINGULAR_SUBJECT_START}[Ii]t\\s+)(?:${alt(BASE_VERBS)}|run|need|use|` +
+	// their past tense is spelled like the base ("because it read as"). So
+	// does "need", a modal in "it need not be perfect".
+	{ re: new RegExp(`(?<=${SINGULAR_SUBJECT_START}[Ii]t\\s+)(?:${alt(BASE_VERBS)}|run|use|` +
 		"work|call|return|start|stop|update|check|build|load|write|store|handle|show|" +
 		"look|pass|break|crash|hang|wait|retry|poll)\\b(?![-'’])", 'g'),
 		hint: (m) => `use "${singularVerb(m[0])}"` },
@@ -214,31 +226,39 @@ const AGREEMENT = [
 	{ re: new RegExp(`(?<=\\b[Ee](?:ach|very)\\s+)${PLURAL_NOUN}` +
 		'(?=\\s+(?:is|are|was|were|has|have|runs?|must|should|can|will|may)\\b)', 'g'),
 		hint: (m) => `use "${singularNoun(m[0])}"` },
-	// "There is three open incidents."
-	{ re: /\b([Tt]here)(?:['’]s|\s+is|\s+(was))(?=\s+(?:two|three|four|five|six|seven|eight|nine|ten|several|many|multiple|[2-9]|\d{2,})\b(?!\s*(?:-|%|percent\b|[kKMG]?B\b|ms\b|minutes?\b|hours?\b|seconds?\b|days?\b|weeks?\b|months?\b|years?\b|dollars?\b|times?\b)))/g,
+	// "There is three open incidents." The count is a whole number before a
+	// lowercase noun that is not a unit: "there is 10.5 GB free" and "there
+	// is 24/7 support" stay.
+	{ re: /\b([Tt]here)(?:['’]s|\s+is|\s+(was))(?=\s+(?:two|three|four|five|six|seven|eight|nine|ten|several|many|multiple|[2-9]|\d{2,})(?![\w.,/%-])\s+(?!(?:percent|[kmgt]?b|ms|minutes?|hours?|seconds?|days?|weeks?|months?|years?|dollars?|times?)\b)[a-z])/g,
 		hint: (m) => `use "${m[1]} ${m[2] ? 'were' : 'are'}"` },
 ];
 
 // Homophones in the one frame where only one spelling is grammatical.
 const HOMOPHONES = [
-	{ re: /\b[Ii]t['’]s(?=\s+own\b)/g, hint: () => 'use "its"' },
+	{ re: /\b[Ii]t['’]s(?=\s+own\b)/g, hint: (m) => `use "${keepCase(m[0], 'its')}"` },
 	{ re: /\b[Yy]ou['’]re(?=\s+own\b)/g, hint: (m) => `use "${keepCase(m[0], 'your')}"` },
 	{ re: /\b[Yy]our(?=\s+(?:going\s+to|not\b(?!-)|able\s+to|all\s+set\b|welcome\s*[.!,]))/g,
 		hint: (m) => `use "${keepCase(m[0], "you're")}"` },
 	{ re: /\b[Tt]heir(?=\s+going\s+to\b)/g, hint: (m) => `use "${keepCase(m[0], "they're")}"` },
 	{ re: /(?<=\bover\s+)their(?=\s*[.,;:!?])/g, hint: () => 'use "there"' },
 	{ re: /\b[Ww]hose(?=\s+(?:going|been|gonna)\b)/g, hint: (m) => `use "${keepCase(m[0], "who's")}"` },
-	{ re: /(?<=\b(?:to|will|won['’]t|would|could|can|can['’]t|might|may|must|should|don['’]t|doesn['’]t|didn['’]t|not|never)\s+)loose\b/g,
+	// "loose" is an adjective after "is not" or "from tight to", so only a
+	// verb slot counts: a modal, a negated auxiliary, or an infinitive "to".
+	{ re: /(?<=\b(?:will|won['’]t|would|could|can|can['’]t|might|may|must|should|don['’]t|doesn['’]t|didn['’]t|(?:want|wants|need|needs|going|trying|try|afraid|about)\s+to)\s+)loose\b/g,
 		hint: () => 'use "lose"' },
 	{ re: /\bprinciple(?=\s+(?:engineer|investigator|architect|designer|developer|scientist|component|components|owner|author|consultant|analyst|officer|reason|cause|concern|source)\b)/g,
 		hint: () => 'use "principal"' },
-	{ re: /(?<=\b(?:decide|decides|decided|deciding|know|knows|knew|check|checks|checked|determine|determines|determined|ask|asked|wonder|wondered|unsure|unclear|choose|chose)\s+)weather\b|\bweather(?=\s+or\s+not\b)/g,
+	// "weather" must open a clause ("decide weather to roll back"); "checks
+	// weather forecasts" is the weather.
+	{ re: /(?<=\b(?:decide|decides|decided|deciding|know|knows|knew|check|checks|checked|determine|determines|determined|ask|asked|wonder|wondered|unsure|unclear|choose|chose)\s+)weather(?=\s+(?:to|or|it|we|they|you|I|he|she|the|a|an|this|that|there|our|their|its)\b)|\bweather(?=\s+or\s+not\b)/g,
 		hint: () => 'use "whether"' },
 	{ re: /(?<=\b(?:[Pp]lease|will|would|should|can|could|must|we|I|they|you)\s+)advice(?=\s+(?:the|a|an|you|them|us|him|her|me|our|your|their|on|against)\b)/g,
 		hint: () => 'use "advise"' },
 	{ re: /(?<!\b(?:a|an|the)\s+)\breal(?=\s+(?:slow|fast|quick|good|bad|easy|hard|simple|big|small|well|soon|quickly|slowly)\b)/g,
 		hint: () => 'use "really"' },
-	{ re: /\beveryday(?=\s*[.,;:!?]|\s+(?:at|in|on|and|to|for|by|until|before|after|from|since|so|or|but)\b)/g,
+	// "everyday and professional use" is the adjective, so only a clause
+	// boundary or a preposition may follow.
+	{ re: /\beveryday(?=\s*[.,;:!?]|\s+(?:at|in|on|to|for|by|until|before|after|from|since)\b)/g,
 		hint: () => 'use "every day"' },
 	// "to" before an adjective that "too" must intensify: "was to complex to
 	// finish", "is to large for the queue", "are to many retries".
@@ -249,28 +269,32 @@ const HOMOPHONES = [
 ];
 
 // A closed compound noun used as a verb: "Setup the server", "we shutdown the
-// old cluster", "need to login to the console". Only verb slots count: after a
-// subject pronoun, a modal, or "please"; after an infinitive "to"; or opening
-// an imperative with an object, at the sentence start or after a label and
-// colon ("Action: Rollback the last deployment"). "Setup takes a day" and "go
-// to checkout" stay.
+// old cluster", "need to login to the console". Only verb slots count, and
+// each needs an object after it: after a subject pronoun, a modal, or
+// "please"; after an infinitive "to"; or opening an imperative at the
+// sentence start or after a label and colon ("Action: Rollback the last
+// deployment"). An object is a determiner or pronoun, never "to": "Failover
+// to the secondary is automatic" is the noun. "Setup takes a day", "Can setup
+// be automated?", and "we email you login instructions" stay.
 const PHRASAL = { setup: 'set up', login: 'log in', logout: 'log out', signup: 'sign up',
 	signin: 'sign in', backup: 'back up', checkout: 'check out', shutdown: 'shut down',
 	cleanup: 'clean up', rollout: 'roll out', rollback: 'roll back', lookup: 'look up',
 	startup: 'start up', teardown: 'tear down', failover: 'fail over',
 	followup: 'follow up', handoff: 'hand off', workaround: 'work around' };
 const COMPOUND = `(?:${alt(Object.keys(PHRASAL))})`;
-const OBJECT_AFTER = '(?=\\s+(?:the|a|an|your|our|their|its|this|that|these|those|all|any|' +
-	'every|each|it|them|to|into)\\b)';
+const OBJECT = '(?:the|a|an|your|our|their|its|this|that|these|those|all|any|every|each|it|them)';
+const OBJECT_AFTER = `(?=\\s+${OBJECT}\\b)`;
+// After an infinitive "to" the compound is a verb, so "to" may follow it.
+const OBJECT_OR_TO_AFTER = `(?=\\s+(?:${OBJECT}|to|into)\\b)`;
 const phrasalHint = (m) => `use "${keepCase(m[0], PHRASAL[m[0].toLowerCase()])}"`;
 const PHRASAL_VERBS = [
 	{ re: new RegExp('(?<=\\b(?:I|[Ww]e|[Yy]ou|[Tt]hey|[Ww]ill|[Ww]ould|[Cc]an|[Cc]ould|' +
 		"[Ss]hould|[Mm]ust|[Mm]ight|[Mm]ay|[Pp]lease|[Dd]on['’]t|[Dd]oesn['’]t|[Dd]idn['’]t|" +
-		`[Ww]on['’]t)\\s+)${COMPOUND}\\b(?![-'’])`, 'g'), hint: phrasalHint },
+		`[Ww]on['’]t)\\s+)${COMPOUND}\\b${OBJECT_AFTER}`, 'g'), hint: phrasalHint },
 	{ re: new RegExp('(?<=\\b(?:need|needs|needed|want|wants|wanted|try|tries|tried|how|' +
 		'remember|forget|able|have|has|had|going|plan|plans|decide|decided|allowed|' +
 		'required|unable|easy|hard|possible|time|order|used|ask|asked)\\s+to\\s+)' +
-		`${COMPOUND}\\b${OBJECT_AFTER}`, 'g'), hint: phrasalHint },
+		`${COMPOUND}\\b${OBJECT_OR_TO_AFTER}`, 'g'), hint: phrasalHint },
 	{ re: new RegExp('(?<=^(?:\\s|[-*+>]\\s|\\d{1,2}[.)]\\s)*|:\\s+)(?:' +
 		`${Object.keys(PHRASAL).map((w) => w[0].toUpperCase() + w.slice(1)).join('|')})` +
 		`\\b${OBJECT_AFTER}`, 'g'), hint: phrasalHint },
@@ -293,8 +317,12 @@ const PROCESS_VERB = '(?:happen|run|ran|work|update|load|respond|restart|retry|r
 	'complete|close|sync|refresh|deploy|reload|scale|recover|execute|finish|start|stop|' +
 	'resolve|render|compile|built|build|install|upgrade|handle|process|exit)' +
 	'(?:s|es|ed|d|ing)?';
+// A process word after a determiner is a noun ("mark the run successful");
+// "this" and "that" stay out, since they are often the subject ("this
+// happens automatic").
 const ADVERB_SLOT = [
-	{ re: new RegExp(`(?<=\\b${PROCESS_VERB}\\s+)(?:${alt(Object.keys(ADVERB_OF))})` +
+	{ re: new RegExp('(?<=(?<!\\b(?:the|a|an|each|every|its|our|your|their|my)\\s+)' +
+		`\\b${PROCESS_VERB}\\s+)(?:${alt(Object.keys(ADVERB_OF))})` +
 		'(?=\\s*[.,;:!?]|\\s+(?:when|if|on|in|at|after|before|and|but|for|with|during|' +
 		'every|once|until|unless|whenever|without|across|of)\\b)', 'g'),
 		hint: (m) => `use "${ADVERB_OF[m[0]]}"` },
@@ -302,14 +330,14 @@ const ADVERB_SLOT = [
 
 // Comma splices a conjunctive adverb reveals: ", however the migration was".
 // "However" also means "in whatever way" ("name it, however the team
-// prefers"), so it counts only when an auxiliary or copula follows its
-// subject.
+// prefers", "keep the date, however it is formatted"), so it counts only
+// when a determiner opens the subject and an auxiliary or copula follows it.
 const SUBJECT = '(?:the|a|an|this|that|these|those|it|we|they|you|I|he|she|there|our|' +
 	'their|its|my|your|some|most|no)';
-const AUXILIARY = '(?:is|are|was|were|has|have|had|did|does|do|will|would|can|could|' +
-	'should|may|might|must)';
+const DETERMINER_SUBJECT = '(?:the|a|an|this|that|these|those|our|their|its|my|your|some|' +
+	'most|no)\\s+[a-z-]+';
 const SPLICES = [
-	{ re: new RegExp(`,\\s+(however)(?=\\s+${SUBJECT}\\s+(?:[a-z-]+\\s+)?${AUXILIARY}\\b)`, 'g'),
+	{ re: new RegExp(`,\\s+(however)(?=\\s+${DETERMINER_SUBJECT}\\s+(?:[a-z-]+\\s+)?${AUXILIARY}\\b)`, 'g'),
 		hint: (m) => `use "; ${m[1]},"` },
 	{ re: new RegExp('(?<!\\b(?:is|was|are|were|be))' +
 		',\\s+(therefore|moreover|furthermore|nevertheless|nonetheless|consequently)' +
@@ -329,7 +357,9 @@ const SENTENCE_SHAPES = [
 	// clause that runs into its main clause without a comma. The lowercase
 	// letter before the period keeps an abbreviation such as "U.S." from
 	// ending the sentence.
-	{ re: /(?<=^\s*)(?:Which|Because(?!\s+of\b)|Although|Whereas|Such as)\b[^,;:?!]*[a-z0-9]\.$/g,
+	// "Which approach you choose depends on your needs" is a whole sentence,
+	// so "Which" counts only as the relative pronoun before its verb.
+	{ re: /(?<=^\s*)(?:Which\s+(?:is|was|means|meant|makes|made|explains|leaves|lets|gives|allows|causes|led|leads|results|would|will|also)\b|Because(?!\s+of\b)|Although|Whereas|Such as)\b[^,;:?!]*[a-z0-9]\.$/g,
 		prose: true,
 		hint: () => 'a subordinate clause needs a main clause: join it to the sentence ' +
 			'it depends on, or add a comma where the main clause starts' },
@@ -346,21 +376,20 @@ const FORMS = [
 		hint: (m) => `use "${SUBJECT_FORM[m[0].toLowerCase()]}"` },
 	{ re: /\b(?:[Cc]an['’]t|[Cc]annot|[Cc]ouldn['’]t)\s+(?:hardly|barely|scarcely)\b/g,
 		hint: (m) => `use "${m[0].replace(/^([Cc])(?:an['’]t|annot)/, '$1an').replace(/^([Cc])ouldn['’]t/, '$1ould')}"` },
-	{ re: /\b(?:[Dd]on['’]t|[Dd]oesn['’]t|[Dd]idn['’]t|[Ww]on['’]t)\s+(?:have|has|need|want|get|see|know|find)\s+(?:no|nothing|nobody|none)\b(?!\s+(?:one|longer|more|less)\b)/g,
+	{ re: /\b(?:[Dd]on['’]t|[Dd]oesn['’]t|[Dd]idn['’]t|[Ww]on['’]t)\s+(?:have|has|need|want|get|see|know|find)\s+(?:no|nothing|nobody|none)\b(?!-|\s+(?:one|longer|more|less)\b)/g,
 		hint: () => 'a double negative: use "any", "anything", or "anybody", or drop the "not"' },
 	{ re: new RegExp(`(?<=\\b(?:${['need', 'needs', 'needed', 'want', 'wants', 'wanted',
-		'remember', 'forget', 'try', 'tries', 'tried', 'how', 'able', 'plan', 'plans', 'planned',
-		'going', 'decide', 'decided'].map(eitherCase).join('|')})\\s+to\\s+)` +
+		'remember', 'forget', 'try', 'tries', 'tried', 'how', 'able', 'decide',
+		'decided'].map(eitherCase).join('|')})\\s+to\\s+)` +
 		'(?![a-z]*(?:ss|us|is|as|eed)\\b)(?!(?:bring|sing|ring|sting|swing|spring|string|' +
 		'fling|cling|sling|wring|ping|embed|shed|shred)\\b)[a-z]+(?:ed|ing|s)\\b', 'g'),
 		hint: () => 'the verb after "to" takes its base form ("to run", not "to runs")' },
 	{ re: /\b(?:informations|feedbacks|softwares|hardwares|equipments|knowledges|furnitures|advices)\b/g,
 		hint: (m) => `use "${m[0].slice(0, -1)}"` },
-	{ re: /(?<!\b(?:it|that|what|there|here|who|let|he|she))\b(?![A-Z])[a-z]+['’]s(?=\s+(?:are|were)\b)/g,
-		hint: (m) => `use "${m[0].slice(0, -2)}s"` },
 	{ re: /(?<=^(?:\s|[-*+]\s)*)Me\s+and\s+([A-Z][a-z]+|him|her|them)\b(?=\s+[a-z]+\b)/g,
 		hint: (m) => `use "${SUBJECT_FORM[m[1]] ?? m[1]} and I"` },
-	{ re: new RegExp('(?<=(?<!\\b(?:[Hh]ave|[Hh]as|[Hh]ad|[Hh]aving)\\s+)\\b(?:I|[Ww]e|' +
+	{ re: new RegExp('(?<=(?<!\\b(?:[Hh]ave|[Hh]as|[Hh]ad|[Hh]aving|[Hh]aven[\'’]t|[Hh]asn[\'’]t|' +
+		'[Hh]adn[\'’]t)\\s+)\\b(?:I|[Ww]e|' +
 		"[Yy]ou|[Tt]hey|[Hh]e|[Ss]he)\\s+)seen\\b", 'g'),
 		hint: () => 'use "saw"' },
 	{ re: /(?<=\b(?:can|could|will|would|should|must|might|may|shall)(?:\s+not)?\s+)(?!\w*eed\b)(?!(?:embed|shed|shred|wed|bed|sled|red|bred)\b)[a-z]+ed\b/g,
@@ -369,7 +398,9 @@ const FORMS = [
 		'(?:has|does|is|was|goes|retries|runs|returns|fixes|needs|takes|makes|gets|uses)\\b', 'g'),
 		hint: (m) => `use "${{ has: 'have', does: 'do', is: 'be', was: 'be' }[m[0]] ??
 			pluralVerb(m[0])}"` },
-	{ re: new RegExp(`(?<!\\bor\\s+)\\b([Ll]ess)(?=\\s+${PLURAL_NOUN})`, 'g'),
+	// "Less happens at startup" is a pronoun before its verb.
+	{ re: new RegExp(`(?<!\\bor\\s+)\\b([Ll]ess)(?=\\s+(?!(?:${alt(SINGULAR_VERBS)})\\b)` +
+		`${PLURAL_NOUN})`, 'g'),
 		hint: (m) => `use "${keepCase(m[1], 'fewer')}"` },
 	{ re: /\b[A-Z]{2,}['’]s(?=\s+(?:are|were|have|do|don['’]t)\b)/g,
 		hint: (m) => `use "${m[0].slice(0, -2)}s"` },

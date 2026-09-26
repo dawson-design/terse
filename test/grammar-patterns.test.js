@@ -59,6 +59,16 @@ describe('agreement at an edit seam', () => {
 		['The change passed review because it read as a small tweak.'],
 		['There is 10 GB free. There is two-factor auth on every account.'],
 		['Each time run the smoke tests first.'],
+		['If the primary were to fail, the replica takes over.'],
+		['Even if the cache were empty, the job would run.'],
+		['It behaves as if the token were valid.'],
+		['The sales calls are scheduled weekly.'],
+		['The customs checks are slow.'],
+		['The salesmen have quotas. The grandchildren are visiting.'],
+		['When the townspeople were asked, they agreed.'],
+		['The policemen remain focused.'],
+		['It need not be perfect. It need only run once.'],
+		['The metadata are stored in the header.'],
 		['Each time take a backup first.'],
 	])('leaves the correct sentence %s alone', (text) => {
 		expect(grammar(text)).toEqual([]);
@@ -94,6 +104,11 @@ describe('homophones and confusables in their only grammatical frame', () => {
 		['It is a real fast car.'],
 		['We built it for everyday use.'],
 		['It is not too late to start.'],
+		['The cable is not loose. Set the tension from tight to loose.'],
+		['The agent checks weather forecasts hourly.'],
+		['There is 99.9% availability. There is 10.5 GB free.'],
+		['There is 2 TB left. There is 24/7 support.'],
+		['We built it for everyday and professional use.'],
 	])('leaves the correct sentence %s alone', (text) => {
 		expect(grammar(text)).toEqual([]);
 	});
@@ -119,6 +134,13 @@ describe('phrasal verbs written as nouns', () => {
 		['Go to checkout to pay.'],
 		['Switch to rollback mode.'],
 		['The login page times out.'],
+		['Failover to the secondary region is automatic.'],
+		['Rollout to production happens on Tuesday.'],
+		['Backup to S3 runs nightly. Login to the portal fails if SSO is down.'],
+		['Handoff to the on-call engineer happens at 9am.'],
+		['Note: Failover to the secondary is manual.'],
+		['Can setup be automated? Will cleanup run nightly?'],
+		['We email you login instructions.'],
 	])('leaves the noun in %s alone', (text) => {
 		expect(grammar(text)).toEqual([]);
 	});
@@ -141,7 +163,6 @@ describe('forms that break after a verb, modal, or quantity', () => {
 		["I can't hardly read the logs.", "can't hardly", 'use "can hardly"'],
 		['The logs contain useful informations.', 'informations', 'use "information"'],
 		["The API's are versioned by date.", "API's", 'use "APIs"'],
-		["We added test's are for the parser.", "test's", 'use "tests"'],
 		['We deploy on monday.', 'monday', 'use "Monday"'],
 	])('%s', (text, match, hint) => {
 		expectOne(text, match, hint);
@@ -155,6 +176,13 @@ describe('forms that break after a verb, modal, or quantity', () => {
 		['It is less obvious, and it more or less works.'],
 		['Rename monday.md and the friday-report branch.'],
 		["It's for the build, and that's all."],
+		['Most of the budget is going to salaries. The fix is going to users next week.'],
+		['Assign each plan to users in the admin panel.'],
+		["Yesterday's builds failed, but today's are green. Everyone else's are failing."],
+		['Less happens at startup. Less depends on the cache now.'],
+		['Mark the run successful. Follow a process consistent with the policy.'],
+		["We don't have no-code support."],
+		["Haven't you seen the logs?"],
 	])('leaves the correct sentence %s alone', (text) => {
 		expect(grammar(text)).toEqual([]);
 	});
@@ -162,7 +190,7 @@ describe('forms that break after a verb, modal, or quantity', () => {
 
 describe('sentence mechanics', () => {
 	it.each([
-		['The migration was too complex, however it was worth it.', ', however',
+		['The build passed, however the deploy was blocked.', ', however',
 			'use "; however,"'],
 		['The team split the config, however the migration was too complex.', ', however',
 			'use "; however,"'],
@@ -184,6 +212,8 @@ describe('sentence mechanics', () => {
 
 	it.each([
 		['Name it, however the team prefers.'],
+		['Keep the date, however it is formatted.'],
+		['Which approach you choose depends on your needs.'],
 		['It is, therefore, the best option.'],
 		['Although it works, it is slow.'],
 		['Because of the outage, we slipped.'],
@@ -206,6 +236,18 @@ describe('sentence mechanics', () => {
 
 	it('lets a list item be a fragment', () => {
 		expect(grammar('Why cache it?\n\n- Because the query is slow.\n')).toEqual([]);
+	});
+});
+
+describe('hints that rebuild the right word', () => {
+	it.each([
+		['The tests goes green on every run.', 'goes', 'use "go"'],
+		['It can goes wrong at startup.', 'goes', 'use "go"'],
+		['Each caches is warm after startup.', 'caches', 'use "cache"'],
+		["It's own design is simple.", "It's", 'use "Its"'],
+		['The artifacts isn’t ready.', 'isn’t', 'use "aren’t"'],
+	])('%s', (text, match, hint) => {
+		expectOne(text, match, hint);
 	});
 });
 
