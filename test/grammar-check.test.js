@@ -138,9 +138,9 @@ describe('Harper admission gate', () => {
 		expect(findings).toEqual(MODEL_PROSE_ERRORS);
 	});
 
-	it('flags no correct sentence of the clause suite', async () => {
-		const suite = JSON.parse(readFileSync(join(HERE, 'fixtures', 'grammar',
-			'clause-suite.json'), 'utf8'));
+	it.each(['clause-suite.json', 'clause-suite-2.json'])(
+		'flags no correct sentence of %s', async (name) => {
+		const suite = JSON.parse(readFileSync(join(HERE, 'fixtures', 'grammar', name), 'utf8'));
 		const correct = Object.values(suite).flatMap(({ errors, lookalikes }) =>
 			[...errors.map(([, corrected]) => corrected), ...lookalikes]);
 		const findings = [];

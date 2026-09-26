@@ -194,6 +194,8 @@ async function grammarReport(checker) {
 		devSuite: await scoreSuite(checker, fixture('grammar', 'dev-suite.json')),
 		heldoutSuite: await scoreSuite(checker, fixture('grammar', 'heldout-suite.json')),
 		clauseSuite: await scoreClauseSuite(checker, fixture('grammar', 'clause-suite.json')),
+		blindClauseSuite: await scoreClauseSuite(checker,
+			fixture('grammar', 'clause-suite-2.json')),
 		grammarRepairFindings: grammarOf((await checker.checkDocument(repair)).flags).length,
 		modelProseFindings: await cleanFindings(checker, fixture('model-prose')),
 		humanProseFindings: await cleanFindings(checker, fixture('human-prose')),
@@ -229,12 +231,14 @@ async function main() {
 function summarize(report) {
 	const { grammar: g } = report;
 	const suite = (s) => `${s.caught}/${s.pairs} (${s.recall}%), false alarms ${s.falseAlarms}`;
+	const clauses = (name, categories) => Object.entries(categories).map(([category, s]) =>
+		`${name} ${category}: ${s.caught} caught, ${s.correctedFlagged} corrected flagged, ` +
+		`${s.lookalikesFlagged} lookalikes flagged`);
 	const lines = [
 		`held-out suite: ${suite(g.heldoutSuite)}`,
 		`dev suite: ${suite(g.devSuite)}`,
-		...Object.entries(g.clauseSuite).map(([category, s]) => `clause suite ${category}: ` +
-			`${s.caught} caught, ${s.correctedFlagged} corrected flagged, ` +
-			`${s.lookalikesFlagged} lookalikes flagged`),
+		...clauses('clause suite', g.clauseSuite),
+		...clauses('blind clause suite', g.blindClauseSuite),
 		`grammar-repair fixture findings: ${g.grammarRepairFindings}`,
 		`grammar findings on clean prose, each a false alarm or a real error to review: ` +
 			`model ${g.modelProseFindings.length}, human ${g.humanProseFindings.length}`,

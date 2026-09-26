@@ -17,6 +17,14 @@ assistant and then edited by hand.
 - clause-suite.json: agreement across a phrase, comma splices, and run-ons,
   each with 25 [error, corrected] pairs and 25 correct lookalikes built to
   trip a naive checker. Written 2026-09-26 by a fresh Claude Sonnet session
-  with no access to Terse, and scored once before any tuning: 4, 9, and 0
-  of 25 caught, no lookalike flagged. The one false alarm on a corrected
-  sentence led to a precision fix in the AnA rule afterwards.
+  with no access to Terse, but its prompt gave example sentences drawn from
+  the patterns under test, so it is not an independent measure. Scored
+  before tuning at 4, 9, and 0 of 25 caught. The one false alarm on a
+  corrected sentence led to a precision fix in the AnA rule afterwards.
+- clause-suite-2.json: the same three categories, each with 30 pairs and 40
+  lookalikes. Written 2026-09-26 by a fresh Claude Opus session with no
+  access to Terse and no example sentences, then scored once: 2, 2, and 0
+  of 30 caught, with 2 of the 40 comma-splice lookalikes flagged. Precision
+  fixes made after that score, and checked against a corpus of third-party
+  Markdown, cleared both false alarms without changing the catches. Its
+  recall is the honest estimate for these categories.
