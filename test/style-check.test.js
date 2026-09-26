@@ -365,8 +365,9 @@ describe('checkText', () => {
 	});
 
 	// Placing each finding by rescanning its sentence took about 12 seconds
-	// here; one scan per pattern takes a fraction of one.
-	it('places many findings in one long sentence in linear time', () => {
+	// here; one scan per pattern takes a fraction of one. The bound catches
+	// that rescan coming back, not every kind of slowdown.
+	it('places 12,500 findings in one sentence without a rescan per finding', () => {
 		const text = `Our ${'the the '.repeat(12_500)}end.`;
 		const started = performance.now();
 		const flags = checkText(text).flags.filter((f) => f.category === 'grammar');
