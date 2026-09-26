@@ -23,10 +23,10 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - 23 more Harper rules, each kept to the context that proves its fix.
 - Frames for grammar across a phrase or a clause boundary. They catch
   agreement across an `of` phrase or a relative clause (`the list of
-  open issues are`) and a comma splice with no linking word. They also
-  catch a run-on whose second clause opens on a subject pronoun. On a
-  suite written without access to the checker, they catch 4, 9, and 0
-  of 25 and flag none of 75 correct lookalikes.
+  open issues are`) and a comma splice with no linking word. On a suite
+  written blind, they catch 2 of 30 of each and flag none of 210
+  correct sentences. Run-ons stay with the model: the frame tried for
+  them caught none of 30 and misfired on third-party docs.
 - Unedited model prose from Claude and GPT joins the precision gates.
 
 ### Changed
