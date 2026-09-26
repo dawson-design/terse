@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkText } from '../scripts/style-check.mjs';
+import { checkText, stripMarkdown } from '../scripts/style-check.mjs';
 
 const HERE = fileURLToPath(new URL('.', import.meta.url));
 
@@ -367,6 +367,12 @@ describe('checkText', () => {
 	// Placing each finding by rescanning its sentence took about 12 seconds
 	// here; one scan per pattern takes a fraction of one. The bound catches
 	// that rescan coming back, not every kind of slowdown.
+	it('strips a run of unclosed link brackets without rescanning it', () => {
+		const started = performance.now();
+		expect(stripMarkdown('['.repeat(100_000))).toHaveLength(100_000);
+		expect(performance.now() - started).toBeLessThan(1000);
+	});
+
 	it('places 12,500 findings in one sentence without a rescan per finding', () => {
 		const text = `Our ${'the the '.repeat(12_500)}end.`;
 		const started = performance.now();
