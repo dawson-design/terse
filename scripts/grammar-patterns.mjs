@@ -121,7 +121,7 @@ const NOT_SINGULAR_NOUN = alt(['people', 'children', 'men', 'women', 'police',
 	'wealthy', 'unemployed', 'homeless', 'sick', 'dead', 'living', 'injured',
 	'i', 'you', 'we', 'they', 'he', 'she', 'it', 'who', 'which', 'what', 'there', 'here',
 	'larvae', 'elytra', 'microglia', 'strata', 'genera', 'corpora', 'dice', 'lice', 'oxen',
-	'loci', 'foci', 'cacti', 'alumni', 'ocelli', 'bacilli', 'termini', 'syllabi', 'radii',
+	'loci', 'foci', 'cacti',
 	'club', 'garrison', 'army', 'navy', 'group', 'council', 'jury', 'squad', 'faculty',
 	'parliament', 'cabinet', 'management', 'department', 'union', 'firm',
 	// time words open an adverbial, not a subject ("each time, take a backup")
@@ -138,10 +138,10 @@ const NOT_SINGULAR_NOUN = alt(['people', 'children', 'men', 'women', 'police',
 	'whom', 'whose', 'taken', 'given', 'written', 'chosen', 'driven', 'broken', 'spoken',
 	'stolen', 'forgotten', 'hidden', 'known', 'shown', 'seen', 'done', 'gone', 'made',
 	'held', 'built', 'sent', 'found', 'left', 'kept', 'said', 'paid', 'set', 'put']);
-// -ae and -ii cover Latin plurals such as algae and radii; -men, -people, -children, and
-// -data cover compounds such as salesmen and metadata; -ed covers
-// participles ("the user approved are").
-const PLURAL_ENDING = '(?:s|ing|ly|ae|ata|ii|ed|men|people|children|data)';
+// -ae and -i cover plurals such as algae, ocelli, and emoji; -men, -people,
+// -children, and -data cover compounds such as salesmen and metadata; -ed
+// covers participles ("the user approved are").
+const PLURAL_ENDING = '(?:s|ing|ly|ae|ata|i|ed|men|people|children|data)';
 const SINGULAR_NOUN = `(?![a-z]*${PLURAL_ENDING}\\b)(?!(?:${NOT_SINGULAR_NOUN})\\b)` +
 	"[a-z]+\\b(?![-'’])";
 // After "these" or "those" an -ing word is a noun ("these setting is").

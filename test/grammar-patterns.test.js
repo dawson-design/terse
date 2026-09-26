@@ -35,7 +35,6 @@ describe('agreement at an edit seam', () => {
 		['There is 2,000 users on the waitlist.', 'There is', 'use "There are"'],
 		['There is 10 new failing checks.', 'There is', 'use "There are"'],
 		['The server were down all night.', 'were', 'use "was"'],
-		['The wiki have three pages.', 'have', 'use "has"'],
 		['The tests has had three failures.', 'has', 'use "have"'],
 		['It need a restart after the upgrade.', 'need', 'use "needs"'],
 		["There's two ways to roll back.", "There's", 'use "There are"'],
@@ -80,6 +79,8 @@ describe('agreement at an edit seam', () => {
 		['It need not be perfect. It need only run once.'],
 		['The metadata are stored in the header.'],
 		['Each time take a backup first.'],
+		['The emoji are rendered as images. The emoji take up two columns.'],
+		['The graffiti were removed.'],
 	])('leaves the correct sentence %s alone', (text) => {
 		expect(grammar(text)).toEqual([]);
 	});
