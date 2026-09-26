@@ -727,7 +727,7 @@ function assignSpans(text, flags, from, span) {
 		const n = seen.get(key) ?? 0;
 		seen.set(key, n + 1);
 		const re = flags[i]._re
-			? new RegExp(flags[i]._re.source, 'gi')
+			? new RegExp(flags[i]._re.source, flags[i]._re.flags.replace('g', '') + 'g')
 			: literalRegex(flags[i].match);
 		delete flags[i]._re;
 		flags[i].span = refineSpan(text, span, re, flags[i].match, n) ?? span;
@@ -819,7 +819,12 @@ function checkLexicon(sentence, flags, file, line, impersonal) {
 				hint: `use the verb: "${verb ?? NOMINAL_VERB[m[1].toLowerCase()]}"` });
 		}
 	}
-	for (const { re, hint } of GRAMMAR_PATTERNS) {
+}
+
+// A list item may be a fragment by design, so prose-only patterns skip it.
+function checkGrammar(sentence, flags, file, line, listItem) {
+	for (const { re, hint, prose } of GRAMMAR_PATTERNS) {
+		if (prose && listItem) continue;
 		for (const m of sentence.matchAll(re)) {
 			flags.push({ file, line, category: 'grammar', _re: re,
 				match: m[0].replace(/\s+/g, ' '), hint: hint(m) });
@@ -985,13 +990,14 @@ export function checkText(rawText,
 	const sentenceLengths = [];
 	for (const s of splitSentences(text)) {
 		const line = lineAt(s.offset + (s.text.length - s.text.trimStart().length));
-		const clean = s.text.replace(/\s+/g, ' ').trim()
-			.replace(/^(?:[-*+]|\d{1,2}[.)])\s+/, '');
+		const trimmed = s.text.replace(/\s+/g, ' ').trim();
+		const clean = trimmed.replace(/^(?:[-*+]|\d{1,2}[.)])\s+/, '');
 		const words = wordsOf(clean);
 		if (words.length === 0) continue; // horizontal rules, stray symbols
 		const before = flags.length;
 			checkSentence(clean, maxGrade, flags, file, line);
 			checkLexicon(clean, flags, file, line, impersonal);
+			checkGrammar(clean, flags, file, line, clean !== trimmed);
 			assignSpans(text, flags, before, [s.offset, s.offset + s.text.length]);
 			for (let i = before; i < flags.length; i++) {
 				if (!SENTENCE_LEVEL.has(flags[i].category)) flags[i].line = lineAt(flags[i].span[0]);
