@@ -346,6 +346,13 @@ describe('checkText', () => {
 		expect(text.slice(...tell.span)).toBe('Note that');
 	});
 
+	it('places the same match from two patterns in one sentence', () => {
+		const text = 'The config file contain the keys; it contain the secrets.';
+		const flags = checkText(text).flags.filter((f) => f.category === 'grammar');
+		expect(flags.map((f) => f.span[0])).toEqual([16, 37]);
+		expect(flags.map((f) => text.slice(...f.span))).toEqual(['contain', 'contain']);
+	});
+
 	it('gives each different match of one pattern its own span', () => {
 		const text = 'We weighed this approach against that tension.';
 		const tells = checkText(text).flags.filter((f) => f.category === 'ai-tell');
