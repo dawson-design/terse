@@ -75,7 +75,7 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - The repo's docs lose the dense sentences the new rule flags.
   Released changelog entries keep their wording under a `terse-ignore`
   comment for sentence difficulty.
-- `npm test` gives every test 30 seconds. Tests that start the CLI load
+- Every test gets 30 seconds. Tests that start the CLI load
   the grammar engine cold and ran past five seconds when every core was
   busy.
 - `NounVerbConfusion` now reports only `affect` in a noun slot, as in
