@@ -305,14 +305,65 @@ Proof so far: the skill file passes the checker and ships in the same
 cross-runtime package. The ablation runner's activation pattern names
 it. A live convergence run stays open.
 
+## Milestone 11: Checks built for LLM-assisted writing
+
+A model's draft is grammatical and dense. Its grammar faults come from
+the edits that follow. A subject changes and its verb stays behind, a
+noun swaps under its old article, or a compound noun lands in a verb
+slot. An agent then acts on every finding, so a false alarm damages
+correct text. The checker targets those faults and puts precision
+first. The model's own pass owns the rest.
+
+- [x] 2026-09-26: measure the checker against the incumbents. It found
+      6 of the 16 fixture errors. It found 37 of 180 errors in a suite
+      written without access to the checker. Its sentence rule flagged
+      only sentences of 25 or more words, so it missed every dense one.
+- [x] Gate every grammar rule on unedited model prose from Claude and
+      GPT. The gate also covers edited human prose, the corrected
+      suite sentences, and 7,453 CEFR-SP Wikipedia sentences.
+- [x] Fix false positives in four admitted Harper rules. Report each
+      Harper insertion as a full replacement.
+- [x] Admit 23 more Harper rules, each kept to the context that proves
+      its fix.
+- [x] Add native patterns for agreement at an edit seam, homophones in
+      their one correct frame, and compound nouns in a verb slot. They
+      also catch comma splices before "however" and clauses with no
+      main clause.
+- [x] Lead sentence difficulty with grade, calibrated on CEFR-SP
+      ratings. Rewrite the repo's own dense sentences to match.
+- [x] `npm run benchmark:accuracy` reproduces every number below.
+- [ ] Agreement across a phrase, comma splices with no linking word,
+      and run-ons need a parser. The model's pass owns them.
+- [ ] Run Terse head to head against Grammarly. No public API has
+      returned single errors since its Text Editor SDK closed on
+      2024-01-10.
+
+Proof, recorded 2026-09-26 with `npm run benchmark:accuracy`:
+
+| Measure | Before | After |
+|---|---|---|
+| Held-out suite errors caught | 37/180 (20.6%) | 87/180 (48.3%) |
+| Held-out corrected sentences flagged | 2 | 0 |
+| Grammar-repair fixture errors caught | 6/16 | 12/16, plus the comma splice |
+| False alarms on unedited model prose | 1 | 0, and one real error caught |
+| CoNLL-2014 errors found (annotator 0) | 0.6% at 46% precision | 1.4% at 71% precision |
+| CEFR-SP F0.5, mean rating C1 or harder | 32.2 | 43.2 |
+| CEFR-SP F0.5, mean rating 4.5 or harder | 34.5 | 52.3 |
+
+Hemingway App's default rule scores 28.2 and 49.1 on the same CEFR-SP
+sentences. Grammarly's research model corrects 40.1% of CoNLL-2014
+errors at 77.5% precision (Omelianchuk et al., 2020). On learner
+English the checker alone is no match for a grammar assistant. Its
+target is the narrower set of faults an edit leaves in a model's draft.
+
 ## Parity scorecard
 
 | Capability | Readability editors | Grammar assistants | Terse today |
 |---|---|---|---|
-| Readability grading | yes | partial | yes |
+| Readability grading | yes | partial | yes, ahead of Hemingway on CEFR-SP (M11) |
 | Passive, adverbs, wordiness | yes | yes | yes |
 | AI-tell detection | no | tagging only | yes, with removal |
-| Grammar repair | paid tier | yes | yes, parity eval (M1) |
+| Grammar repair | paid tier | yes | model: parity eval (M1); checker: 48% (M11) |
 | Tone presets | paid tier | yes | yes, eval pending (M6) |
 | Voice capture with sign-off | no | partial | yes |
 | Colored highlight view | yes | yes | yes (M3) |

@@ -11,9 +11,10 @@ Terse has two layers:
 
 - **Mechanical checks** run offline in `scripts/style-check.mjs`. They cover
   readability, passive voice, adverbs, and qualifiers. They also find wordy
-  phrases, grammar faults, long asides, and common model-writing patterns.
-  The checker reports a file,
-  line, category, matched text, and suggested fix for each finding.
+  phrases, long asides, and common model-writing patterns. Their grammar
+  checks target the faults that edits leave in a model's draft. The checker
+  reports a file, line, category, matched text, and suggested fix for each
+  finding.
 - **Writing skills** apply judgment. They preserve a useful passive, keep a
   meaningful hedge, and follow an approved voice template. They also check
   structure, evidence, flow, and the reader's needs.
@@ -150,7 +151,14 @@ fragment. Offline mode makes no network request.
 npm ci
 npm test
 npm run benchmark:grammar
+npm run benchmark:accuracy
 ```
+
+The accuracy benchmark scores grammar recall on an error suite written
+without access to the checker. It also counts false alarms on clean human
+and model prose. With the public CoNLL-2014 and CEFR-SP data, it scores
+grammar detection and sentence difficulty too. It prints how to fetch that
+data.
 
 The committed Codex marketplace points to this GitHub repository. Start a new
 Codex task after reinstalling so the host loads the current skills and hook.

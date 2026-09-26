@@ -6,6 +6,49 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- `npm run benchmark:accuracy` scores the deterministic checks. It
+  measures grammar recall on an error suite written without access to
+  the checker, and false alarms on clean human and model prose. With the
+  public CoNLL-2014 and CEFR-SP data in `.bench-data/`, it also scores
+  grammar detection and sentence difficulty.
+- Native grammar patterns for the faults an edit leaves in a model's
+  draft. They catch agreement at an edit seam (`the artifacts is`,
+  `each request take`, `there is three`). They catch homophones in their
+  one correct frame (`it's own`, `your going to`, `to complex to`) and
+  compound nouns in a verb slot (`setup the server`). They also catch
+  comma splices before `however`, questions closed with a period, and
+  clauses with no main clause.
+- 23 more Harper rules, each kept to the context that proves its fix.
+- Unedited model prose from Claude and GPT joins the precision gates.
+
+### Changed
+
+- Sentence difficulty leads with grade. A sentence of 14 or more words
+  is a `hard-sentence` four grades above the target and a
+  `very-hard-sentence` eight above. On
+  CEFR-SP sentences that teachers rated C1 or harder, F0.5 rises from
+  32.2 to 43.2, where Hemingway App's default rule scores 28.2. The
+  hint names the fix: split a long sentence, or use plainer words in a
+  dense one.
+- The repo's docs lose the dense sentences the new rule flags.
+
+### Fixed
+
+- Four admitted Harper rules misread correct text. `ItsPossessive`
+  flagged `It's been broken`, and `NounVerbConfusion` flagged `did not
+  affect paying customers`. `PronounVerbAgreement` flagged `We engineers
+  need`, and `AnA` flagged the grade in `A- and U23 games`.
+- A comma lint that inserts a space reports the full fix (`use ", "`).
+  It used to say `use " "`, which told the fixer to delete the comma.
+- A second, different match of one pattern in a sentence gets its own
+  span.
+- Inline code that wraps onto the next line stays code.
+- The 0.13.0 notes said the checker catches what a grammar assistant's
+  free tier catches. It found 20.6% of the held-out suite's errors
+  then, and it finds 48.3% now.
+
 ## [0.13.1] (2026-09-04)
 
 ### Fixed
