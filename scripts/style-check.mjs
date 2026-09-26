@@ -517,11 +517,14 @@ const INLINE_CODE = new RegExp(`\`(?:[^\`\\n]|${CODE_LINE_BREAK})+\``, 'g');
 
 // Exported for the conservation property tests. Inline code may wrap onto
 // the next line of its paragraph, as CommonMark allows.
-export function stripMarkdown(text) {
+// `codeMark` fills inline code: the default blank for prose checks, or a
+// capital letter for grammar, so the words on either side of a code span
+// never read as neighbors ("the optional `getOptions` are").
+export function stripMarkdown(text, codeMark = ' ') {
 	return text
 		.replace(/^---\n[\s\S]*?\n---(?=\n|$)/, (m) => m.replace(/[^\n]/g, ' '))
 		.replace(/```[\s\S]*?```/g, (m) => m.replace(/[^\n]/g, ' '))
-		.replace(INLINE_CODE, (m) => m.replace(/[^\n]/g, ' '))
+		.replace(INLINE_CODE, (m) => m.replace(/[^\n]/g, codeMark))
 		.replace(/<!--[\s\S]*?-->/g, (m) => m.replace(/[^\n]/g, ' '))
 		.replace(/\[([^\]]*)\]\((?:[^()\n]|\([^()\n]*\))*\)/g, (m, label) =>
 			label.padEnd(m.length, ' '))
@@ -732,9 +735,10 @@ function pushMatchesWithLine(text, re, lineAt, flags, flag) {
 // sentence-level categories keep the whole sentence.
 const SENTENCE_LEVEL = new Set(['hard-sentence', 'very-hard-sentence']);
 
-// Each pattern runs once per sentence and its hits are grouped by text, so
-// many findings from one pattern cost one scan.
-function assignSpans(text, flags, from, span) {
+// Grammar findings refine against `grammarText`, which masks inline code the
+// way checkGrammar saw it. Each pattern runs once per sentence and its hits
+// are grouped by text, so many findings from one pattern cost one scan.
+function assignSpans({ rawText, text, grammarText }, flags, from, span) {
 	const seen = new Map(); // repeated matches refine to their own occurrence
 	const hits = new Map();
 	for (let i = from; i < flags.length; i++) {
@@ -756,12 +760,24 @@ function assignSpans(text, flags, from, span) {
 		// hint replaces the matched text, and a sentence-wide span would
 		// replace the whole sentence.
 		const grammar = flags[i].category === 'grammar';
-		const hitKey = `${re.source}:${re.flags}`;
-		if (!hits.has(hitKey)) hits.set(hitKey, hitsByText(text.slice(span[0], span[1]), re));
+		const source = grammar ? grammarText : text;
+		const hitKey = `${grammar}:${re.source}:${re.flags}`;
+		if (!hits.has(hitKey)) hits.set(hitKey, hitsByText(source.slice(span[0], span[1]), re));
 		const m = hits.get(hitKey).get(normalized(flags[i].match))?.[n];
 		flags[i].span = m ? [span[0] + m.index, span[0] + m.index + m[0].length]
 			: (grammar ? null : span);
+		if (grammar && flags[i].span) unmaskCode(rawText, text, grammarText, flags[i]);
 	}
+}
+
+// A grammar match that covers inline code saw only its mask. The match
+// shows the source instead, and a replacement hint loses its span: it was
+// written from the mask ("use "XXXXXs""), and applying it would delete code.
+function unmaskCode(rawText, text, grammarText, flag) {
+	const [start, end] = flag.span;
+	if (grammarText.slice(start, end) === text.slice(start, end)) return;
+	if (flag.hint.startsWith('use "')) flag.span = null;
+	else flag.match = rawText.slice(start, end).replace(/\s+/g, ' ');
 }
 
 function literalRegex(match) {
@@ -973,6 +989,7 @@ export function checkText(rawText,
 	ignore = Array.isArray(ignore) ? ignore : [];
 	targets = targets && typeof targets === 'object' ? targets : {};
 	const text = stripMarkdown(rawText);
+	const grammarText = stripMarkdown(rawText, 'X');
 	const lineAt = makeLineIndex(text);
 	const flags = [];
 	for (const m of text.matchAll(/—/g)) {
@@ -1021,13 +1038,16 @@ export function checkText(rawText,
 		const line = lineAt(s.offset + (s.text.length - s.text.trimStart().length));
 		const trimmed = s.text.replace(/\s+/g, ' ').trim();
 		const clean = trimmed.replace(/^(?:[-*+]|\d{1,2}[.)])\s+/, '');
+		const grammarClean = grammarText.slice(s.offset, s.offset + s.text.length)
+			.replace(/\s+/g, ' ').trim().replace(/^(?:[-*+]|\d{1,2}[.)])\s+/, '');
 		const words = wordsOf(clean);
 		if (words.length === 0) continue; // horizontal rules, stray symbols
 		const before = flags.length;
 			checkSentence(clean, maxGrade, flags, file, line);
 			checkLexicon(clean, flags, file, line, impersonal);
-			checkGrammar(clean, flags, file, line, clean !== trimmed);
-			assignSpans(text, flags, before, [s.offset, s.offset + s.text.length]);
+			checkGrammar(grammarClean, flags, file, line, clean !== trimmed);
+			assignSpans({ rawText, text, grammarText }, flags, before,
+				[s.offset, s.offset + s.text.length]);
 			for (let i = flags.length - 1; i >= before; i--) if (!flags[i].span) flags.splice(i, 1);
 			for (let i = before; i < flags.length; i++) {
 				if (!SENTENCE_LEVEL.has(flags[i].category)) flags[i].line = lineAt(flags[i].span[0]);

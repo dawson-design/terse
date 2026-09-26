@@ -120,6 +120,10 @@ describe('homophones and confusables in their only grammatical frame', () => {
 		['There is 2 TB left. There is 24/7 support.'],
 		['There is 10 kB free. There is 5 min left. There is 50 cents due.'],
 		['There is 20 ms of latency. There is 30 mins left.'],
+		['The optional `getOptions` are applied to the result.'],
+		['The app `arguments` are app dependent.'],
+		['The more schemas `stringify` has to try, the slower it gets.'],
+		["The `API`'s are versioned by date."],
 		['The agent checked weather this morning.'],
 		['We built it for everyday and professional use.'],
 	])('leaves the correct sentence %s alone', (text) => {
@@ -229,6 +233,11 @@ describe('sentence mechanics', () => {
 		['We shipped it!!', '!!', 'use "!"'],
 	])('%s', (text, match, hint) => {
 		expectOne(text, match, hint);
+	});
+
+	it('shows inline code in the match, not the mask the patterns saw', () => {
+		const text = 'Because `levelup` would overwrite the options.';
+		expectOne(text, text, expect.stringMatching(/^a subordinate clause needs a main clause/));
 	});
 
 	it('flags a subordinate clause with no main clause, or no comma before one', () => {
