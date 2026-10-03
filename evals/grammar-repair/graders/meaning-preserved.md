@@ -1,6 +1,6 @@
 ---
 type: llm
-target: { source: file, path: notes.md }
+focus: { source: file, path: notes.md }
 criteria: All corrections are grammatical fixes; no facts changed, added, or dropped.
 ---
 Compare against the intent of the original: three pipeline stages, per-stage

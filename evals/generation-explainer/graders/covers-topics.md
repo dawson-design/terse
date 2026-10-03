@@ -1,6 +1,6 @@
 ---
 type: llm
-target: { source: file, path: explainer.md }
+focus: { source: file, path: explainer.md }
 criteria: Technically correct, covers all four required topics, right audience level.
 ---
 Score 1 only if the explainer correctly covers: what an index is, B-tree

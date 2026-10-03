@@ -1,6 +1,6 @@
 ---
 type: llm
-target: { source: file, path: draft.md }
+focus: { source: file, path: draft.md }
 criteria: Every listed fact survives the edit with its meaning intact.
 ---
 Check the edited document still states all of these facts, in any wording:

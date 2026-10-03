@@ -1,6 +1,6 @@
 ---
 type: llm
-target: { source: file, path: launch.md }
+focus: { source: file, path: launch.md }
 criteria: Covers every supplied product fact without inventing features.
 ---
 Score 1 only if the post accurately covers QueueLens 1.0, RabbitMQ dead-letter

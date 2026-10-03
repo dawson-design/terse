@@ -1,6 +1,6 @@
 ---
 type: llm
-target: { source: file, path: article.md }
+focus: { source: file, path: article.md }
 criteria: Every remaining quotation appears verbatim in source.md.
 ---
 Compare every quotation left in article.md against source.md. Score 1 only

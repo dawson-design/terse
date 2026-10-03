@@ -1,6 +1,6 @@
 ---
 type: llm
-target: { source: file, path: README.md }
+focus: { source: file, path: README.md }
 criteria: Complete, accurate, and free of invented features.
 ---
 Score 1 only if the README documents all given facts (stdin and file input,
