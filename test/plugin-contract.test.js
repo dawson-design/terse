@@ -9,9 +9,8 @@ const readRegexGrader = (path) => {
 	const source = readFileSync(join(ROOT, path), 'utf8');
 	const pattern = source.match(/^pattern: (.+)$/m)?.[1];
 	if (!pattern) throw new Error(`Missing regex pattern in ${path}`);
-	const decoded = JSON.parse(pattern);
-	const inlineFlags = decoded.match(/^\(\?([a-z]+)\)/)?.[1] ?? '';
-	return new RegExp(decoded.replace(/^\(\?[a-z]+\)/, ''), inlineFlags);
+	const flags = source.match(/^flags: (\w+)$/m)?.[1] ?? '';
+	return new RegExp(JSON.parse(pattern), flags);
 };
 
 describe('Codex plugin contract', () => {

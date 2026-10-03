@@ -22,14 +22,10 @@ export function loadGraders(dir) {
 	});
 }
 
-function toRegex(pattern) {
-	let source = pattern.replace(/^"|"$/g, '').replace(/\\\\/g, '\\');
-	let flags = '';
-	const inlineFlags = source.match(/^\(\?([is]+)\)/);
-	if (inlineFlags) {
-		source = source.slice(inlineFlags[0].length);
-		flags = [...new Set(inlineFlags[1])].join('');
-	}
+// Flags come from the grader's `flags` field, as in `claude plugin eval`:
+// JavaScript has no inline `(?i)` syntax, so a pattern never carries them.
+function toRegex(pattern, flags = '') {
+	const source = pattern.replace(/^"|"$/g, '').replace(/\\\\/g, '\\');
 	return new RegExp(source, flags);
 }
 
@@ -42,7 +38,7 @@ export function gradeRegexGraders(graders, files) {
 			return { name: grader.name, type: grader.type, scored: true, pass: false,
 				note: `missing file ${path}` };
 		}
-		const hit = toRegex(grader.pattern).test(content);
+		const hit = toRegex(grader.pattern, grader.flags).test(content);
 		const pass = (grader.match ?? 'contains').trim() === 'not_contains' ? !hit : hit;
 		return { name: grader.name, type: grader.type, scored: true, pass };
 	});

@@ -1,7 +1,8 @@
 ---
 type: regex
 target: { source: file, path: notes.md }
-pattern: "(?i)decided to separate the config from the code|previous release|error rate"
+pattern: "decided to separate the config from the code|previous release|error rate"
+flags: i
 match: contains
 ---
 The fix stays inside grammar scope: these grammatical phrasings from the
