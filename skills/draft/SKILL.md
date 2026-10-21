@@ -77,9 +77,10 @@ a bare one means naming a missing fact, which you can check.
    standing as subject or object takes a gerund or a full clause:
    `renaming`, never `a rename`, unless the noun is the domain's own
    term (`a commit`). Make the actor the subject and the action the
-   verb: `the service validates the schema`, not `validation of the
-   schema happens`. Replace a dash with a period, colon, or comma, and
-   keep `because`, `so`, and `but` where they join two clauses.
+   verb: `the service validates the schema`, not
+   `validation of the schema happens`. Replace a dash with a period,
+   colon, or comma, and keep `because`, `so`, and `but` where they
+   join two clauses.
    State a claim once and move on, and list three things when there
    are three. Keep an aside under six words or promote it to its own
    sentence. Put a source inline, as a link on the words it

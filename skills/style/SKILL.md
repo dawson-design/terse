@@ -76,9 +76,10 @@ shares.
    becomes a `-tion` or `-ment` noun, and the actor disappears.
    `The validation of the schema happens at startup` becomes
    `the service validates the schema at startup`. An empty verb on a
-   thing as subject hides the action the same way: `the hook ensures
-   consistency` says less than `the hook rejects a config with no
-   owner`. Make the actor the subject and the action the verb.
+   thing as subject hides the action the same way:
+   `the hook ensures consistency` says less than
+   `the hook rejects a config with no owner`. Make the actor the
+   subject and the action the verb.
 7. **Say what is, not what isn't.** State what is true and what to
    do, rather than what is false and what to avoid. "The cache holds
    entries for an hour" beats "the cache does not keep entries
