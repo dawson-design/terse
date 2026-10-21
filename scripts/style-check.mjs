@@ -462,6 +462,44 @@ const WEAK_VERB_REGEXES = [
 	{ re: new RegExp(`\\b${LIGHT('provide|provides|provided|providing')}\\s+the\\s+(?:capability|ability)\\s+to\\b`, 'gi'), verb: 'can' },
 ];
 
+// An action turned into a noun with its actor dropped: "the validation of
+// the schema", "deletion happens nightly". Only nouns whose verb is the plain
+// way to say it are listed, so "the department of" and "the station of" stay.
+const NOMINALIZED = {
+	implementation: 'implement', utilization: 'use', validation: 'validate',
+	verification: 'verify', creation: 'create', deletion: 'delete',
+	addition: 'add', introduction: 'introduce', installation: 'install', execution: 'run', generation: 'generate',
+	migration: 'migrate', transformation: 'transform', integration: 'integrate',
+	enablement: 'enable', establishment: 'establish', improvement: 'improve',
+	enhancement: 'improve', deployment: 'deploy', adoption: 'adopt',
+	completion: 'complete', resolution: 'resolve', evaluation: 'evaluate',
+	investigation: 'investigate', modification: 'change', optimization: 'optimize',
+	consolidation: 'combine', standardization: 'standardize', automation: 'automate',
+	assessment: 'assess', examination: 'examine', determination: 'determine',
+	identification: 'identify', reduction: 'reduce', elimination: 'remove',
+	prevention: 'prevent', separation: 'separate', allocation: 'allocate',
+	coordination: 'coordinate', extraction: 'extract', conversion: 'convert',
+	ingestion: 'ingest', retrieval: 'retrieve', maintenance: 'maintain',
+	processing: 'process', handling: 'handle', tracking: 'track',
+	provisioning: 'provision',
+};
+const NOMINALIZED_NOUNS = Object.keys(NOMINALIZED).join('|');
+const NOMINALIZATION_REGEXES = [
+	// "a resolution of 1080p" is a measurement, not an action
+	new RegExp(`\\b(?:the|a|an)\\s+(${NOMINALIZED_NOUNS})\\s+of\\b(?!\\s+\\d)`, 'gi'),
+	new RegExp(`\\b(${NOMINALIZED_NOUNS})\\s+(?:of\\s+[\\w'’\\s-]{1,40}?\\s+)?(?:happens|happened|occurs|occurred|takes\\s+place|took\\s+place|is\\s+(?:\\w+\\s+)?manual)\\b`, 'gi'),
+];
+// A light verb before the noun is already a weak-verb finding.
+const AFTER_LIGHT_VERB = /\b(?:conduct(?:s|ed|ing)?|perform(?:s|ed|ing)?|carr(?:y|ies|ied|ying)\s+out|provid(?:e|es|ed|ing)|give|gives|gave|giving|make|makes|made|making|reach(?:es|ed|ing)?|come|comes|came|coming)\s+(?:to\s+)?$/i;
+
+// An empty verb whose object is an abstract quality: "ensures consistency",
+// "improves reliability". The sentence names no action a reader can check.
+// The qualities are listed, because a suffix also matches "the business" and
+// "the city". A number after it ("improves throughput by 40%") makes the
+// claim checkable, and a noun after it ("availability zones") makes it a thing.
+const ABSTRACT_QUALITIES = 'consistency|reliability|scalability|availability|maintainability|flexibility|visibility|observability|usability|stability|performance|efficiency|resilience|quality|compliance|accountability|transparency|robustness|simplicity|clarity|productivity|interoperability|traceability|readability|durability|accessibility|integrity|security|safety|correctness';
+const ABSTRACT_VERB_RE = new RegExp(`\\b(ensur(?:e|es|ed|ing)|enabl(?:e|es|ed|ing)|provid(?:e|es|ed|ing)|improv(?:e|es|ed|ing)|support(?:s|ed|ing)?|address(?:es|ed|ing)?|increas(?:e|es|ed|ing)|reduc(?:e|es|ed|ing))\\s+(?:(?:the|a|an|better|greater|more|its|their)\\s+)?(${ABSTRACT_QUALITIES})\\b(?!\\s+(?:by|to|from|under|below)\\s+(?:about\\s+|roughly\\s+|around\\s+|nearly\\s+|over\\s+|~)?\\d)(?!\\s+(?:zones?|groups?|windows?|checks?|tests?|metrics?|sets?|levels?|requirements?|issues?|tiers?|teams?|reports?|budgets?|patches|patch|reviews?|scans?)\\b)`, 'gi');
+
 // Mechanics a pattern can prove: doubled function words, "could of",
 // "its" before a word only "it's" precedes, "their" before a be-verb, and a
 // short list of misspellings with one correct form. Everything else in the
@@ -709,7 +747,7 @@ function checkSentence(sentence, maxGrade, flags, file, line) {
 		flags.push({ file, line,
 			category: veryHard ? 'very-hard-sentence' : 'hard-sentence',
 			match: `${words.length} words, grade ${grade}`,
-			hint: 'split the sentence or convert an in-sentence list to bullets' });
+			hint: 'split where the second half can name its link to the first, cut words, or convert an in-sentence list to bullets' });
 	}
 	const passiveRe = /\b(am|is|are|was|were|be|been|being|get|gets|got)(?:n['’]t)?\s+(?:\w+ly\s+)*(?:being\s+)?(?:\w+ly\s+)*(\w+)\b/gi;
 	for (const m of sentence.matchAll(passiveRe)) {
@@ -778,12 +816,13 @@ function assignSpans(text, flags, from, span) {
 			continue;
 		}
 		const key = `${flags[i].category}:${flags[i].match}`;
-		const n = seen.get(key) ?? 0;
+		const n = flags[i]._nth ?? seen.get(key) ?? 0;
 		seen.set(key, n + 1);
 		const re = flags[i]._re
 			? new RegExp(flags[i]._re.source, 'gi')
 			: literalRegex(flags[i].match);
 		delete flags[i]._re;
+		delete flags[i]._nth;
 		flags[i].span = refineSpan(text, span, re, n) ?? span;
 	}
 }
@@ -868,6 +907,29 @@ function checkLexicon(sentence, flags, file, line, impersonal) {
 				hint: `use the verb: "${verb ?? NOMINAL_VERB[m[1].toLowerCase()]}"` });
 		}
 	}
+	// _nth is the match's place among all matches of its regex, so the span
+	// lands on this occurrence even when other matches of the regex differ.
+	const nouns = new Set(); // one finding per noun when both patterns match
+	for (const re of NOMINALIZATION_REGEXES) {
+		let nth = -1;
+		for (const m of sentence.matchAll(re)) {
+			nth++;
+			const noun = m.index + m[0].toLowerCase().indexOf(m[1].toLowerCase());
+			if (nouns.has(noun)) continue;
+			nouns.add(noun);
+			if (AFTER_LIGHT_VERB.test(sentence.slice(0, m.index))) continue;
+			flags.push({ file, line, category: 'nominalization', _re: re, _nth: nth,
+				match: m[0].toLowerCase().replace(/\s+/g, ' '),
+				hint: `make the action the verb ("${NOMINALIZED[m[1].toLowerCase()]}") and name who does it` });
+		}
+	}
+	let nth = -1;
+	for (const m of sentence.matchAll(ABSTRACT_VERB_RE)) {
+		nth++;
+		flags.push({ file, line, category: 'abstract-verb', _re: ABSTRACT_VERB_RE, _nth: nth,
+			match: m[0].toLowerCase().replace(/\s+/g, ' '),
+			hint: 'name the concrete action and what it acts on' });
+	}
 	for (const { re, hint } of GRAMMAR_PATTERNS) {
 		for (const m of sentence.matchAll(re)) {
 			flags.push({ file, line, category: 'grammar', _re: re,
@@ -910,7 +972,16 @@ export function isSuppressed(map, flag) {
 // Structure and readability stay flagged: a hard sentence is hard to read
 // whoever wrote it.
 const QUOTED_EXEMPT = new Set(['ai-tell', 'simpler-alternative', 'weak-verb',
+	'nominalization', 'abstract-verb',
 	'qualifier', 'preference', 'personal-pronoun', 'em-dash', 'grammar']);
+
+// A quote after "not" or "instead of" is a counter-example the author wrote
+// badly on purpose ("use X, not "Y""), so every word-level finding in it goes.
+const COUNTER_EXAMPLE_LEAD = /\b(?:not|instead\s+of|rather\s+than|never)[ \t]*$/i;
+
+function counterExampleRanges(text, quoted) {
+	return quoted.filter(([start]) => COUNTER_EXAMPLE_LEAD.test(text.slice(Math.max(0, start - 20), start)));
+}
 
 /** Return raw `[start, end]` ranges for quotations in stripped Markdown. */
 export function quotedRanges(text) {
@@ -1031,10 +1102,12 @@ function filterFindings(rawText, text, flags, ignore) {
 	const quoted = quotedRanges(text);
 	const lines = text.split('\n');
 	const inBlockquote = (line) => /^[ \t]*>/.test(lines[line - 1] ?? '');
+	const counterExamples = counterExampleRanges(text, quoted);
 	return flags.filter((f) =>
 		!isSuppressed(suppressions, f) && !isIgnored(ignore, f) &&
 		!(QUOTED_EXEMPT.has(f.category) && f.span &&
-			(inQuotedRange(quoted, f.span) || inBlockquote(f.line))));
+			(inQuotedRange(quoted, f.span) || inBlockquote(f.line))) &&
+		!(!SENTENCE_LEVEL.has(f.category) && f.span && inQuotedRange(counterExamples, f.span)));
 }
 
 export function checkText(rawText,

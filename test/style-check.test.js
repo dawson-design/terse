@@ -291,6 +291,23 @@ describe('checkText', () => {
 		expect(block.flags.filter((f) => f.category === 'simpler-alternative')).toEqual([]);
 	});
 
+	it('exempts every word-level finding in a quoted counter-example', () => {
+		for (const text of [
+			'Write "the installer adds the rule", not "rule addition is handled by the installer".',
+			'Write "the job deletes rows", instead of "deletion happens nightly".',
+			'Name the action, rather than "it sadly ensures consistency".',
+			'Say "the hook rejects it", never "validation is handled quietly".',
+		]) {
+			expect(checkText(text).flags).toEqual([]);
+		}
+	});
+
+	it('keeps a finding outside a counter-example quote', () => {
+		const text = 'Write "X", not "this ensures consistency", because the hook improves reliability.';
+		const flags = checkText(text).flags.filter((f) => f.category === 'abstract-verb');
+		expect(flags.map((f) => text.slice(...f.span))).toEqual(['improves reliability']);
+	});
+
 	it('still flags readability categories inside quoted material', () => {
 		const { flags } = checkText('"Sadly, the server died."');
 		expect(flags.filter((f) => f.category === 'adverb').map((f) => f.match))

@@ -25,6 +25,7 @@ every category.
 | preference | checker | wording |
 | personal-pronoun | checker, under `--impersonal` | wording |
 | simpler-alternative, weak-verb, ai-tell | checker | wording |
+| nominalization, abstract-verb | checker | wording |
 | em-dash | checker | wording |
 | grammar | native checker, admitted Harper rules, and model, `references/grammar-scope.md` | mechanics |
 | quote-unsourced, quote-unverified, quote-link-plain | quote checker (`scripts/quote-check.mjs`) | mechanics |
@@ -90,8 +91,9 @@ Four layers mark keeps before a finding reaches the report or the loop:
 Order matters: a rewrite makes earlier grammar findings stale. Visit
 each sentence once, applying its findings in stage order:
 
-1. **structural**: split the sentence, convert the in-sentence list to
-   bullets, cut or promote the aside
+1. **structural**: split the sentence at a link the second half can
+   name, or else cut words. Convert the in-sentence list to bullets,
+   and cut or promote the aside
 2. **wording**: name the actor (capability statements keep their
    passive), swap the flagged word or phrase, delete or evidence the
    qualifier, replace the em dash

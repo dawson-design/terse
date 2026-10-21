@@ -19,11 +19,15 @@ shares.
 
 ## Core Ideas
 
-1. **Plain, direct, concrete language.** Keep sentences short, but vary
-   their length so the text has a natural cadence rather than blunt,
-   isolated statements. A sentence joined by `, so` or `because` stays
-   whole when it is readable on one pass. When it must split, the second
-   sentence opens on the shared term rather than a bare `So`.
+1. **Plain, direct, concrete language.** Connect each sentence to the
+   last, and let length follow the content: short is the default, not
+   the goal. Vary the length so the text has a natural cadence rather
+   than blunt, isolated statements. A sentence joined by `, so` or
+   `because` stays whole when it is readable on one pass. Split a long
+   sentence only where the second half can name its link to the first.
+   The second sentence then opens on the shared term or the relation
+   word, not a bare `So`. When no split keeps the link, cut words
+   instead.
 2. **Prefer the word the reader already has.** Use a technical term
    only when it is more precise than the plain description and the
    audience owns it. Write the plain version first; keep the term of art
@@ -68,6 +72,14 @@ shares.
    clause: `renaming is impossible`, or `you cannot rename a topic`.
    The bare noun saves three letters and costs the reader a parse.
    A noun the domain owns stays: `a commit`, `a build`, `a release`.
+   The nominalization is the longer form of the same fault. The action
+   becomes a `-tion` or `-ment` noun, and the actor disappears.
+   `The validation of the schema happens at startup` becomes
+   `the service validates the schema at startup`. An empty verb on a
+   thing as subject hides the action the same way:
+   `the hook ensures consistency` says less than
+   `the hook rejects a config with no owner`. Make the actor the
+   subject and the action the verb.
 7. **Say what is, not what isn't.** State what is true and what to
    do, rather than what is false and what to avoid. "The cache holds
    entries for an hour" beats "the cache does not keep entries
@@ -143,7 +155,8 @@ three groups:
 | Trigger | Do this instead | False alarm |
 |---|---|---|
 | "Passive voice reads as more formal" | Name the actor and use active voice. | The actor is irrelevant or unknown, or the sentence states a thing's capability or limit (`topics cannot be renamed`). |
-| "The sentence is long, but it all belongs together" | Split it, or turn an in-sentence list into a bulleted list. | The items are few and parallel, and the sentence stays readable on one pass. |
+| "The sentence is long, but it all belongs together" | Split only where the second sentence can name its link to the first (the shared term, or `because`, `so`, `but`). Otherwise cut words, or turn an in-sentence list into a bulleted list. | The items are few and parallel, and the sentence stays readable on one pass, or an approved voice template measures sentences this long. |
+| "The noun form sounds more precise" (`the implementation of`, `X ensures Y`) | Make the actor the subject and the action the verb. | The noun is the domain's own term, or the actor is unknown and the sentence states a result. |
 | "A qualifier softens the claim politely" | Delete the qualifier or state the evidence. | The hedge is the claim: the sentence exists to mark the uncertainty. |
 | "An adverb strengthens the verb" | Pick a stronger verb or give the number. | The adverb changes meaning, not intensity ("only", "never", "no longer"). |
 | "The five-dollar word is more precise" | Write the plain version first; keep the term only if the plain version is longer, vaguer, or wrong for this audience. | The readers are specialists and the term is their working vocabulary. |

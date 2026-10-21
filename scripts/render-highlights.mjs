@@ -20,6 +20,8 @@ const CATEGORIES = {
 	qualifier: 'Qualifier',
 	'simpler-alternative': 'Wordy',
 	'weak-verb': 'Weak verb',
+	nominalization: 'Action as a noun',
+	'abstract-verb': 'Abstract verb',
 	preference: 'Wish, not requirement',
 	'personal-pronoun': 'Personal pronoun',
 	'em-dash': 'Em dash',

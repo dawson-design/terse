@@ -6,6 +6,27 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- A `nominalization` finding catches an action turned into a noun with its
+  actor dropped, as in "the validation of the schema" or "deletion happens
+  nightly". Its hint gives the verb to use.
+- An `abstract-verb` finding catches an empty verb on a listed abstract
+  quality, as in "ensures consistency" or "improves reliability". A number
+  after the quality, as in "improves performance by 40%", or a noun after it,
+  as in "availability zones", keeps the sentence clean.
+
+### Changed
+
+- A hard sentence's hint now says to split only where the second half can
+  name its link to the first, or else to cut words. The style, draft, and edit
+  skills say the same, so a split keeps its `because`, `so`, or `but`.
+- The draft skill treats 25 words as a sentence ceiling, not a target.
+  "Connect with a period, colon, or comma" now applies only to replacing a
+  dash.
+- A quote after "not", "instead of", "rather than", or "never" is a
+  counter-example, and raises no word-level finding.
+
 ## [0.14.0] (2026-10-02)
 
 ### Added

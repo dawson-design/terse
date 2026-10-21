@@ -7,5 +7,8 @@ examples/
 !.terse/config.json
 drafts/
 
+# Writing samples for a personal voice stay on the author's machine.
+samples/dawson/
+
 # Eval task fixtures ship an approved voice template.
 !eval/tasks/*/environment/workspace/.terse/

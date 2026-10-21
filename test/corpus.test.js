@@ -290,7 +290,8 @@ describe('weak verbs: detected with the plain verb as the hint', () => {
 });
 
 describe('edited human prose: zero lexical false positives', () => {
-	const LEXICAL = new Set(['ai-tell', 'weak-verb', 'simpler-alternative', 'em-dash']);
+	const LEXICAL = new Set(['ai-tell', 'weak-verb', 'simpler-alternative', 'em-dash',
+		'nominalization', 'abstract-verb']);
 	for (const f of readdirSync(FIXTURES)) {
 		it(`${f} carries no lexical flags`, () => {
 			const { flags } = checkText(readFileSync(join(FIXTURES, f), 'utf8'));
