@@ -25,6 +25,7 @@ every category.
 | preference | checker | wording |
 | personal-pronoun | checker, under `--impersonal` | wording |
 | simpler-alternative, weak-verb, ai-tell | checker | wording |
+| nominalization, abstract-verb | checker | wording |
 | em-dash | checker | wording |
 | grammar | native checker, admitted Harper rules, and model, `references/grammar-scope.md` | mechanics |
 | quote-unsourced, quote-unverified, quote-link-plain | quote checker (`scripts/quote-check.mjs`) | mechanics |

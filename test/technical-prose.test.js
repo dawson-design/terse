@@ -153,3 +153,66 @@ describe('nominalizations with "an"', () => {
 		expect(of('They reached an agreement on the design.', 'weak-verb')[0].hint).toContain('"agree"');
 	});
 });
+
+describe('an action turned into a noun', () => {
+	for (const [text, verb] of [
+		['The implementation of retries is complete.', 'implement'],
+		['The validation of the schema happens at startup.', 'validate'],
+		['Deletion happens nightly.', 'delete'],
+		['Resolution of exhausted jobs is often manual.', 'resolve'],
+	]) {
+		it(`suggests "${verb}" for: ${text}`, () => {
+			const flags = of(text, 'nominalization');
+			expect(flags).toHaveLength(1);
+			expect(flags[0].hint).toContain(`"${verb}"`);
+		});
+	}
+	for (const text of [
+		'The Department of Labor runs a station of the line.',
+		'The screen has a resolution of 1080 pixels.',
+		'Processing is a cost.',
+		'The configuration of the cluster is three brokers.',
+	]) {
+		it(`leaves alone: ${text}`, () => {
+			expect(of(text, 'nominalization')).toEqual([]);
+		});
+	}
+	it('leaves a light-verb phrase to the weak-verb finding', () => {
+		const text = 'We conducted an investigation of the outage.';
+		expect(of(text, 'nominalization')).toEqual([]);
+		expect(of(text, 'weak-verb')).toHaveLength(1);
+	});
+	it('flags a nominalization after "Given"', () => {
+		expect(matches('Given the validation of the schema, the build passes.', 'nominalization'))
+			.toEqual(['the validation of']);
+	});
+	it('places the span on the occurrence it flags', () => {
+		const text = 'We performed the validation of the schema, and the validation of the config happens at boot.';
+		const [flag] = of(text, 'nominalization');
+		expect(flag.span[0]).toBe(text.lastIndexOf('the validation of'));
+	});
+	it('places each span on its own match when one wraps a line', () => {
+		const text = 'Deletion of old\nrows happens weekly, and deletion of logs happens nightly.';
+		expect(of(text, 'nominalization').map((f) => text.slice(...f.span)))
+			.toEqual(['Deletion of old\nrows happens', 'deletion of logs happens']);
+	});
+});
+
+describe('an empty verb on an abstract quality', () => {
+	it('flags each one, each on its own words', () => {
+		const text = 'The hook ensures consistency and improves reliability.';
+		expect(of(text, 'abstract-verb').map((f) => text.slice(...f.span)))
+			.toEqual(['ensures consistency', 'improves reliability']);
+	});
+	for (const text of [
+		'The script improves performance by about 40%.',
+		'The cluster spans three availability zones, and the team improves availability checks.',
+		'The team supports the business and provides a reference implementation.',
+		'The new road enables the city to grow, and the policy supports identity federation.',
+		'The fix reduces entity duplicates and supports maintenance windows.',
+	]) {
+		it(`leaves alone: ${text}`, () => {
+			expect(of(text, 'abstract-verb')).toEqual([]);
+		});
+	}
+});

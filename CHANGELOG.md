@@ -6,6 +6,16 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- A `nominalization` finding catches an action turned into a noun with its
+  actor dropped, as in "the validation of the schema" or "deletion happens
+  nightly". Its hint gives the verb to use.
+- An `abstract-verb` finding catches an empty verb on a listed abstract
+  quality, as in "ensures consistency" or "improves reliability". A number
+  after the quality, as in "improves performance by 40%", or a noun after it,
+  as in "availability zones", keeps the sentence clean.
+
 ## [0.14.0] (2026-10-02)
 
 ### Added

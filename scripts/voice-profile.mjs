@@ -28,7 +28,8 @@ const TARGET_KEYS = { adverb: 'adverbsPerKword', 'passive-voice': 'passivePerKwo
 // utilize`), so keeping one phrase does not exempt the whole list. Other
 // categories are structural and kept whole. Grammar is never a voice, and the
 // three rate categories are counted against targets instead.
-const KEEP_PER_MATCH = new Set(['ai-tell', 'simpler-alternative', 'weak-verb', 'preference']);
+const KEEP_PER_MATCH = new Set(['ai-tell', 'simpler-alternative', 'weak-verb',
+	'nominalization', 'abstract-verb', 'preference']);
 const NEVER_KEPT = new Set(['grammar', ...Object.keys(TARGET_KEYS)]);
 const KEEP_RATE = 1; // per 1,000 words: rarer habits are not worth a question
 const PROSE = /\.(?:md|markdown|txt)$/i;
