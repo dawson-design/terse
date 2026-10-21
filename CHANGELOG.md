@@ -16,6 +16,11 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   after the quality, as in "improves performance by 40%", or a noun after it,
   as in "availability zones", keeps the sentence clean.
 
+### Changed
+
+- A quote after "not", "instead of", "rather than", or "never" is a
+  counter-example, and raises no word-level finding.
+
 ## [0.14.0] (2026-10-02)
 
 ### Added

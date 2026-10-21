@@ -975,6 +975,14 @@ const QUOTED_EXEMPT = new Set(['ai-tell', 'simpler-alternative', 'weak-verb',
 	'nominalization', 'abstract-verb',
 	'qualifier', 'preference', 'personal-pronoun', 'em-dash', 'grammar']);
 
+// A quote after "not" or "instead of" is a counter-example the author wrote
+// badly on purpose ("use X, not "Y""), so every word-level finding in it goes.
+const COUNTER_EXAMPLE_LEAD = /\b(?:not|instead\s+of|rather\s+than|never)[ \t]*$/i;
+
+function counterExampleRanges(text, quoted) {
+	return quoted.filter(([start]) => COUNTER_EXAMPLE_LEAD.test(text.slice(Math.max(0, start - 20), start)));
+}
+
 /** Return raw `[start, end]` ranges for quotations in stripped Markdown. */
 export function quotedRanges(text) {
 	const ranges = [];
@@ -1094,10 +1102,12 @@ function filterFindings(rawText, text, flags, ignore) {
 	const quoted = quotedRanges(text);
 	const lines = text.split('\n');
 	const inBlockquote = (line) => /^[ \t]*>/.test(lines[line - 1] ?? '');
+	const counterExamples = counterExampleRanges(text, quoted);
 	return flags.filter((f) =>
 		!isSuppressed(suppressions, f) && !isIgnored(ignore, f) &&
 		!(QUOTED_EXEMPT.has(f.category) && f.span &&
-			(inQuotedRange(quoted, f.span) || inBlockquote(f.line))));
+			(inQuotedRange(quoted, f.span) || inBlockquote(f.line))) &&
+		!(!SENTENCE_LEVEL.has(f.category) && f.span && inQuotedRange(counterExamples, f.span)));
 }
 
 export function checkText(rawText,
