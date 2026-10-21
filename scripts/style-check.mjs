@@ -747,7 +747,7 @@ function checkSentence(sentence, maxGrade, flags, file, line) {
 		flags.push({ file, line,
 			category: veryHard ? 'very-hard-sentence' : 'hard-sentence',
 			match: `${words.length} words, grade ${grade}`,
-			hint: 'split the sentence or convert an in-sentence list to bullets' });
+			hint: 'split where the second half can name its link to the first, cut words, or convert an in-sentence list to bullets' });
 	}
 	const passiveRe = /\b(am|is|are|was|were|be|been|being|get|gets|got)(?:n['’]t)?\s+(?:\w+ly\s+)*(?:being\s+)?(?:\w+ly\s+)*(\w+)\b/gi;
 	for (const m of sentence.matchAll(passiveRe)) {

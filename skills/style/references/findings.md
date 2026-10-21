@@ -91,8 +91,9 @@ Four layers mark keeps before a finding reaches the report or the loop:
 Order matters: a rewrite makes earlier grammar findings stale. Visit
 each sentence once, applying its findings in stage order:
 
-1. **structural**: split the sentence, convert the in-sentence list to
-   bullets, cut or promote the aside
+1. **structural**: split the sentence at a link the second half can
+   name, or else cut words. Convert the in-sentence list to bullets,
+   and cut or promote the aside
 2. **wording**: name the actor (capability statements keep their
    passive), swap the flagged word or phrase, delete or evidence the
    qualifier, replace the em dash

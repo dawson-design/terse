@@ -50,8 +50,8 @@ a bare one means naming a missing fact, which you can check.
 3. Set the constraints before drafting. These are the numbers the
    checker measures, so writing to them costs nothing and clearing
    them afterwards costs a rewrite:
-   - document grade below 10; keep sentences under 25 words, or below
-     grade 10 when they run longer
+   - document grade below 10; 25 words is a ceiling for a sentence,
+     not a target, and the cadence check keeps the lengths varied
    - the first paragraph under 90 words, opening on the fact the
      reader came for
    - adverbs about 1 per 134 words, passive about 1 per 123,
@@ -76,7 +76,10 @@ a bare one means naming a missing fact, which you can check.
    action the same way: a log does not `buy` you anything. An action
    standing as subject or object takes a gerund or a full clause:
    `renaming`, never `a rename`, unless the noun is the domain's own
-   term (`a commit`). Connect with a period, colon, or comma.
+   term (`a commit`). Make the actor the subject and the action the
+   verb: `the service validates the schema`, not `validation of the
+   schema happens`. Replace a dash with a period, colon, or comma, and
+   keep `because`, `so`, and `but` where they join two clauses.
    State a claim once and move on, and list three things when there
    are three. Keep an aside under six words or promote it to its own
    sentence. Put a source inline, as a link on the words it

@@ -172,9 +172,11 @@ every mode.
    discards the sentence's collected grammar findings; re-proof the new
    wording.
    - **structural** first:
-     - hard sentence: split it, or turn an in-sentence list into
-       bullets. A split keeps the link: the second sentence opens on
-       the shared term, not a bare `So`
+     - hard sentence: split it where the second half can name its
+       link to the first, or turn an in-sentence list into bullets.
+       A split keeps the link: the second sentence opens on the
+       shared term or the relation word, not a bare `So`. When no
+       split keeps the link, cut words and leave the sentence whole
      - flow: fix it inside the sentence with a connective word, a
        clause, or the antecedent named outright. Some fixes need a
        reorder or a new sentence. Those go to the report for the
@@ -190,7 +192,12 @@ every mode.
        invent an actor, keep the passive and record the keep
      - adverb: choose a stronger verb, or give the number
      - qualifier: delete it or state the evidence
-     - simpler alternative and weak verb: substitute the suggested word
+     - simpler alternative and weak verb: substitute the suggested
+       word when the sentence still reads as speech. When the swap
+       reads stiff, rewrite the clause around its actor and action
+     - nominalization and abstract verb: make the actor the subject
+       and the action the verb. When the actor is unknown, keep the
+       sentence and record the keep
      - ai-tell: first read the flag in context. A frame matches a
        surface, and the surface has literal uses the lexicon cannot
        list. Run the translation test on the sentence as written.

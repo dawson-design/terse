@@ -18,6 +18,12 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- A hard sentence's hint now says to split only where the second half can
+  name its link to the first, or else to cut words. The style, draft, and edit
+  skills say the same, so a split keeps its `because`, `so`, or `but`.
+- The draft skill treats 25 words as a sentence ceiling, not a target.
+  "Connect with a period, colon, or comma" now applies only to replacing a
+  dash.
 - A quote after "not", "instead of", "rather than", or "never" is a
   counter-example, and raises no word-level finding.
 
