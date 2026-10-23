@@ -5,13 +5,13 @@
     "url": "https://github.com/kreek"
   },
   "metadata": {
-    "description": "Clear professional writing with deterministic style checks and voice-preserving edits.",
+    "description": "Skills for the documents engineering leads write: ADRs, PRDs, tech specs, PR descriptions, review comments, emails, and Slack messages, each structured and sized to industry practice and written in your voice.",
     "version": "0.14.0"
   },
   "plugins": [
     {
       "name": "terse",
-      "description": "Deterministic style checks plus model-assisted edits that keep the writer's voice.",
+      "description": "Skills for the documents engineering leads write: ADRs, PRDs, tech specs, PR descriptions, review comments, emails, and Slack messages, each structured and sized to industry practice and written in your voice.",
       "version": "0.14.0",
       "author": {
         "name": "Alastair Dawson"

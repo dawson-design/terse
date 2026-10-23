@@ -1,7 +1,7 @@
 {
   "name": "terse",
   "version": "0.14.0",
-  "description": "Clear professional writing with deterministic style checks and edits that preserve the writer's voice.",
+  "description": "Skills for the documents engineering leads write: ADRs, PRDs, tech specs, PR descriptions, review comments, emails, and Slack messages, each structured and sized to industry practice and written in your voice.",
   "author": {
     "name": "Alastair Dawson",
     "url": "https://github.com/kreek"
@@ -11,9 +11,13 @@
   "license": "MIT",
   "keywords": [
     "writing",
-    "editing",
-    "readability",
-    "style",
+    "adr",
+    "prd",
+    "design-doc",
+    "pull-request",
+    "code-review",
+    "email",
+    "slack",
     "codex",
     "claude-code",
     "agent-skills"
@@ -21,8 +25,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Terse",
-    "shortDescription": "Clear professional writing in your voice.",
-    "longDescription": "Write, outline, draft, and edit professional documents with deterministic readability checks and voice-preserving revisions.",
+    "shortDescription": "Engineering documents, structured and sized right, in your voice.",
+    "longDescription": "Draft and review ADRs, PRDs, tech specs, PR descriptions, PR review comments, emails, and Slack messages. Each skill follows industry practice for structure and length, writes in your voice, and never posts or sends anything unless you ask.",
     "developerName": "Alastair Dawson",
     "category": "Productivity",
     "capabilities": [
@@ -31,9 +35,9 @@
     ],
     "websiteURL": "https://github.com/kreek/terse",
     "defaultPrompt": [
-      "Write a professional document in my voice.",
-      "Edit this file for clarity without changing its meaning.",
-      "Outline this document before drafting it."
+      "Write an ADR for this decision.",
+      "Draft the PR description for this branch.",
+      "Turn my review notes into PR comments."
     ]
   }
 }

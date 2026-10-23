@@ -1,6 +1,6 @@
-// Pins the installable Codex manifest and the shared hook entrypoint.
+// Pins the installable manifests, their shared version, and the absence of hooks.
 import { describe, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const ROOT = join(import.meta.dirname, '..');
@@ -21,9 +21,9 @@ describe('Codex plugin contract', () => {
 		});
 		expect(manifest.interface.defaultPrompt).toHaveLength(3);
 		expect(manifest.interface.defaultPrompt).toEqual([
-			'Write a professional document in my voice.',
-			'Edit this file for clarity without changing its meaning.',
-			'Outline this document before drafting it.',
+			'Write an ADR for this decision.',
+			'Draft the PR description for this branch.',
+			'Turn my review notes into PR comments.',
 		]);
 		for (const field of [
 			'hooks', 'apps', 'mcp', 'mcpServers', 'commands', 'agents',
@@ -43,12 +43,9 @@ describe('Codex plugin contract', () => {
 			.toEqual(Array(5).fill('0.14.0'));
 	});
 
-	it('uses either host plugin root for the trusted hook', () => {
-		const hooks = readJson('hooks/hooks.json');
-		const post = hooks.hooks.PostToolUse[0];
-		expect(post.matcher).toBe('Write|Edit');
-		expect(post.hooks[0].command).toBe(
-			'node "${PLUGIN_ROOT:-$CLAUDE_PLUGIN_ROOT}/scripts/style-hook.mjs"');
+	it('ships no hooks, so nothing runs when the user writes a file', () => {
+		expect(existsSync(join(ROOT, 'hooks', 'hooks.json'))).toBe(false);
+		expect(readJson('.claude-plugin/plugin.json')).not.toHaveProperty('hooks');
 	});
 
 	it('publishes the repository root through the Codex marketplace', () => {
