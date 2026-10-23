@@ -20,6 +20,7 @@
     "check": "node scripts/style-check.mjs",
     "check:quotes": "node scripts/quote-check.mjs",
     "test": "vitest run test",
+    "claudisms": "node scripts/claudisms.mjs",
     "eval:harbor": "python3 eval/scripts/run.py --suite all --agent claude-code",
     "eval:harbor:smoke": "python3 eval/scripts/run.py --suite smoke --agent claude-code --install-only",
     "eval:legacy": "claude plugin eval . --allow-tools Bash Write Edit --json evals/results/latest.json --max-cost-usd 10 --no-publish && node scripts/eval-score.mjs evals/results/latest.json",
