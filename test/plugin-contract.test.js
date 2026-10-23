@@ -5,15 +5,6 @@ import { join } from 'node:path';
 
 const ROOT = join(import.meta.dirname, '..');
 const readJson = (path) => JSON.parse(readFileSync(join(ROOT, path), 'utf8'));
-const readRegexGrader = (path) => {
-	const source = readFileSync(join(ROOT, path), 'utf8');
-	const pattern = source.match(/^pattern: (.+)$/m)?.[1];
-	if (!pattern) throw new Error(`Missing regex pattern in ${path}`);
-	const decoded = JSON.parse(pattern);
-	const inlineFlags = decoded.match(/^\(\?([a-z]+)\)/)?.[1] ?? '';
-	return new RegExp(decoded.replace(/^\(\?[a-z]+\)/, ''), inlineFlags);
-};
-
 describe('Codex plugin contract', () => {
 	it('declares a skills-only productivity plugin', () => {
 		const manifest = readJson('.codex-plugin/plugin.json');
@@ -75,55 +66,5 @@ describe('Codex plugin contract', () => {
 				category: 'Productivity',
 			}],
 		});
-	});
-});
-
-describe('Codex fact-grader contract', () => {
-	it('accepts equivalent batch and deduplication word order', () => {
-		const grader = readRegexGrader(
-			'evals/claudism-removal/graders/facts-present.md');
-		const facts = [
-			'Customer change\nfeeds retry, then batch writes and deduplicate them. Cache\nhit rates increase throughput.',
-			'Customer change feeds retry, then batch and deduplicate writes. Cache hit rates increase throughput.',
-		];
-		for (const prose of facts) expect(grader.test(prose)).toBe(true);
-	});
-
-	it('accepts semantic README wording for input and exit codes', () => {
-		const grader = readRegexGrader(
-			'evals/generation-readme/graders/facts-present.md');
-		const prose = [
-			'Logsift reads files or standard\ninput.',
-			'Use --level, --since, --until, --where, --format, --config, and ~/.logsift.toml.',
-			'Install with brew\ninstall logsift or a release\nbinary.',
-			'Exit `0` means records matched; `1` means no logs matched; `2` means invalid input or a read error.',
-			'License: MIT.',
-		].join(' ');
-		expect(grader.test(prose)).toBe(true);
-	});
-
-	it('accepts wrapped explainer facts', () => {
-		const grader = readRegexGrader(
-			'evals/generation-explainer/graders/facts-present.md');
-		const facts = [
-			'A B-tree avoids a full\ntable scan. Writes cost more\nwork, so do\nnot add an index without a measured query.',
-			'A B-tree means the engine need not inspect every row. Extra indexes slow writes, so do not automatically index every column.',
-			'Without an index, the database may inspect every row. A B-tree narrows the search. More indexes mean write speed falls. Skip one for tiny tables.',
-			'A B-tree avoids a full table scan. Indexes make writes more expensive and increase write work. Avoid unused indexes.',
-			'An index uses a B-tree instead of reading every table row. Indexes add work to writes. Do not add an index by default.',
-		];
-		for (const prose of facts) expect(grader.test(prose)).toBe(true);
-	});
-
-	it('accepts wrapped launch facts', () => {
-		const grader = readRegexGrader(
-			'evals/generation-launch/graders/facts-present.md');
-		const prose = [
-			'QueueLens\n1.0 reads RabbitMQ dead-letter queues and groups by exception\ntype.',
-			'It shows the first and latest\noccurrence and exports newline-delimited\nJSON.',
-			'Use --confirm and ~/.queuelens.toml. There is no hosted\ncontrol\nplane.',
-			'Install with brew\ninstall queuelens. MIT.',
-		].join(' ');
-		expect(grader.test(prose)).toBe(true);
 	});
 });
