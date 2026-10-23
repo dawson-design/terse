@@ -9,9 +9,8 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Terse 1.0 is a rewrite. The sentence rules in earlier versions, the ones the
 Hemingway app and Grammarly apply, made agent prose choppier and harder to
 read than no plugin, and their evals only showed Terse passing its own
-checker. 1.0 is a set of
-skills for the documents an engineering lead writes, built on industry
-practice for structure and length.
+checker. 1.0 is a set of skills for software engineering documents, built
+on industry practice for structure and length.
 
 ### Added
 

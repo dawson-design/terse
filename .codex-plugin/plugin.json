@@ -1,7 +1,7 @@
 {
   "name": "terse",
   "version": "1.0.0",
-  "description": "Skills for the documents engineering leads write: ADRs, PRDs, tech specs, PR descriptions, review comments, emails, and Slack messages, each structured and sized to industry practice and written in your voice.",
+  "description": "Skills for software engineering documents: ADRs, PRDs, tech specs, PR descriptions, review comments, emails, and Slack messages, each structured and sized to industry practice and written in your voice.",
   "author": {
     "name": "Alastair Dawson",
     "url": "https://github.com/kreek"

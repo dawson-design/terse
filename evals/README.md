@@ -2,8 +2,8 @@
 
 Each case asks for one document type from realistic notes. It runs once
 with Terse loaded and once without it, then a blind judge compares the two
-drafts. The question is the one Terse exists to answer: would an
-engineering lead rather receive the draft written with Terse, or the one
+drafts. The question is the one Terse exists to answer: would the
+document's reader rather receive the draft written with Terse, or the one
 written without it?
 
 ## Run

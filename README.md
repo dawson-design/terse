@@ -1,8 +1,8 @@
 # Terse
 
-Terse is a set of skills for Claude Code and Codex that write and review the
-documents an engineering lead sends: ADRs, PRDs, tech specs, PR
-descriptions, PR review comments, emails, and Slack messages. Each skill
+Terse is a set of skills for Claude Code and Codex that write and review
+software engineering documents: ADRs, PRDs, tech specs, PR descriptions,
+PR review comments, emails, and Slack messages. Each skill
 holds that document type's industry practice for structure and length,
 writes in your voice, and never posts or sends anything unless you ask.
 
