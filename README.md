@@ -6,14 +6,6 @@ PR review comments, emails, and Slack messages. Each skill
 holds that document type's industry practice for structure and length,
 writes in your voice, and never posts or sends anything unless you ask.
 
-Terse 1.0 replaces everything that came before it. Earlier versions checked
-sentences the way the Hemingway app and Grammarly do: grade level, sentence
-length, passive voice, adverbs. A hook enforced those rules on every save,
-and agent prose came out choppier and harder to read than with no plugin.
-1.0 removes the checker, the hook, and the generic outline, draft, and edit
-workflow. It keeps one sentence-level check, a list of phrases that mark
-model-written text, and your voice template.
-
 ## Skills
 
 Codex uses `$terse:*`; Claude Code uses `/terse:*`. Each skill also starts
