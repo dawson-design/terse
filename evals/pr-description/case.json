@@ -1,0 +1,26 @@
+{
+  "id": "pr-description",
+  "docType": "pr-description",
+  "docLabel": "pull request description",
+  "deliverable": "PR_DESCRIPTION.md",
+  "budget": { "maxWords": 300, "minWords": 35 },
+  "structure": {
+    "lead": { "withinWords": 60, "mentionsAny": [["duplicate", "twice", "second claim", "two claims"]] }
+  },
+  "facts": [
+    { "id": "idempotency", "any": ["idempotency"] },
+    { "id": "retry-statuses", "any": ["502", "503", "504", "5xx"] },
+    { "id": "no-retry-4xx", "any": ["4xx", "400", "client error"] },
+    { "id": "issue", "any": ["#311", "issue 311", "311"] }
+  ],
+  "judge": {
+    "reader": "the teammate assigned to review the PR, and the engineer who runs git blame on the retry code next year",
+    "questions": [
+      "Does it say why the change is needed (duplicate claims, issue #311) before or alongside what changed?",
+      "Does it describe the behavior and the decisions (same key on every retry, which statuses retry, the backoff) rather than listing files?",
+      "Is its length right for this change: short enough to read before the diff, long enough to carry the risks a reviewer needs?"
+    ]
+  },
+  "git": { "branch": "feature/idempotent-claim-submit", "baseMessage": "Add the claim intake client" },
+  "judgeInputs": ["fixture/commits", "workspace"]
+}

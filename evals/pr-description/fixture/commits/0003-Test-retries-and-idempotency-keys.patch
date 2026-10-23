@@ -1,0 +1,73 @@
+From 82764d1bb17fd060c60b6af6ad411e89b50dfe0c Mon Sep 17 00:00:00 2001
+From: Dana Reyes <dana@example.gov>
+Date: Wed, 7 Oct 2026 14:05:00 +0000
+Subject: [PATCH 3/3] Test retries and idempotency keys
+
+---
+ test/claimClient.test.js | 43 +++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 40 insertions(+), 3 deletions(-)
+
+diff --git a/test/claimClient.test.js b/test/claimClient.test.js
+index dfeadf8..58650c4 100644
+--- a/test/claimClient.test.js
++++ b/test/claimClient.test.js
+@@ -1,16 +1,53 @@
+ import { test } from 'node:test';
+ import assert from 'node:assert/strict';
+-import { ClaimClient } from '../src/claimClient.js';
++import { ClaimClient, backoffDelay } from '../src/claimClient.js';
+ 
+ const reply = (status, body = {}) => ({ ok: status < 400, status, json: async () => body });
+ 
+-test('submit posts the claim as JSON', async () => {
++function clientReturning(statuses) {
+ 	const calls = [];
+ 	const client = new ClaimClient({
+ 		baseUrl: 'https://intake.example.gov',
+-		fetchImpl: async (url, init) => { calls.push({ url, init }); return reply(201, { id: 'c-1' }); },
++		fetchImpl: async (url, init) => { calls.push({ url, init }); return reply(statuses.shift(), { id: 'c-1' }); },
++		sleep: async () => {},
+ 	});
++	return { client, calls };
++}
++
++test('submit posts the claim as JSON', async () => {
++	const { client, calls } = clientReturning([201]);
+ 	assert.deepEqual(await client.submit({ ssnLast4: '1234' }), { id: 'c-1' });
+ 	assert.equal(calls[0].url, 'https://intake.example.gov/claims');
+ 	assert.equal(calls[0].init.method, 'POST');
+ });
++
++test('submit sends an idempotency key', async () => {
++	const { client, calls } = clientReturning([201]);
++	await client.submit({}, { idempotencyKey: 'key-1' });
++	assert.equal(calls[0].init.headers['Idempotency-Key'], 'key-1');
++});
++
++test('a 503 is retried with the same idempotency key', async () => {
++	const { client, calls } = clientReturning([503, 504, 201]);
++	assert.deepEqual(await client.submit({}), { id: 'c-1' });
++	assert.equal(calls.length, 3);
++	const keys = new Set(calls.map((call) => call.init.headers['Idempotency-Key']));
++	assert.equal(keys.size, 1);
++});
++
++test('a 400 fails without a retry', async () => {
++	const { client, calls } = clientReturning([400]);
++	await assert.rejects(client.submit({}), /returned 400/);
++	assert.equal(calls.length, 1);
++});
++
++test('submit gives up after three retries', async () => {
++	const { client, calls } = clientReturning([503, 503, 503, 503]);
++	await assert.rejects(client.submit({}), /returned 503/);
++	assert.equal(calls.length, 4);
++});
++
++test('backoff stays under the cap', () => {
++	assert.equal(backoffDelay(10, () => 0.999), 7992);
++	assert.equal(backoffDelay(0, () => 0.5), 250);
++});
+-- 
+2.50.1 (Apple Git-155)
+

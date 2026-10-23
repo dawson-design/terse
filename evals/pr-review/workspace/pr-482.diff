@@ -1,0 +1,113 @@
+diff --git a/app/controllers/drafts_controller.rb b/app/controllers/drafts_controller.rb
+new file mode 100644
+--- /dev/null
++++ b/app/controllers/drafts_controller.rb
+@@ -0,0 +1,52 @@
++# Saves and restores in-progress renewal answers.
++class DraftsController < ApplicationController
++  before_action :authenticate_user!
++
++  DRAFT_TTL = 30.days
++
++  rescue_from ActiveRecord::RecordNotFound do
++    head :not_found
++  end
++
++  # GET /renewals/:renewal_id/draft
++  #
++  # Returns the saved answers for a renewal, or 404 when there is no draft
++  # or it has expired.
++  def show
++    draft = Draft
++      .where("updated_at > ?", DRAFT_TTL.ago)
++      .find_by!(renewal_id: params[:renewal_id])
++
++    render json: DraftSerializer.new(draft).as_json
++  end
++
++  # POST /renewals/:renewal_id/draft
++  #
++  # Creates or replaces the draft for a renewal the current user owns.
++  def create
++    renewal = current_user.renewals.find(params[:renewal_id])
++    draft = Draft.find_or_initialize_by(renewal_id: renewal.id)
++    draft.draft_data = draft_params
++
++    unless RenewalSchema.valid_partial?(draft.draft_data)
++      render json: { errors: RenewalSchema.errors(draft.draft_data) },
++             status: :unprocessable_entity
++      return
++    end
++
++    applicant = renewal.applicant
++    draft.save!
++
++    Rails.logger.info(
++      "saved renewal draft renewal=#{renewal.id} applicant_ssn=#{applicant.ssn}"
++    )
++
++    render json: DraftSerializer.new(draft).as_json, status: :created
++  end
++
++  private
++
++  def draft_params
++    params.require(:draft).permit!.to_h
++  end
++end
+diff --git a/app/serializers/draft_serializer.rb b/app/serializers/draft_serializer.rb
+new file mode 100644
+--- /dev/null
++++ b/app/serializers/draft_serializer.rb
+@@ -0,0 +1,22 @@
++class DraftSerializer
++  def initialize(draft)
++    @draft = draft
++  end
++
++  def as_json(*)
++    {
++      renewal_id: @draft.renewal_id,
++      saved_at: @draft.updated_at.iso8601,
++      answers: @draft.draft_data,
++      household: household
++    }
++  end
++
++  private
++
++  def household
++    @draft.renewal.household_members.map do |member|
++      { name: member.name, income_sources: member.income_sources.map(&:kind) }
++    end
++  end
++end
+diff --git a/spec/requests/drafts_spec.rb b/spec/requests/drafts_spec.rb
+new file mode 100644
+--- /dev/null
++++ b/spec/requests/drafts_spec.rb
+@@ -0,0 +1,24 @@
++require "rails_helper"
++
++RSpec.describe "Renewal drafts" do
++  let(:user) { create(:user) }
++  let(:renewal) { create(:renewal, user: user) }
++
++  before { sign_in user }
++
++  it "saves a draft" do
++    post "/renewals/#{renewal.id}/draft", params: { draft: { income: "1200" } }
++
++    expect(response).to have_http_status(:created)
++    expect(Draft.last.draft_data).to eq("income" => "1200")
++  end
++
++  it "restores a saved draft" do
++    create(:draft, renewal: renewal, draft_data: { "income" => "1200" })
++
++    get "/renewals/#{renewal.id}/draft"
++
++    expect(response).to have_http_status(:ok)
++    expect(response.parsed_body["answers"]).to eq("income" => "1200")
++  end
++end

@@ -1,0 +1,35 @@
+{
+  "id": "tech-spec",
+  "docType": "tech-spec",
+  "docLabel": "technical design spec",
+  "deliverable": "docs/specs/async-document-upload.md",
+  "budget": { "maxWords": 1500, "minWords": 400 },
+  "structure": {
+    "sections": [
+      { "name": "Context", "aliases": ["Background", "Problem", "Context and scope"] },
+      { "name": "Goals", "aliases": ["Goals and non-goals", "Goals and non goals"] },
+      { "name": "Design", "aliases": ["Proposed design", "Proposal", "Detailed design", "Design overview"] },
+      { "name": "Alternatives", "aliases": ["Alternatives considered"] },
+      { "name": "Rollout", "aliases": ["Rollout and testing", "Rollout plan", "Testing and rollout"] },
+      { "name": "Open questions", "aliases": ["Unresolved questions"] }
+    ]
+  },
+  "facts": [
+    { "id": "presigned", "any": ["presigned", "pre-signed"] },
+    { "id": "size-cap", "any": ["25 MB", "25MB"] },
+    { "id": "govcloud", "any": ["GovCloud"] },
+    { "id": "fedramp", "any": ["FedRAMP"] },
+    { "id": "clamav", "any": ["ClamAV"] },
+    { "id": "quarantine", "any": ["quarantine"] },
+    { "id": "failure-rate", "any": ["6.1%", "6.1 percent"] }
+  ],
+  "judge": {
+    "reader": "the platform and security reviewers deciding whether to approve the design",
+    "questions": [
+      "Does the spec open with what will be built and the recommendation?",
+      "Does it weigh the three alternatives the notes give, and only those, with the reasons they lost?",
+      "Does it carry the three open questions forward rather than settling them by assertion?",
+      "Does it cover security and rollout without inventing numbers the notes don't give?"
+    ]
+  }
+}

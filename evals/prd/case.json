@@ -1,0 +1,31 @@
+{
+  "id": "prd",
+  "docType": "prd",
+  "docLabel": "product requirements document (PRD)",
+  "deliverable": "docs/prd/appointment-status-notifications.md",
+  "budget": { "maxWords": 1500, "minWords": 300 },
+  "structure": {
+    "sections": [
+      { "name": "Problem", "aliases": ["Problem statement", "The problem", "Background and problem"] },
+      { "name": "Goals", "aliases": ["Goals and success metrics", "Goals and metrics", "Success metrics", "Goals and non-goals"] },
+      { "name": "Non-goals", "aliases": ["Out of scope", "Non goals"] },
+      { "name": "Requirements", "aliases": ["Functional requirements", "Product requirements"] }
+    ]
+  },
+  "facts": [
+    { "id": "call-share", "any": ["38%", "38 percent", "41,200"] },
+    { "id": "pilot-sites", "any": ["Tucson"] },
+    { "id": "opt-in", "any": ["opt-in", "opt in", "opted in", "consent"] },
+    { "id": "accessibility", "any": ["508"] },
+    { "id": "no-phi", "any": ["health information", "PHI"] }
+  ],
+  "judge": {
+    "reader": "the product owner and the engineering lead deciding whether this scope is right for the pilot",
+    "questions": [
+      "Does the problem statement name who has the problem and the pain, backed by the call-center and interview evidence?",
+      "Are success metrics given with the baseline the notes provide, without inventing a target the notes leave open?",
+      "Are non-goals stated (the parked ideas), and can each requirement be tested?",
+      "Does it stay at what and why, leaving technical design to engineering?"
+    ]
+  }
+}

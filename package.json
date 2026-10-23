@@ -21,7 +21,13 @@
   },
   "scripts": {
     "test": "vitest run test",
-    "claudisms": "node scripts/claudisms.mjs"
+    "claudisms": "node scripts/claudisms.mjs",
+    "eval": "node scripts/eval.mjs run --runs 5",
+    "eval:quick": "node scripts/eval.mjs run --runs 1",
+    "eval:case": "node scripts/eval.mjs run --runs 1 --case",
+    "eval:preflight": "node scripts/eval.mjs preflight",
+    "eval:score": "node scripts/eval.mjs score",
+    "eval:judge": "node scripts/eval.mjs judge"
   },
   "devDependencies": {
     "vitest": "^3.2.1"
