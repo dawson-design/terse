@@ -34,7 +34,8 @@ budget. Phrases listed under its Exceptions belong to the author and stay.
 - Name the reader and what they must decide or do. If no reader has to
   decide or do anything, there is no document to write.
 - One purpose per document: one decision, one problem, one design, one ask.
-  Two purposes make two linked documents.
+  Two purposes make two linked documents. For a long document,
+  `<terse-root>/references/splitting.md` gives the test.
 - Size the document to the cost of being wrong and the number of people who
   must agree, not to how much you know. Every budget is a ceiling, not a
   target: a draft near its ceiling usually has something to cut.

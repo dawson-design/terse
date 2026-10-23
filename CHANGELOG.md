@@ -27,6 +27,10 @@ practice for structure and length.
   skills run after drafting. A voice template's Exceptions and sample
   sentences allow the phrases the author uses. `--voice` prints the voice
   the skills will use.
+- `references/splitting.md` and `scripts/outline.mjs`: the test the ADR,
+  PRD, and tech-spec skills run to decide whether a long document should
+  become several, and a script that prints each section's prose words so
+  the test needs no full read. A split comes back as a plan for approval.
 - `docs/research/document-types.md`: the source of every structure and
   length rule, each number labelled measured, originator guidance, or
   convention.

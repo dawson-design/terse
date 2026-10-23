@@ -124,8 +124,10 @@ known: "In the context of <use case>, facing <concern>, we decided for
 | Options | at least two real options, one to three sentences each | Zimmermann's definition of done (originator guidance) |
 
 Scale with the cost of reversal: a Y-statement for a contained choice, two
-pages at most for a complex one. Past 1,000 words it is a design doc under
-an ADR's name. Move the detail to a spec, or split the decision.
+pages at most for a complex one. Past 1,000 words, cut first. A record still
+over is a design doc under an ADR's name: run the split test in
+`<terse-root>/references/splitting.md`, then move the detail to a spec or
+split the decision.
 
 ## Draft
 
@@ -145,7 +147,9 @@ accepted record's body unless the repo amends ADRs with dated notes.
 
 ## Review an existing ADR
 
-Report each structural finding with its fix, then run the claudism scan.
+Run the split test in `<terse-root>/references/splitting.md` first. When it
+calls for a split, lead with the split plan. Then report each structural
+finding with its fix, and run the claudism scan.
 Leave sentence style to the voice.
 - The title names the problem, not the decision, or the record holds more
   than one decision.

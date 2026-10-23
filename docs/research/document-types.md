@@ -120,6 +120,20 @@ An earlier version of this note gave the range as 12.8 to 23.0 words and
 omitted the two-channel caveat. The 50, 75, and 100-word budgets are
 conventions above the measured range.
 
+## Splitting
+
+| Rule | Source | Label |
+|---|---|---|
+| A larger project's design doc runs 10 to 20 pages; "way beyond that", split the problem into sub-problems | [Ubl](https://www.industrialempathy.com/posts/design-docs-at-google/) | convention |
+| The PRD is approved before RFC writing starts, and links to the RFC once it exists | [HashiCorp PRD template](https://www.hashicorp.com/en/how-hashicorp-works/articles/prd-template) | originator guidance |
+| An RFC "should not contain a list of specific tasks or project plan"; review the objectives apart from the plan | [Calçado, "A Structured RFC Process"](https://philcalcado.com/2018/11/19/a_structured_rfc_process.html) | convention |
+| Shorter linked documents suit readers new to a subject; longer ones suit experienced readers, who rarely read them in one sitting | [Google Technical Writing Two, "Organizing large documents"](https://developers.google.com/tech-writing/two/large-docs) | originator guidance |
+| The split points (1,000 words for an ADR, 3,000 for a PRD, 20 pages for a tech spec), applied after cutting, and the one-page test for a part that belongs to another document type | Terse, from the budgets above | convention |
+
+None of these sources gives a length past which a document must split, and
+Google's guide gives no number at all. Terse's tech-spec split point sits at
+the top of Ubl's range, earlier than his "way beyond" it.
+
 ## Shared principles
 
 | Rule | Source | Label |

@@ -104,7 +104,7 @@ algorithm. Draw only what the code or the user confirms.
 | Size | Budget | Source |
 |---|---|---|
 | Mini spec, the default | 500 to 1,500 words of prose, one to three pages | Ubl, "Design Docs at Google": the mini design doc (documented convention) |
-| Full spec | up to 10 to 20 pages for a large project; split into sub-specs past that | Ubl (documented convention) |
+| Full spec | up to 10 to 20 pages for a large project; past that, run the split test | Ubl (documented convention) |
 | Summary | one or two paragraphs | HashiCorp RFC template (originator guidance); Rust RFC template: one paragraph |
 | Context | a paragraph or two, a page at most | HashiCorp RFC template and writing guide (originator guidance) |
 
@@ -118,7 +118,9 @@ the user approves, with a word budget for each section.
 2. Resolve the convention, the size, and the path.
 3. Gather, ask in one batch, and mark the gaps.
 4. For a full spec, write a skeleton first: each heading with a one-line
-   claim and a word budget. Get it approved before writing prose.
+   claim and a word budget. Run the split test in
+   `<terse-root>/references/splitting.md` on it, then get it approved before
+   writing prose.
 5. Write Design and Alternatives first, then the Context they need. Write
    the Summary last, stating the recommendation.
 6. Add a sentence only where a reviewer would otherwise have to ask.
@@ -126,7 +128,9 @@ the user approves, with a word budget for each section.
 
 ## Review an existing spec
 
-Report each structural finding with its fix, then run the claudism scan.
+Run the split test in `<terse-root>/references/splitting.md` first. When it
+calls for a split, lead with the split plan. Then report each structural
+finding with its fix, and run the claudism scan.
 Leave sentence style to the voice.
 - The Summary describes the doc ("This document covers…") instead of
   recommending.

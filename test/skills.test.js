@@ -37,10 +37,15 @@ describe('skill files', () => {
 		expect(rootPaths(read(`skills/${skill}/SKILL.md`))).toContain('references/principles.md');
 	});
 
+	it.each(['adr', 'prd', 'tech-spec'])('%s runs the split test', (skill) => {
+		expect(rootPaths(read(`skills/${skill}/SKILL.md`))).toContain('references/splitting.md');
+	});
+
 	it('names only <terse-root> paths that exist', () => {
 		const files = [
 			...skillNames.map((skill) => `skills/${skill}/SKILL.md`),
 			'references/principles.md',
+			'references/splitting.md',
 		];
 		for (const file of files) {
 			for (const path of rootPaths(read(file))) {

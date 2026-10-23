@@ -1,21 +1,16 @@
 // Deterministic checks on a deliverable: required sections in order, the
 // short-form shape, the word budget, required facts, and claudisms. Pure.
-import { blankCode, findClaudisms } from '../claudisms.mjs';
+import { findClaudisms } from '../claudisms.mjs';
+import { proseText, wordCount } from '../outline.mjs';
+
+export { proseText };
 
 // A heading that restates the body, when it closes the document.
 const SUMMARY_HEADINGS = /^(summary|conclusion|key takeaways?|tl;?dr|final thoughts|wrapping up)$/;
 
-/** The text with front matter, code, blockquotes, and comments removed. */
-export function proseText(markdown) {
-	return blankCode(markdown.replace(/^---\n[\s\S]*?\n---(?=\n|$)/, ''))
-		.replace(/<!--[\s\S]*?-->/g, '')
-		.replace(/^[ \t]*>.*$/gm, '');
-}
-
-/** Words of prose: tokens holding a letter or digit, outside code, quotes, and a subject line. */
+/** Words of prose: the outline's count, leaving out a subject line. */
 export function countWords(markdown) {
-	return proseText(markdown).replace(/^\s*subject:.*$/im, '')
-		.split(/\s+/).filter((token) => /[\p{L}\p{N}]/u.test(token)).length;
+	return wordCount(proseText(markdown).replace(/^\s*subject:.*$/im, ''));
 }
 
 /** Heading texts in order, lowercased: Markdown headings and bold-only lines. */

@@ -105,7 +105,7 @@ unless the team's template uses stories.
 |---|---|---|
 | Problem statement | one or two sentences | Yien's PRD template at Square (originator guidance for that template) |
 | One-pager, the default for a single feature | about 600 words | one page to start (Adam Thomas, via Lenny Rachitsky; convention); about 500 words a page (convention) |
-| Full PRD | about 1,500 words; past 3,000, split by phase or into child PRDs | convention; Figma's template warns that thoroughness yields a 20-page doc nobody reads |
+| Full PRD | about 1,500 words; past 3,000 after cutting, split by phase or into child PRDs | convention; Figma's template warns that thoroughness yields a 20-page doc nobody reads |
 | PR/FAQ | a press release under one page, FAQs of five pages or fewer | Bryar and Carr, Amazon (originator guidance) |
 
 No study measures PRD length. Acceptance criteria count toward the budget;
@@ -117,16 +117,20 @@ linked research doesn't.
    spec, or nothing.
 2. Resolve the template and location.
 3. Gather, ask in one batch, and mark the gaps.
-4. Write the Problem first and show it to the user. If they don't agree with
+4. For a full PRD, list the sections with a word budget for each, and run
+   the split test in `<terse-root>/references/splitting.md` on that list.
+5. Write the Problem first and show it to the user. If they don't agree with
    it, nothing below it matters.
-5. Then write Goals and metrics, Non-goals, and Requirements, in that order.
+6. Then write Goals and metrics, Non-goals, and Requirements, in that order.
    Write the one-line description last.
-6. Add a sentence only where a reader would otherwise have to ask.
-7. Check the length, then run the claudism scan from the principles.
+7. Add a sentence only where a reader would otherwise have to ask.
+8. Check the length, then run the claudism scan from the principles.
 
 ## Review an existing PRD
 
-Report each structural finding with its fix, then run the claudism scan.
+Run the split test in `<terse-root>/references/splitting.md` first. When it
+calls for a split, lead with the split plan. Then report each structural
+finding with its fix, and run the claudism scan.
 Leave sentence style to the voice.
 - The Problem isn't on the first screen, or runs past two sentences.
 - The Problem names a feature ("users need a dashboard") instead of an

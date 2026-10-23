@@ -11,7 +11,7 @@ import { dirname, join, relative } from 'node:path';
 
 const FIXED_DATE = '2026-10-01T09:00:00Z';
 // What a host loads from the plugin: the manifest, the skills, and what they read.
-const PLUGIN_PATHS = ['.claude-plugin', 'skills', 'references', 'scripts/claudisms.mjs'];
+const PLUGIN_PATHS = ['.claude-plugin', 'skills', 'references', 'scripts/claudisms.mjs', 'scripts/outline.mjs'];
 const GIT_ENV = {
 	GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_NOSYSTEM: '1',
 	GIT_AUTHOR_NAME: 'Dana Reyes', GIT_AUTHOR_EMAIL: 'dana@example.gov',

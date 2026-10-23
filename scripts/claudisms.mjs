@@ -132,9 +132,10 @@ function closingLine(lines, from, fence) {
 /**
  * Blank every code fence, keeping line breaks and offsets. A markdown or text
  * fence keeps its body, which is checked the same way, so a suggestion block
- * nested in a review comment is still code.
+ * nested in a review comment is still code. With keepProse false, every
+ * fence is blanked, so a template's headings don't read as the document's.
  */
-export function blankCode(text) {
+export function blankCode(text, { keepProse = true } = {}) {
 	const lines = text.split('\n');
 	const out = [];
 	for (let i = 0; i < lines.length;) {
@@ -142,8 +143,9 @@ export function blankCode(text) {
 		if (!open) { out.push(lines[i++]); continue; }
 		const close = closingLine(lines, i + 1, open[1]);
 		const body = lines.slice(i + 1, close);
+		const prose = keepProse && PROSE_INFO.test(open[2].trim());
 		out.push(blank(lines[i]));
-		if (body.length) out.push(...(PROSE_INFO.test(open[2].trim()) ? blankCode(body.join('\n')).split('\n') : body.map(blank)));
+		if (body.length) out.push(...(prose ? blankCode(body.join('\n')).split('\n') : body.map(blank)));
 		if (close < lines.length) out.push(blank(lines[close]));
 		i = close + 1;
 	}

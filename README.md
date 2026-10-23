@@ -54,6 +54,12 @@ The shared rules are in [`references/principles.md`](references/principles.md):
   sentences that use them. The list covers performative candor, the
   "isn't X, it's Y" reframe, hedging connectives, and metaphors like
   "blast radius". `node scripts/claudisms.mjs <file>` runs the same scan.
+- The ADR, PRD, and tech-spec skills run a split test from
+  [`references/splitting.md`](references/splitting.md) on a skeleton and
+  first in a review. A document that cutting can't bring under its type's
+  split point, or that holds more than a page of another document type,
+  such as a runbook or a task list, gets a split plan before any rewrite.
+  `node scripts/outline.mjs <file>` prints the word count of each section.
 
 ## Your voice
 
@@ -102,7 +108,7 @@ bar.
 ## Develop
 
 ```sh
-npm test                 # manifests, skill files, the claudism list, the eval runner
+npm test                 # manifests, skill files, the claudism list, the outline, the eval runner
 npm run claudisms -- draft.md
 npm run eval:preflight
 ```
