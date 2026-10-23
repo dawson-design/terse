@@ -10,8 +10,8 @@ written without it?
 
 ```sh
 npm run eval:preflight        # sign-in, isolation, skills, judge: under $0.10
-npm run eval:quick            # one pair per case: about 35 to 55 minutes
-npm run eval                  # five pairs per case: the acceptance run, 2 to 4 hours
+npm run eval:quick            # one pair per case
+npm run eval                  # five pairs per case: the acceptance run
 npm run eval:case -- email    # one pair of one case
 npm run eval:score -- evals/results/<run>   # recompute checks and the summary, no model calls
 npm run eval:judge -- evals/results/<run>   # re-judge saved drafts
@@ -25,6 +25,9 @@ model (default `claude-opus-5-5`), `--gen-effort` pins its effort, `--resume
 <run folder>` finishes an interrupted run with its original model, effort,
 and plugin version, rerunning any pair whose session failed, and `--keep`
 keeps the temporary workspaces.
+
+With `--concurrency 2` on 2026-10-22, `eval:quick` took 3 minutes and
+$3.11 of API-equivalent usage, and `eval` took 14 minutes and $15.61.
 
 ## What one pair does
 
