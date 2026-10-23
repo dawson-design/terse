@@ -1,6 +1,6 @@
 {
   "name": "terse",
-  "version": "0.14.0",
+  "version": "1.0.0",
   "description": "Skills for the documents engineering leads write: ADRs, PRDs, tech specs, PR descriptions, review comments, emails, and Slack messages, each structured and sized to industry practice and written in your voice.",
   "author": {
     "name": "Alastair Dawson"

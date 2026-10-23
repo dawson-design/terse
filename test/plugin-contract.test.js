@@ -10,7 +10,7 @@ describe('Codex plugin contract', () => {
 		const manifest = readJson('.codex-plugin/plugin.json');
 		expect(manifest).toMatchObject({
 			name: 'terse',
-			version: '0.14.0',
+			version: '1.0.0',
 			skills: './skills/',
 			interface: {
 				displayName: 'Terse',
@@ -33,14 +33,14 @@ describe('Codex plugin contract', () => {
 		}
 	});
 
-	it('keeps both host manifests and package metadata on version 0.14.0', () => {
+	it('keeps both host manifests and package metadata on version 1.0.0', () => {
 		const codex = readJson('.codex-plugin/plugin.json');
 		const claude = readJson('.claude-plugin/plugin.json');
 		const claudeMarketplace = readJson('.claude-plugin/marketplace.json');
 		const pkg = readJson('package.json');
 		expect([codex.version, claude.version, claudeMarketplace.metadata.version,
 			claudeMarketplace.plugins[0].version, pkg.version])
-			.toEqual(Array(5).fill('0.14.0'));
+			.toEqual(Array(5).fill('1.0.0'));
 	});
 
 	it('ships no hooks, so nothing runs when the user writes a file', () => {

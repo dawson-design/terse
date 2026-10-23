@@ -4,28 +4,59 @@ Notable changes to Terse. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the
 project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.0.0] (2026-10-23)
+
+Terse 1.0 is a rewrite. The sentence rules in earlier versions, the ones the
+Hemingway app and Grammarly apply, made agent prose choppier and harder to
+read than no plugin, and their evals only showed Terse passing its own
+checker. 1.0 is a set of
+skills for the documents an engineering lead writes, built on industry
+practice for structure and length.
 
 ### Added
 
-- A `nominalization` finding catches an action turned into a noun with its
-  actor dropped, as in "the validation of the schema" or "deletion happens
-  nightly". Its hint gives the verb to use.
-- An `abstract-verb` finding catches an empty verb on a listed abstract
-  quality, as in "ensures consistency" or "improves reliability". A number
-  after the quality, as in "improves performance by 40%", or a noun after it,
-  as in "availability zones", keeps the sentence clean.
+- Seven document skills: `adr`, `prd`, `tech-spec`, `pr-description`,
+  `pr-review`, `email`, and `slack`. Each holds its type's sections in order,
+  a length budget with sourced numbers, draft steps, a review checklist, and
+  the failures agent-written versions of that type tend to show.
+- `references/principles.md`: the rules every skill shares. The answer comes
+  first, the repo's conventions win, unknown facts become `[TBD: …]` rather
+  than inventions, and nothing is posted or sent unless you ask.
+- `references/claudisms.md` and `scripts/claudisms.mjs`: 114 phrases in ten
+  families, from performative candor to metaphor soup, and a matcher the
+  skills run after drafting. A voice template's Exceptions and sample
+  sentences allow the phrases the author uses. `--voice` prints the voice
+  the skills will use.
+- `docs/research/document-types.md`: the source of every structure and
+  length rule, each number labelled measured, originator guidance, or
+  convention.
+- A new eval runner, `scripts/eval.mjs`, with one case per document type.
+  Each case runs with and without Terse on the signed-in subscription. A
+  blind judge compares the drafts in both orders, deterministic checks score
+  structure, length, facts, and claudisms, and each session proves its
+  isolation from your CLAUDE.md files, settings, and personal voice.
 
 ### Changed
 
-- A hard sentence's hint now says to split only where the second half can
-  name its link to the first, or else to cut words. The style, draft, and edit
-  skills say the same, so a split keeps its `because`, `so`, or `but`.
-- The draft skill treats 25 words as a sentence ceiling, not a target.
-  "Connect with a period, colon, or comma" now applies only to replacing a
-  dash.
-- A quote after "not", "instead of", "rather than", or "never" is a
-  counter-example, and raises no word-level finding.
+- The voice skill no longer measures grade, passive voice, or adverbs, and
+  no longer writes `config.json`. It keeps the contrast with the default
+  voice, the yes-or-no trait questions, genre lengths, and the blind
+  recognition test. Its genres are the seven document types.
+- The voice sets tone, wording, and the order of an argument in long
+  documents. The answer or the ask still opens every document.
+
+### Removed
+
+- The `brainstorm`, `outline`, `draft`, `edit`, `style`, and `write` skills.
+- The PostToolUse hook and the style checker (`style-check.mjs`), with its
+  readability grade, sentence-length, passive-voice, adverb, qualifier, and
+  simpler-word rules.
+- The Harper grammar engine, the quote checker, the outline checker, the
+  highlight renderer, and `voice-profile.mjs`.
+- The Harbor eval suite (`eval/`), the legacy runner, and the old eval cases.
+- `~/.terse/config.json` and a project's `config.json` are no longer read,
+  except for a project's `"personal": false`. `maxGrade`, `targets`, and
+  `ignore` have no effect.
 
 ## [0.14.0] (2026-10-02)
 
