@@ -1,8 +1,0 @@
-{
-  "tasks": [
-    "generation-issue",
-    "generation-slack",
-    "generation-email",
-    "voice-email-length"
-  ]
-}

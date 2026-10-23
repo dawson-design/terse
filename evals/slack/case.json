@@ -1,0 +1,23 @@
+{
+  "id": "slack",
+  "docType": "slack",
+  "docLabel": "Slack thread reply",
+  "deliverable": "slack.md",
+  "budget": { "maxWords": 75, "minWords": 10 },
+  "structure": {
+    "noHeadings": true,
+    "lead": { "withinWords": 20, "mentionsAny": [["Tuesday", "June 8", "6/8", "Jun 8"]] }
+  },
+  "facts": [
+    { "id": "new-day", "any": ["Tuesday", "June 8", "6/8", "Jun 8"] },
+    { "id": "cause", "any": ["ZIP+4", "ZIP + 4", "ZIP"] }
+  ],
+  "judge": {
+    "reader": "Maria Chen, who asked in the thread and has to tell the call center",
+    "questions": [
+      "Does the first line answer her question (not Friday; Tuesday June 8)?",
+      "Does it give the reason in a few words, without headings, labels, or a memo structure?",
+      "Is it short enough to read in a notification preview?"
+    ]
+  }
+}

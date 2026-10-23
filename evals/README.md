@@ -1,90 +1,102 @@
-# Terse eval suite (legacy)
+# Evals
 
-This harness is legacy. The documented suite is the Harbor one in
-[`eval/README.md`](../eval/README.md). This harness stays because it has run
-live and Harbor has not. Its deletion waits for a passing live Harbor run.
+Each case asks for one document type from realistic notes. It runs once
+with Terse loaded and once without it, then a blind judge compares the two
+drafts. The question is the one Terse exists to answer: would the
+document's reader rather receive the draft written with Terse, or the one
+written without it?
 
-This suite proves the plugin's claim with A/B tests on both supported
-hosts. Each case runs once with Terse and once without it. The suite must
-show better prose with the plugin on, with no AI-tell editing signals in a
-plugin-on output.
+## Run
 
-Note: `claude plugin eval` is in early access. If it prints an
-early-access message, ask an Anthropic contact for enablement. The case
-files here match the documented format and run unchanged once enabled.
-
-Until then, `npm run eval:legacy:fallback` runs the same cases through
-headless `claude -p` sessions. The with arm loads the plugin via
-`--plugin-dir`; the without arm runs `--bare`. Regex graders score both
-arms; llm and tool_used graders wait for the real tool. The runner
-needs `ANTHROPIC_API_KEY` exported: `--bare` sessions never read OAuth,
-so a subscription login cannot carry them.
-
-`npm run eval:legacy:codex` runs four approved genres through the active
-Codex default model: README, explainer, launch post, and planted-tell edit. It uses
-ephemeral temporary workspaces with project rules disabled. The with arm sets
-`plugins."terse@terse".enabled=true`; the without arm changes only that value
-to `false`. Each arm uses an isolated Codex home that shares the installed
-plugin and authentication. This avoids CLI builds that ignore a nested `-c`
-plugin override. The report records the provider, CLI version, model slug, date,
-files, graders, and checker metrics. It requires a logged-in Codex CLI and a
-local `terse@terse` install. A failed preflight prints the install or login
-command needed to continue.
-
-## Run it
-
-```
-npm run eval:legacy          # full suite, 3 runs per case, cost-capped
-npm run eval:legacy:quick    # one run of the headline case
-npm run eval:legacy:codex    # four Codex genres, one run per arm
-npm run eval:legacy:codex:quick  # planted-tell Codex smoke evaluation
-node scripts/eval-score.mjs evals/results/latest.json   # re-score a past run
+```sh
+npm run eval:preflight        # sign-in, isolation, skills, judge: under $0.10
+npm run eval:quick            # one pair per case
+npm run eval                  # five pairs per case: the acceptance run
+npm run eval:case -- email    # one pair of one case
+npm run eval:score -- evals/results/<run>   # recompute checks and the summary, no model calls
+npm run eval:judge -- evals/results/<run>   # re-judge saved drafts
 ```
 
-Set `CODEX_BIN` when the executable to test is not first on `PATH`. The report
-records the version returned by that exact executable.
+The runner uses the `claude` CLI on your signed-in subscription and never an
+API key. Run `claude auth status` first: an expired login makes every
+session "succeed" at $0, and the preflight stops the run when it sees one.
+Flags: `--concurrency N` runs N pairs at once, `--model` sets the drafting
+model (default `claude-opus-5-5`), `--gen-effort` pins its effort, `--resume
+<run folder>` finishes an interrupted run with its original model, effort,
+and plugin version, rerunning any pair whose session failed, and `--keep`
+keeps the temporary workspaces.
 
-This spends real tokens. It is a local or nightly job, not per-push CI.
+With `--concurrency 2` on 2026-10-22, `eval:quick` took 3 minutes and
+$3.11 of API-equivalent usage, and `eval` took 14 minutes and $15.61.
 
-## Cases
+## What one pair does
 
-| Case | Proves | Deterministic graders |
-|---|---|---|
-| `claudism-removal` | Editing strips every tell family | regex not_contains per family (phrases, vocabulary, structures) on the edited file |
-| `grammar-repair` | Grammar-assistant parity with scope discipline | 16 planted errors gone (recall), original style intact (precision), comma splice fixed |
-| `generation-readme` | Fresh prose comes out clean and short | no tells in the produced README; under 200 words |
-| `generation-explainer` | Same, different genre | no tells in the produced explainer; under 200 words |
-| `generation-launch` | Fresh launch copy avoids model defaults | no tells in the produced post; under 200 words |
-| `quote-verification` | The gate catches altered and invented quotes | tampered wording gone, invented quote gone, verbatim quote kept |
+1. Both arms get the same prompt, input files, model, tools, and flags, in a
+   fresh folder outside the repo. The only difference is `--plugin-dir`,
+   which points at a hashed copy of the plugin taken when the run starts.
+   Every session runs that one version, and the copy holds none of `evals/`,
+   so the plugin arm can't read the cases or the judge prompt. Sessions may
+   run Bash, so they run commands on your machine, inside their temporary
+   folder.
+   `--setting-sources ""` keeps your CLAUDE.md files, settings, and installed
+   plugins out of both arms, and a `.terse/config.json` with
+   `"personal": false` keeps your personal voice out of the plugin arm.
+2. Each session's stream and hook log prove the isolation. A SessionStart
+   hook shows the hooks ran, and no InstructionsLoaded event means no memory
+   file loaded. The plugin arm lists Terse, the bare arm doesn't, and both
+   use the same model. A pair that fails any of these is invalid.
+3. The judge (`claude-sonnet-5-5` at low effort, no tools) sees the request,
+   every input file, and the two drafts as A and B, with the word "terse"
+   masked. It scores both on structure, length, the clarity of the ask,
+   accuracy, and how human the draft reads, then picks one. It runs twice
+   with the drafts swapped, and orders that disagree count as a tie. The
+   judge never sees the claudism list or the deterministic checks. The
+   prompt is `judge-prompt.md`.
+4. Deterministic checks score each draft: required sections in order or the
+   short-form shape, the word budget, required facts, and claudisms.
 
-Each case adds two more graders. An `llm` grader judges what patterns
-cannot: facts preserved, content accurate. A `tool_used: Skill` indicator
-shows whether a terse skill fired in the with-arm. Ablation leaves the
-indicator out of the score. If it never fires, the case measured nothing;
-fix the skill descriptions, not the prose.
+A draft that never appears forfeits the pair. A session that crashes with no
+output, hits a rate limit, or times out is retried.
 
-Prompts never mention Terse or its skills by name. Automatic activation is
-part of what is under test. Direct invocation belongs in the separate CLI and
-Desktop smoke checks.
+## The acceptance bar
 
-## Reading results
+The bar was set before the first full run and stays fixed.
 
-`aggregate-result.json` holds per-arm grader scores, and the eval's own
-summary shows the delta per case. `scripts/eval-score.mjs` then runs the
-checker over every produced document. It prints flags per thousand words,
-AI-tell count, and grade per arm.
+- Validity, or the run exits 2: the preflight passed, every case has its
+  pairs, and every pair is isolated and comparable.
+- Quality, or the run exits 1:
+  1. the matching skill fired on every plugin run;
+  2. plugin wins are at least bare wins on 5 of 7 cases;
+  3. no case has zero plugin wins;
+  4. a one-sided sign test on decisive pairs gives p < 0.05;
+  5. every plugin draft passes structure, budget, and facts;
+  6. in every case, the plugin's claudisms are at most the bare arm's.
 
-Acceptance bar:
+`eval:quick` gates validity and rules 1, 5, and 6. With one pair per case,
+its pairwise results are a readout.
 
-- with-arm AI tells equal zero on every produced document
-- a clean with-arm never has more flags than its paired output; a zero/zero
-  tie passes because no result can improve below zero
-- at least one style case in the full suite has fewer total flags with Terse
-- grammar-repair recall and precision graders pass in the with-arm
-- the skill-fired indicator is positive in every with-arm run
-- all supplied facts survive the planted edit and generation content graders
+## Results
 
-The without-arm need not fail every individual tell grader. The required
-contrast is fewer total flags in each with-arm output. If authentication or
-skill telemetry is unavailable, the runner fails with an actionable message
-and the live A/B claim remains unproven.
+Each run writes `evals/results/<UTC stamp>/` with `results.json`,
+`summary.md`, and per pair the two drafts, both streams, both hook logs, and
+both judge verdicts. `evals/results/LATEST` names the newest run. The folder
+is gitignored.
+
+## Add a case
+
+Create `evals/<doc-type>/` with:
+
+- `case.json`: `id`, `docType`, `docLabel`, `deliverable`,
+  `budget.maxWords` (and `minWords`), `structure` (`sections` with
+  `aliases`, or `subjectLine`, `noHeadings`, `lead`, `mentionOrder`),
+  `facts` (each an `id` and literal `any` alternatives), and `judge`
+  (`reader`, `questions`). See `scripts/eval/cases.mjs`.
+- `prompt.md`: the request as a person would type it, after the one-shot
+  line. Never name Terse.
+- `workspace/`: the input files.
+- `fixture/` for a case that needs a git branch: `repo/` holds the files on
+  `main`, and `commits/` holds `git format-patch main..HEAD` output. The
+  runner rebuilds the repo with fixed names and dates.
+
+`test/eval/cases.test.js` checks that the case's word ceiling and required
+sections appear in its skill's `SKILL.md`.

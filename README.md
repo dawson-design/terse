@@ -1,26 +1,81 @@
 # Terse
 
-Terse is a writing system for Codex and Claude Code. It combines a local
-checker with skills for planning, drafting, and editing prose. The checker
-finds mechanical faults. The skills decide how to fix them without replacing
-the writer's voice.
+Terse is a set of skills for Claude Code and Codex that write and review
+software engineering documents: ADRs, PRDs, tech specs, PR descriptions,
+PR review comments, emails, and Slack messages. Each skill
+holds that document type's industry practice for structure and length,
+writes in your voice, and never posts or sends anything unless you ask.
 
-## How it works
+Terse 1.0 replaces everything that came before it. Earlier versions checked
+sentences the way the Hemingway app and Grammarly do: grade level, sentence
+length, passive voice, adverbs. A hook enforced those rules on every save,
+and agent prose came out choppier and harder to read than with no plugin.
+1.0 removes the checker, the hook, and the generic outline, draft, and edit
+workflow. It keeps one sentence-level check, a list of phrases that mark
+model-written text, and your voice template.
 
-Terse has two layers:
+## Skills
 
-- **Mechanical checks** run offline in `scripts/style-check.mjs`. They cover
-  readability, passive voice, adverbs, and qualifiers. They also find wordy
-  phrases, grammar faults, long asides, and common model-writing patterns.
-  The checker reports a file,
-  line, category, matched text, and suggested fix for each finding.
-- **Writing skills** apply judgment. They preserve a useful passive, keep a
-  meaningful hedge, and follow an approved voice template. They also check
-  structure, evidence, flow, and the reader's needs.
+Codex uses `$terse:*`; Claude Code uses `/terse:*`. Each skill also starts
+on its own when you ask for its document ("write an ADR for this", "draft
+the PR description", "reply to Maria on Slack").
 
-The [GPT and Codex research note](docs/research/gpt-writing-tells.md) records
-the evidence and false-positive limits behind model-writing signals. Those
-signals guide edits; they do not identify who wrote a passage.
+| Skill | For | Default length |
+|---|---|---|
+| `adr` | Recording one architecture decision: the forces, the decision, the options that lost, and what it costs | 400 to 600 words, at most 1,000 |
+| `prd` | Agreeing on the problem, who has it, success metrics, and requirements, before any design | a one-pager of about 600 words; a full PRD near 1,500 |
+| `tech-spec` | A design doc or RFC: how we'll build it, and why this design beats the alternatives | a mini spec of 500 to 1,500 words; larger specs from an approved skeleton |
+| `pr-description` | The title and body of a pull request, from the diff, commits, linked issue, and the repo's template | 150 words for a typical change |
+| `pr-review` | Turning review findings into labelled inline comments and a summary that opens on the verdict | three sentences a comment, 60 words of summary |
+| `email` | One ask, first, in a subject and a few sentences | 125 words for a request |
+| `slack` | A post, thread reply, DM, or announcement whose first line carries it | 50 words for a reply, 100 for an announcement |
+| `voice` | Learning your voice from your past writing | |
+
+Every length is a ceiling, and every number cites its source in
+[`docs/research/document-types.md`](docs/research/document-types.md),
+labelled as measured, the format owner's guidance, or convention.
+
+## How the skills work
+
+The shared rules are in [`references/principles.md`](references/principles.md):
+
+- The answer opens the document: the decision, the recommendation, the ask,
+  or the news.
+- Your repo's template and conventions win over the defaults. That includes
+  an existing ADR log and its numbering, a PR template, and your team's
+  review labels.
+- Nothing gets invented. A missing metric, owner, date, or test result
+  becomes `[TBD: what is missing]` in a long document, and a question to you
+  in a short one.
+- Writing is not sending. `gh pr create`, `gh pr review`, email, and Slack
+  run only when you ask for that action.
+- After drafting, each skill scans for the phrases in
+  [`references/claudisms.md`](references/claudisms.md) and rewrites the
+  sentences that use them. The list covers performative candor, the
+  "isn't X, it's Y" reframe, hedging connectives, and metaphors like
+  "blast radius". `node scripts/claudisms.mjs <file>` runs the same scan.
+- The ADR, PRD, and tech-spec skills run a split test from
+  [`references/splitting.md`](references/splitting.md) on a skeleton and
+  first in a review. A document that cutting can't bring under its type's
+  split point, or that holds more than a page of another document type,
+  such as a runbook or a task list, gets a split plan before any rewrite.
+  `node scripts/outline.mjs <file>` prints the word count of each section.
+
+## Your voice
+
+`/terse:voice` (or `$terse:voice`) learns your voice from your past writing:
+a folder of Markdown or text files, your GitHub PRs and issues, or, with your
+consent, a connected document or mail tool. It sets aside samples dense with
+model phrasing, asks yes-or-no questions backed by your own sentences, and
+runs a blind test before you approve: can you pick its writing as yours?
+
+Your voice lives in `~/.terse/voice.md` and follows you into every project.
+A project can hold its own `.terse/voice.md`, which the skills use in its
+place. A project that sets `"personal": false` in `.terse/config.json`
+leaves your personal voice out. The voice sets tone and wording, and in long
+documents the order of the argument. The answer still comes first.
+`node scripts/claudisms.mjs --voice <folder>` prints the voice the skills will
+use for documents in that folder.
 
 ## Install
 
@@ -28,158 +83,35 @@ Terse requires Node.js 18 or newer.
 
 ### Codex Desktop and CLI
 
-Add the repository marketplace and install Terse from a terminal:
-
 ```sh
 codex plugin marketplace add kreek/terse
 codex plugin add terse@terse
 ```
 
-Codex Desktop and the CLI use the same plugin profile. Restart Desktop and
-start a new task after an install or update. Codex asks you to review and
-trust the bundled hook before it runs.
+Restart Desktop and start a new task after an install or update.
 
 ### Claude Code
-
-Keep the existing marketplace and command surface:
 
 ```text
 /plugin marketplace add kreek/terse
 /plugin install terse@terse
 ```
 
-## Skills
+## Evals
 
-Codex uses `$terse:*`; Claude Code uses `/terse:*`.
-
-| Codex | Claude Code | Purpose |
-|---|---|---|
-| `$terse:write <subject>` | `/terse:write <subject>` | Run the full outline, draft, and edit workflow. |
-| `$terse:brainstorm <topic>` | `/terse:brainstorm <topic>` | Settle the reader, question, and governing thought. |
-| `$terse:outline <subject>` | `/terse:outline <subject>` | Agree on claims, evidence, order, and word budgets. |
-| `$terse:draft <outline or subject>` | `/terse:draft <outline or subject>` | Expand an approved outline or write a short document. |
-| `$terse:edit <file>` | `/terse:edit <file>` | Report or fix findings in an existing document. |
-| `$terse:style` | `/terse:style` | Apply the shared voice and clarity rules. |
-| `$terse:voice [samples]` | `/terse:voice [samples]` | Learn or refresh your voice from your past writing. |
-
-The full workflow has two approval points: the outline and a short skeleton.
-Each file remains beside the finished document as a record of the agreed
-structure. A scripted session can continue through both points when the
-request grants approval in advance.
-
-## Voice and project settings
-
-The voice skill learns your voice from your past writing. It reads a folder of
-Markdown or text files or your GitHub PRs and issues. With your consent, it
-also reads a connected document or mail tool. It sets aside samples dense with AI tells, then asks
-yes-or-no questions backed by your own sentences. Before you approve, it runs
-a blind test: can you pick its writing as yours?
-
-Your voice lives in `~/.terse/voice.md` and follows you into every project. A
-project can hold its own `.terse/voice.md`, which the skills use in its place
-inside that project.
-Measured sentence length, grade, hedging, and recorded exceptions then bound
-later drafts and edits.
-
-Each common genre has a default length and shape. A Slack message stays a
-sentence or two, and an email stays under 125 words. The defaults are in
-`skills/style/references/document-lengths.md`, and their sources are in
-`docs/research/document-lengths.md`. When the voice skill
-learns your voice, keep samples of one genre together, such as `samples/email/`.
-With three or more, the voice records that genre's length, and it replaces the
-default.
-
-Checker settings live in `.terse/config.json`. The checker reads your personal
-`~/.terse/config.json` and layers the nearest project file over it. Project
-keys replace personal ones, `ignore` lists combine, and `targets` merge rate
-by rate. A project can add keeps to your voice but cannot remove one. A
-project with a house style sets `"personal": false` to leave your voice out,
-so local checks match CI. This example enables broad US spelling and adds project words:
-
-```json
-{
-  "grammar": {
-    "spelling": true,
-    "dialect": "american",
-    "words": ["Terse", "ProseMirror"]
-  }
-}
-```
-
-The same file can set `maxGrade`, enable `impersonal` checks, select `targets`,
-or ignore a category or match. Without broad spelling, Terse still runs its
-small typo list, conservative grammar patterns, and pinned offline grammar
-engine.
-
-To keep a finding in one paragraph, record the reason in the document:
-
-```html
-<!-- terse-ignore -->
-This paragraph keeps every finding.
-
-<!-- terse-ignore: em-dash, qualifier -->
-This paragraph keeps only the named categories.
-```
-
-## Automatic checks
-
-The trusted plugin hook checks each Markdown write or edit. Claude Code sends
-a file path. Codex sends an `apply_patch` command. Terse reads every added,
-updated, or moved Markdown path and reports only findings that overlap added
-text. A deletion and an unrelated tool event stay silent.
-
-## Command-line checks
-
-Run the style and outline checks:
-
-```sh
-node scripts/style-check.mjs draft.md
-node scripts/style-check.mjs draft.md --max-grade 8
-node scripts/style-check.mjs draft.md --json
-node scripts/style-check.mjs issue.md --impersonal
-node scripts/outline-check.mjs draft.md
-node scripts/voice-profile.mjs ~/writing
-```
-
-Exit code 0 means clean, 1 means findings remain, and 2 means the check could
-not run. `voice-profile.mjs` measures a folder of samples for the voice skill
-and exits 0 unless it cannot read them. `checkText` exposes synchronous readability and style results to
-code. `checkDocument` adds the offline grammar engine for the CLI, hook,
-preview, and eval scorer.
-
-Generate a self-contained highlight page with:
-
-```sh
-node scripts/render-highlights.mjs draft.md
-```
-
-## Verify quotations
-
-The quote checker compares each quotation with its linked source:
-
-```sh
-node scripts/quote-check.mjs draft.md
-node scripts/quote-check.mjs draft.md --offline
-node scripts/quote-check.mjs draft.md --json
-```
-
-It reports missing sources, changed words, and plain links that lack a text
-fragment. Offline mode makes no network request.
+[`evals/`](evals/README.md) holds one case per document type. Each case runs
+with and without Terse, and a blind judge picks the draft a principal
+engineer would rather receive. Deterministic checks cover structure, length,
+facts, and claudisms. The README there gives the commands and the acceptance
+bar.
 
 ## Develop
 
 ```sh
-npm ci
-npm test
-npm run benchmark:grammar
+npm test                 # manifests, skill files, the claudism list, the outline, the eval runner
+npm run claudisms -- draft.md
+npm run eval:preflight
 ```
-
-The eval suite runs on Harbor, and [`eval/README.md`](eval/README.md)
-documents it. The legacy harness in `evals/` stays until a live Harbor run
-passes, because it is the only one that has run live.
-
-The committed Codex marketplace points to this GitHub repository. Start a new
-Codex task after reinstalling so the host loads the current skills and hook.
 
 ## License
 

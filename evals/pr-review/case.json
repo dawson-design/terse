@@ -1,0 +1,28 @@
+{
+  "id": "pr-review",
+  "docType": "pr-review",
+  "docLabel": "code review (inline comments plus a summary)",
+  "deliverable": "review.md",
+  "budget": { "maxWords": 350, "minWords": 100 },
+  "structure": {
+    "lead": { "withinWords": 50, "mentionsAny": [["request changes", "requesting changes", "changes requested", "request_changes"]] },
+    "mentionOrder": [["ssn"], ["n+1", "includes("], ["draft_data"]]
+  },
+  "facts": [
+    { "id": "ssn-line", "any": ["drafts_controller.rb:41", "controller.rb:41", "line 41"] },
+    { "id": "ownership-line", "any": ["drafts_controller.rb:18", "controller.rb:18", "line 18"] },
+    { "id": "ownership", "any": ["current_user"] },
+    { "id": "n-plus-one", "any": ["N+1", "n+1"] },
+    { "id": "expired-spec", "any": ["expired", "30 days", "30-day"] },
+    { "id": "ttl-question", "any": ["60 days", "60-day"] }
+  ],
+  "judge": {
+    "reader": "Sam Okafor, the PR's author, a mid-level engineer who will act on each comment",
+    "questions": [
+      "Can the author tell from each comment alone whether it blocks the merge?",
+      "Does the review open with the verdict, with the two security findings ahead of everything else?",
+      "Does it stay within the reviewer's notes, adding no findings of its own and overstating none?",
+      "Is the 30-day question asked as a question, and the naming point offered as optional?"
+    ]
+  }
+}

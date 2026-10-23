@@ -1,0 +1,27 @@
+{
+  "id": "email",
+  "docType": "email",
+  "docLabel": "email",
+  "deliverable": "email.md",
+  "budget": { "maxWords": 125, "minWords": 35 },
+  "structure": {
+    "subjectLine": true,
+    "noHeadings": true,
+    "lead": { "withinWords": 40, "mentionsAny": [["June 18", "18 June", "6/18", "Jun 18"], ["approve", "approval", "sign off", "sign-off", "go-ahead"]] }
+  },
+  "facts": [
+    { "id": "old-date", "any": ["June 4", "4 June", "6/4", "Jun 4"] },
+    { "id": "new-date", "any": ["June 18", "18 June", "6/18", "Jun 18"] },
+    { "id": "reason", "any": ["two high", "2 high", "high-severity", "high severity"] },
+    { "id": "answer-by", "any": ["May 27", "Thursday"] },
+    { "id": "why-by", "any": ["call center", "call centre", "contact center"] }
+  ],
+  "judge": {
+    "reader": "Maria Chen, the agency product owner, who reads email between meetings",
+    "questions": [
+      "Does the email ask for one decision and state it in the subject and the first two sentences?",
+      "Does it give the reason (two high-severity findings that block release) without alarm or excess detail?",
+      "Does it say when the answer is needed and why (the call center needs notice)?"
+    ]
+  }
+}

@@ -11,5 +11,6 @@ const home = join(tmpdir(), 'terse-test-home');
 mkdirSync(home, { recursive: true });
 
 export default defineConfig({
-	test: { pool: 'forks', env: { HOME: home, USERPROFILE: home } },
+	// Only the plugin's tests: the PR eval fixture carries its own node:test file.
+	test: { include: ['test/**/*.test.js'], pool: 'forks', env: { HOME: home, USERPROFILE: home } },
 });

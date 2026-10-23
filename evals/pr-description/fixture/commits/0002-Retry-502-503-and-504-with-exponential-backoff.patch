@@ -1,0 +1,72 @@
+From 7b6de3bd17fe1edb8166a65017826c35c8ee1c5f Mon Sep 17 00:00:00 2001
+From: Dana Reyes <dana@example.gov>
+Date: Wed, 7 Oct 2026 10:40:00 +0000
+Subject: [PATCH 2/3] Retry 502, 503, and 504 with exponential backoff
+
+The intake API returns 503 during its nightly batch window and 504 when
+the mainframe is slow. Retry those up to three times with full-jitter
+backoff from 500 ms, capped at 8 s. Every retry reuses the claim's
+idempotency key. A 4xx still fails at once.
+---
+ src/claimClient.js | 38 ++++++++++++++++++++++++++++----------
+ 1 file changed, 28 insertions(+), 10 deletions(-)
+
+diff --git a/src/claimClient.js b/src/claimClient.js
+index dd8b389..c222878 100644
+--- a/src/claimClient.js
++++ b/src/claimClient.js
+@@ -1,23 +1,41 @@
+ // Submits unemployment insurance claims to the state intake API.
+ import { randomUUID } from 'node:crypto';
+ 
++const RETRYABLE = new Set([502, 503, 504]);
++const MAX_RETRIES = 3;
++const BASE_DELAY_MS = 500;
++const MAX_DELAY_MS = 8000;
++
++const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
++
++// Full jitter: a random delay up to the exponential cap, so retries from many
++// claimants don't arrive together.
++export function backoffDelay(attempt, random = Math.random) {
++	return Math.floor(random() * Math.min(MAX_DELAY_MS, BASE_DELAY_MS * 2 ** attempt));
++}
++
+ export class ClaimClient {
+-	constructor({ baseUrl, fetchImpl = fetch }) {
++	constructor({ baseUrl, fetchImpl = fetch, sleep = wait, random = Math.random }) {
+ 		this.baseUrl = baseUrl;
+ 		this.fetch = fetchImpl;
++		this.sleep = sleep;
++		this.random = random;
+ 	}
+ 
+ 	// The intake API treats POSTs that share an Idempotency-Key as one
+-	// submission for 24 hours.
++	// submission for 24 hours, so every retry reuses the same key.
+ 	async submit(claim, { idempotencyKey = randomUUID() } = {}) {
+-		const response = await this.fetch(`${this.baseUrl}/claims`, {
+-			method: 'POST',
+-			headers: { 'Content-Type': 'application/json', 'Idempotency-Key': idempotencyKey },
+-			body: JSON.stringify(claim),
+-		});
+-		if (!response.ok) {
+-			throw new Error(`intake API returned ${response.status}`);
++		for (let attempt = 0; ; attempt++) {
++			const response = await this.fetch(`${this.baseUrl}/claims`, {
++				method: 'POST',
++				headers: { 'Content-Type': 'application/json', 'Idempotency-Key': idempotencyKey },
++				body: JSON.stringify(claim),
++			});
++			if (response.ok) return response.json();
++			if (!RETRYABLE.has(response.status) || attempt === MAX_RETRIES) {
++				throw new Error(`intake API returned ${response.status}`);
++			}
++			await this.sleep(backoffDelay(attempt, this.random));
+ 		}
+-		return response.json();
+ 	}
+ }
+-- 
+2.50.1 (Apple Git-155)
+

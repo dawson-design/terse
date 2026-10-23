@@ -1,0 +1,32 @@
+{
+  "id": "adr",
+  "docType": "adr",
+  "docLabel": "architecture decision record (ADR)",
+  "deliverable": "docs/adr/0014-cache-claim-status.md",
+  "budget": { "maxWords": 1000, "minWords": 200 },
+  "structure": {
+    "sections": [
+      { "name": "Context", "aliases": ["Context and problem statement", "Background"] },
+      { "name": "Decision", "aliases": ["Decision outcome"] },
+      { "name": "Options considered", "aliases": ["Considered options", "Alternatives", "Alternatives considered", "Options"] },
+      { "name": "Consequences" }
+    ]
+  },
+  "facts": [
+    { "id": "redis", "any": ["Redis", "ElastiCache"] },
+    { "id": "ttl", "any": ["10-minute", "10 minute", "ten-minute", "ten minute", "10 min"] },
+    { "id": "circuit-breaker", "any": ["circuit breaker", "circuit-breaker"] },
+    { "id": "snapshot", "any": ["snapshot"] },
+    { "id": "latency", "any": ["4.2"] },
+    { "id": "pii", "any": ["PII", "personally identifiable"] }
+  ],
+  "judge": {
+    "reader": "an engineer joining the team next year who wants to know why claim status is cached and whether they can change it",
+    "questions": [
+      "Does the title state the decision, and does the record commit to it plainly?",
+      "Does it give the two rejected options with the reasons the notes give, and no options the notes don't mention?",
+      "Does it state the costs (up to 10 minutes stale, no invalidation, errors on a miss during an outage) as well as the benefits?",
+      "Does it follow the format of the team's existing ADR, and leave the cache-warming question open rather than deciding it?"
+    ]
+  }
+}

@@ -1,7 +1,7 @@
 {
   "name": "terse",
-  "version": "0.14.0",
-  "description": "Clear professional writing with deterministic style checks and edits that preserve the writer's voice.",
+  "version": "1.0.0",
+  "description": "Skills for software engineering documents: ADRs, PRDs, tech specs, PR descriptions, review comments, emails, and Slack messages, each structured and sized to industry practice and written in your voice.",
   "author": {
     "name": "Alastair Dawson"
   },
@@ -10,9 +10,13 @@
   "license": "MIT",
   "keywords": [
     "writing",
-    "editing",
-    "readability",
-    "style",
+    "adr",
+    "prd",
+    "design-doc",
+    "pull-request",
+    "code-review",
+    "email",
+    "slack",
     "codex",
     "claude-code",
     "agent-skills"
